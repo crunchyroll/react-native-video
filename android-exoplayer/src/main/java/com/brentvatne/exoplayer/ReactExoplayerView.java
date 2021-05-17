@@ -152,6 +152,7 @@ class ReactExoplayerView extends FrameLayout implements
     private ReadableArray textTracks;
     private boolean disableFocus;
     private boolean disableBuffering;
+    private boolean disableDisconnectError;
     private boolean preventsDisplaySleepDuringVideoPlayback = true;
     private float mProgressUpdateInterval = 250.0f;
     private boolean playInBackground = false;
@@ -528,6 +529,7 @@ class ReactExoplayerView extends FrameLayout implements
     private MediaSource buildMediaSource(Uri uri, String overrideExtension, DrmSessionManager drmSessionManager) {
         int type = Util.inferContentType(!TextUtils.isEmpty(overrideExtension) ? "." + overrideExtension
                 : uri.getLastPathSegment());
+        config.setDisableDisconnectError(this.disableDisconnectError);
         switch (type) {
             case C.TYPE_SS:
                 return new SsMediaSource.Factory(
@@ -1319,6 +1321,10 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setDisableBuffering(boolean disableBuffering) {
         this.disableBuffering = disableBuffering;
+    }
+
+    public void setDisableDisconnectError(boolean disableDisconnectError) {
+        this.disableDisconnectError = disableDisconnectError;
     }
 
     public void setFullscreen(boolean fullscreen) {
