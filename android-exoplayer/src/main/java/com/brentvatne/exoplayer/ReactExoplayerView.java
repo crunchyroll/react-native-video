@@ -81,6 +81,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @SuppressLint("ViewConstructor")
 class ReactExoplayerView extends FrameLayout implements
@@ -416,7 +418,7 @@ class ReactExoplayerView extends FrameLayout implements
         }
     }
 
-    private startBufferCheckTimer() {
+    private void startBufferCheckTimer() {
         SimpleExoPlayer player = this.player;
         VideoEventEmitter eventEmitter = this.eventEmitter;
 
@@ -438,7 +440,7 @@ class ReactExoplayerView extends FrameLayout implements
         this.bufferCheckTimer.scheduleAtFixedRate(bufferCheckTimerTask, 500, 1000);
     }
 
-    private stopBufferCheckTimer() {
+    private void stopBufferCheckTimer() {
         this.bufferCheckTimer.cancel();
         this.bufferCheckTimer = null;
     }
