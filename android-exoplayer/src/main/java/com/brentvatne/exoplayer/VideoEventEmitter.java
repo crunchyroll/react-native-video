@@ -211,7 +211,7 @@ class VideoEventEmitter {
         receiveEvent(EVENT_BUFFER, map);
     }
 
-    void bufferProgress(int start, int end) {
+    void bufferProgress(double start, double end) {
         WritableMap map = Arguments.createMap();
         map.putDouble(EVENT_PROP_BUFFER_START, start);
         map.putDouble(EVENT_PROP_BUFFER_END, end);
