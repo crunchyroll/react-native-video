@@ -137,6 +137,7 @@ class ReactExoplayerView extends FrameLayout implements
     private int bufferForPlaybackAfterRebufferMs = DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS;
 
     private Handler mainHandler;
+    private Timer bufferCheckTimer;
 
     // Props from React
     private int backBufferDurationMs = DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS;
@@ -415,6 +416,33 @@ class ReactExoplayerView extends FrameLayout implements
         }
     }
 
+    private startBufferCheckTimer() {
+        SimpleExoPlayer player = this.player;
+        VideoEventEmitter eventEmitter = this.eventEmitter;
+
+        if (this.bufferCheckTimer != null) {
+            this.stopBufferCheckTimer();
+        }
+
+        this.bufferCheckTimer = new Timer();
+        TimerTask bufferCheckTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (player != null) {
+                    double bufferedDuration = (double) (player.getBufferedPercentage() * player.getDuration() / 100);
+                    eventEmitter.bufferProgress(0d, bufferedDuration);
+                }
+            };
+        };
+
+        this.bufferCheckTimer.scheduleAtFixedRate(bufferCheckTimerTask, 500, 1000);
+    }
+
+    private stopBufferCheckTimer() {
+        this.bufferCheckTimer.cancel();
+        this.bufferCheckTimer = null;
+    }
+
     private void initializePlayer() {
         ReactExoplayerView self = this;
         // This ensures all props have been settled, to avoid async racing conditions.
@@ -506,6 +534,7 @@ class ReactExoplayerView extends FrameLayout implements
                 initializePlayerControl();
                 setControls(controls);
                 applyModifiers();
+                startBufferCheckTimer();
             }
         }, 1);
     }
@@ -597,6 +626,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     private void releasePlayer() {
         if (player != null) {
+            stopBufferCheckTimer();
             updateResumePosition();
             player.release();
             player.removeMetadataOutput(this);
