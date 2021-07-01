@@ -421,6 +421,7 @@ class ReactExoplayerView extends FrameLayout implements
     private void startBufferCheckTimer() {
         SimpleExoPlayer player = this.player;
         VideoEventEmitter eventEmitter = this.eventEmitter;
+        Handler mainHandler = this.mainHandler;
 
         if (this.bufferCheckTimer != null) {
             this.stopBufferCheckTimer();
@@ -430,9 +431,15 @@ class ReactExoplayerView extends FrameLayout implements
         TimerTask bufferCheckTimerTask = new TimerTask() {
             @Override
             public void run() {
-                if (player != null) {
-                    double bufferedDuration = (double) (player.getBufferedPercentage() * player.getDuration() / 100);
-                    eventEmitter.bufferProgress(0d, bufferedDuration);
+                if (mainHandler != null) {
+                    mainHandler.post(new Runnable() {
+                        public void run() {
+                            if (player != null) {
+                                double bufferedDuration = (double) (player.getBufferedPercentage() * player.getDuration() / 100);
+                                eventEmitter.bufferProgress(0d, bufferedDuration);
+                            }
+                        }
+                    });
                 }
             };
         };
