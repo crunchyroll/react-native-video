@@ -1085,13 +1085,18 @@ static int const RCTVideoUnset = -1;
       // Fallback on earlier versions
   }
 
+  NSLog(@"************ APPLY MODIFIERS");
   if (_player != nil) {
+    NSLog(@"************ PLAYR EXISTS");
     if (_disableBuffering) {
+      NSLog(@"************ DISABLING BUFFERING");
       [_player replaceCurrentItemWithPlayerItem:nil];
     } else {
+      NSLog(@"************ ENABLING BUFFERING");
       [_player replaceCurrentItemWithPlayerItem:_playerItem];
     }
   }
+  NSLog(@"************ PLAYER DOES NOT EXIST");
   
   [self setDisableBuffering: _disableBuffering];
   [self setMaxBitRate:_maxBitRate];
