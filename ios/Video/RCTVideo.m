@@ -60,6 +60,7 @@ static int const RCTVideoUnset = -1;
   float _rate;
   float _maxBitRate;
 
+  BOOL _disableBuffering;
   BOOL _automaticallyWaitsToMinimizeStalling;
   BOOL _muted;
   BOOL _paused;
@@ -96,6 +97,7 @@ static int const RCTVideoUnset = -1;
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher
 {
   if ((self = [super init])) {
+    _disableBuffering = NO;
     _eventDispatcher = eventDispatcher;
 	  _automaticallyWaitsToMinimizeStalling = YES;
     _playbackRateObserverRegistered = NO;
@@ -169,6 +171,7 @@ static int const RCTVideoUnset = -1;
 - (CMTime)playerItemDuration
 {
   AVPlayerItem *playerItem = [_player currentItem];
+    [playerItem buffer]
   if (playerItem.status == AVPlayerItemStatusReadyToPlay)
   {
     return([playerItem duration]);
@@ -839,6 +842,12 @@ static int const RCTVideoUnset = -1;
 
 #pragma mark - Prop setters
 
+- (void)setDisableBuffering: (BOOL) disableBuffering
+{
+  _disableBuffering = disableBuffering;
+  [self applyModifiers];
+}
+
 - (void)setResizeMode:(NSString*)mode
 {
   if( _controls )
@@ -1075,7 +1084,16 @@ static int const RCTVideoUnset = -1;
   } else {
       // Fallback on earlier versions
   }
+
+  if (_player != nil) {
+    if (_disableBuffering) {
+      [_player replaceCurrentItemWithPlayerItem:nil];
+    } else {
+      [_player replaceCurrentItemWithPlayerItem:_playerItem];
+    }
+  }
   
+  [self setDisableBuffering: _disableBuffering];
   [self setMaxBitRate:_maxBitRate];
   [self setSelectedAudioTrack:_selectedAudioTrack];
   [self setSelectedTextTrack:_selectedTextTrack];

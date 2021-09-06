@@ -18,6 +18,7 @@ RCT_EXPORT_MODULE();
     return self.bridge.uiManager.methodQueue;
 }
 
+RCT_EXPORT_VIEW_PROPERTY(disableBuffering, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(src, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(drm, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(maxBitRate, float);
