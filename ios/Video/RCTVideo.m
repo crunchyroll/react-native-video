@@ -171,7 +171,6 @@ static int const RCTVideoUnset = -1;
 - (CMTime)playerItemDuration
 {
   AVPlayerItem *playerItem = [_player currentItem];
-    [playerItem buffer]
   if (playerItem.status == AVPlayerItemStatusReadyToPlay)
   {
     return([playerItem duration]);
@@ -1097,8 +1096,7 @@ static int const RCTVideoUnset = -1;
     }
   }
   NSLog(@"************ PLAYER DOES NOT EXIST");
-  
-  [self setDisableBuffering: _disableBuffering];
+
   [self setMaxBitRate:_maxBitRate];
   [self setSelectedAudioTrack:_selectedAudioTrack];
   [self setSelectedTextTrack:_selectedTextTrack];
