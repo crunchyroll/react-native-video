@@ -1089,12 +1089,18 @@ static int const RCTVideoUnset = -1;
     NSLog(@"************ PLAYR EXISTS");
     if (_disableBuffering) {
       NSLog(@"************ DISABLING BUFFERING");
-      //[_player replaceCurrentItemWithPlayerItem:nil];
-      _playerItem.preferredForwardBufferDuration = 0.01;
+      if (_player.currentTime.seconds > 0) {
+        _playerItem.preferredForwardBufferDuration = 1;
+      } else {
+        [_player replaceCurrentItemWithPlayerItem:nil];
+      }
     } else {
       NSLog(@"************ ENABLING BUFFERING");
-      //[_player replaceCurrentItemWithPlayerItem:_playerItem];
-      _playerItem.preferredForwardBufferDuration = _preferredForwardBufferDuration;
+      if (_player.currentTime.seconds > 0) {
+        _playerItem.preferredForwardBufferDuration = _preferredForwardBufferDuration;
+      } else {
+        [_player replaceCurrentItemWithPlayerItem:_playerItem];
+      }  
     }
   }
   NSLog(@"************ PLAYER DOES NOT EXIST");
