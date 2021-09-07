@@ -96,6 +96,7 @@ static int const RCTVideoUnset = -1;
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher
 {
   if ((self = [super init])) {
+    _allowCellularAccess = YES;
     _eventDispatcher = eventDispatcher;
 	  _automaticallyWaitsToMinimizeStalling = YES;
     _playbackRateObserverRegistered = NO;
@@ -417,6 +418,10 @@ static int const RCTVideoUnset = -1;
   _drm = drm;
 }
 
+- (void)setAllowCellularAccess:(BOOL) allowCellularAccess {
+  _allowCellularAccess = allowCellularAccess;
+}
+
 - (NSURL*) urlFilePath:(NSString*) filepath {
   if ([filepath containsString:@"file://"]) {
     return [NSURL URLWithString:filepath];
@@ -517,6 +522,8 @@ static int const RCTVideoUnset = -1;
     }
     NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
     [assetOptions setObject:cookies forKey:AVURLAssetHTTPCookiesKey];
+
+    [assetOptions setBool: _allowCellularAccess forKey: AVURLAssetAllowsCellularAccessKey];
     
 #if __has_include(<react-native-video/RCTVideoCache.h>)
     if (shouldCache && (!_textTracks || !_textTracks.count)) {
