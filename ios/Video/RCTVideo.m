@@ -60,6 +60,7 @@ static int const RCTVideoUnset = -1;
   float _rate;
   float _maxBitRate;
 
+  BOOL _allowCellularAccess;
   BOOL _automaticallyWaitsToMinimizeStalling;
   BOOL _muted;
   BOOL _paused;
@@ -523,7 +524,7 @@ static int const RCTVideoUnset = -1;
     NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
     [assetOptions setObject:cookies forKey:AVURLAssetHTTPCookiesKey];
 
-    [assetOptions setBool: _allowCellularAccess forKey: AVURLAssetAllowsCellularAccessKey];
+    [assetOptions setValue: _allowCellularAccess forKey: AVURLAssetAllowsCellularAccessKey];
     
 #if __has_include(<react-native-video/RCTVideoCache.h>)
     if (shouldCache && (!_textTracks || !_textTracks.count)) {
