@@ -420,7 +420,10 @@ static int const RCTVideoUnset = -1;
 }
 
 - (void)setAllowCellularAccess:(BOOL) allowCellularAccess {
-  _allowCellularAccess = allowCellularAccess;
+    if (allowCellularAccess != _allowCellularAccess) {
+        _allowCellularAccess = allowCellularAccess;
+        [self setSrc: _source];
+    }
 }
 
 - (NSURL*) urlFilePath:(NSString*) filepath {
@@ -524,7 +527,7 @@ static int const RCTVideoUnset = -1;
     NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
     [assetOptions setObject:cookies forKey:AVURLAssetHTTPCookiesKey];
 
-    [assetOptions setValue: _allowCellularAccess forKey: AVURLAssetAllowsCellularAccessKey];
+    [assetOptions setValue: [NSNumber numberWithBool:_allowCellularAccess] forKey: AVURLAssetAllowsCellularAccessKey];
     
 #if __has_include(<react-native-video/RCTVideoCache.h>)
     if (shouldCache && (!_textTracks || !_textTracks.count)) {
