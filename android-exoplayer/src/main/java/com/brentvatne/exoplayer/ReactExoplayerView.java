@@ -46,6 +46,7 @@ import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.drm.UnsupportedDrmException;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
+import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.MetadataOutput;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
@@ -478,6 +479,7 @@ class ReactExoplayerView extends FrameLayout implements
                     );
                     DefaultRenderersFactory renderersFactory =
                             new DefaultRenderersFactory(getContext())
+                                    .setEnableDecoderFallback(true)
                                     .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
                     player = new SimpleExoPlayer.Builder(getContext(), renderersFactory)
                                 .setTrackSelector​(trackSelector)
@@ -1261,6 +1263,13 @@ class ReactExoplayerView extends FrameLayout implements
                 .build();
         trackSelector.setParameters(selectionParameters);
     }
+
+    /*private boolean isFormatSupported(Format format) {
+        int width = format.width == Format.NO_VALUE ? 0 : format.width;
+        int height = format.height == Format.NO_VALUE ? 0 : format.height;
+        int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
+        MediaCodecInfo.
+    }*/
 
     private int getGroupIndexForDefaultLocale(TrackGroupArray groups) {
         if (groups.length == 0){
