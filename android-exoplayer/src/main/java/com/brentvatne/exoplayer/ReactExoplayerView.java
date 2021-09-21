@@ -18,6 +18,7 @@ import android.view.Window;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.webkit.MimeTypeMap;
 
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
@@ -77,7 +78,6 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.util.MimeTypes;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -1285,13 +1285,8 @@ class ReactExoplayerView extends FrameLayout implements
         int width = format.width == Format.NO_VALUE ? 0 : format.width;
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
         int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
-        String codecs = format.codecs;
 
-        if (codecs == null) {
-            // Could not get codec type from format, assume it works
-            return true;
-        }
-        String mimeType = MimeTypes.getMediaMimeType​(codecs);
+        String mimeType = MimeTypeMap.getMimeTypeFromExtension(this.extension);
 		int codecCount = MediaCodecList.getCodecCount();
 
         MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
