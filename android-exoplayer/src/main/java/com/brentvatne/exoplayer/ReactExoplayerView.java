@@ -1286,7 +1286,7 @@ class ReactExoplayerView extends FrameLayout implements
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
         int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
 
-        if (!this.extension) {
+        if (this.extension == null) {
             return true;
         }
 
