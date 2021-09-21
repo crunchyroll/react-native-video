@@ -927,7 +927,9 @@ class ReactExoplayerView extends FrameLayout implements
                 videoTrack.putString("codecs", format.codecs != null ? format.codecs : "");
                 videoTrack.putString("trackId",
                         format.id == null ? String.valueOf(trackIndex) : format.id);
-                videoTracks.pushMap(videoTrack);
+                if (isFormatSupported(format)) {
+                    videoTracks.pushMap(videoTrack);
+                }
             }
         }
         return videoTracks;
