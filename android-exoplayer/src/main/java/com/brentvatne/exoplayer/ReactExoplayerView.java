@@ -1289,7 +1289,7 @@ class ReactExoplayerView extends FrameLayout implements
         if (this.srcUri == null) {
             return true;
         }
-        String srcExtension = MimeTypeMap.getFileExtensionFromUrl(this.srcUri);
+        String srcExtension = MimeTypeMap.getFileExtensionFromUrl(this.srcUri.toString());
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(srcExtension);
         Log.w("ReactExoPlayerViewMime", "MimeType " + mimeType);
         Log.w("ReactExoPlayerViewMime", "Extension " + srcExtension);
