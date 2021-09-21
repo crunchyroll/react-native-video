@@ -1255,7 +1255,7 @@ class ReactExoplayerView extends FrameLayout implements
             
             // Valiate list of all tracks and add only supported formats
             int u = 0;
-            for (int k = 0l; k < allTracks.length; k++) {
+            for (int k = 0; k < allTracks.length; k++) {
                 Format format = group.getFormat(k);
                 if (isFormatSupported(format)) {
                     tracks[u] = allTracks[k];
@@ -1282,16 +1282,22 @@ class ReactExoplayerView extends FrameLayout implements
         int width = format.width == Format.NO_VALUE ? 0 : format.width;
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
         int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
-        int codecs = format.codecs == Format.NO_VALUE ? 0 : format.codecs;
+        String codecs = format.codecs;
 
+        if (codecs == null) {
+            // Could not get codec type from format, assume it works
+            return true;
+        }
         String mimeType = MimeTypes.getMediaMimeType​(codecs);
 		int codecCount = MediaCodecList.getCodecCount();
+
+        MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
 
         boolean isSupported = false;
 		for (int i = 0; i < codecCount; ++i) {
 			MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
-            CodecCapabilities codecCapabilities = info.VideoCapabilities.getCapabilitiesForType(mimeType);
-            boolean _isFormatSupported = codecCapabilities.isFormatSupported(format);
+            CodecCapabilities codecCapabilities = info.getCapabilitiesForType(mimeType);
+            boolean _isFormatSupported = codecCapabilities.isFormatSupported(mediaFormat);
             if (_isFormatSupported) {
                 isSupported = true;
                 break;
