@@ -1287,7 +1287,8 @@ class ReactExoplayerView extends FrameLayout implements
         int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
 
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(this.extension);
-        Log.w("ReactExoPlayerViewMime", mimeType);
+        Log.w("ReactExoPlayerViewMime", "MimeType " + mimeType);
+        Log.w("ReactExoPlayerViewMime", "Extension " + extstension);
 		int codecCount = MediaCodecList.getCodecCount();
 
         MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
