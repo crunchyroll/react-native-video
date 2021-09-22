@@ -1294,42 +1294,12 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean isFormatSupported(Format format) {
         int width = format.width == Format.NO_VALUE ? 0 : format.width;
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
-        // int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
         float frameRate = format.frameRate == Format.NO_VALUE ? 0 : format.frameRate;
         String mimeType = format.sampleMimeType;
-        //String codecType = mimeType.replace("video/", "");
-        
         if (mimeType == null) {
             return true;
         }
-
-        Log.w("ReactExoPlayerViewFormat", "Detected mime type for current video: " + mimeType);
-        // Log.w("ReactExoPlayerViewFormat", "Format requires codec type: " + codecType);
-		//int codecCount = MediaCodecList.getCodecCount();
-        //MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
         boolean isSupported = false;
-        //boolean isCodecFound = false;
-		/*for (int i = 0; i < codecCount; ++i) {
-            try {
-                
-                MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
-                if (!info.getName().contains(codecType)) {
-                    // Codec is not meant for this Format
-                    continue;
-                }
-                isCodecFound = true;
-                Log.w("ReactExoPlayerViewFormat", "Codec check: " + info.getName());
-                Log.w("ReactExoPlayerViewFormat", "Format: " + String.valueOf(width) + "x" + String.valueOf(height));
-                CodecCapabilities codecCapabilities = info.getCapabilitiesForType(mimeType);
-                boolean _isFormatSupported = codecCapabilities.isFormatSupported(mediaFormat);
-                Log.w("ReactExoPlayerViewFormat", "isSupported: " + String.valueOf(_isFormatSupported));
-                Log.w("ReactExoPlayerViewFormat", "*************************");
-                if (_isFormatSupported) {
-                    isSupported = true;
-                    break;
-                }
-            } catch(Exception e) {}
-		}*/
         try {
             MediaCodecInfo codecInfo = MediaCodecUtil.getDecoderInfo(mimeType, false, false);
             isSupported = codecInfo.isVideoSizeAndRateSupportedV21(width, height, frameRate);
@@ -1337,8 +1307,6 @@ class ReactExoplayerView extends FrameLayout implements
             // Failed to get decoder info - assume it is supported
             isSupported = true;
         }
-        Log.w("ReactExoPlayerViewFormat", "isSupported: " + isSupported);
-        // If no codec was found we let the player decide if this Format is supportd
         return isSupported;
     }
 
