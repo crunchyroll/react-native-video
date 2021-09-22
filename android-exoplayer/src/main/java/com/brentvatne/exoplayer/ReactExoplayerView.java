@@ -1295,7 +1295,7 @@ class ReactExoplayerView extends FrameLayout implements
         int width = format.width == Format.NO_VALUE ? 0 : format.width;
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
         // int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
-        int framerate = format.framerate == Format.NO_VALUE ? 0 : format.framerate;
+        float framerate = format.framerate == Format.NO_VALUE ? 0 : format.framerate;
         String mimeType = format.sampleMimeType;
         //String codecType = mimeType.replace("video/", "");
         
@@ -1304,7 +1304,7 @@ class ReactExoplayerView extends FrameLayout implements
         }
 
         Log.w("ReactExoPlayerViewFormat", "Detected mime type for current video: " + mimeType);
-        Log.w("ReactExoPlayerViewFormat", "Format requires codec type: " + codecType);
+        // Log.w("ReactExoPlayerViewFormat", "Format requires codec type: " + codecType);
 		//int codecCount = MediaCodecList.getCodecCount();
         //MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
         boolean isSupported = false;
@@ -1330,7 +1330,7 @@ class ReactExoplayerView extends FrameLayout implements
                 }
             } catch(Exception e) {}
 		}*/
-        MediaCodecInfo codecInfo = MediaCodecInfo.getDecoderInfo(mimeType, false, false);
+        MediaCodecInfo codecInfo = MediaCodecUtil.getDecoderInfo(mimeType, false, false);
         isSupported = codecInfo.isVideoSizeAndRateSupportedV21(width, height, framerate);
         Log.w("ReactExoPlayerViewFormat", "isSupported: " + isSupported);
         // If no codec was found we let the player decide if this Format is supportd
