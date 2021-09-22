@@ -1295,22 +1295,27 @@ class ReactExoplayerView extends FrameLayout implements
         int width = format.width == Format.NO_VALUE ? 0 : format.width;
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
         int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
-        String codecs = format.codecs;
         String mimeType = format.sampleMimeType;
-
-        if (mimeType == null || codecs == null) {
+        String codecType = mimeType.replace('video/', '');
+        
+        if (mimeType == null) {
             return true;
         }
 
         Log.w("ReactExoPlayerViewFormat", "Detected mime type for current video: " + mimeType);
-        Log.w("ReactExoPlayerViewFormat", "Format requires codecs: " + codecs);
+        Log.w("ReactExoPlayerViewFormat", "Format requires codec type: " + codecType);
 		int codecCount = MediaCodecList.getCodecCount();
         MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
-        mediaFormat.setString(MediaFormat.KEY_CODECS_STRING, codecs);
         boolean isSupported = false;
+        boolean isCodecFound = false;
 		for (int i = 0; i < codecCount; ++i) {
             try {
                 MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
+                if (!info.getName().contains(codecType)) {
+                    // Codec is not meant for this Format
+                    continue;
+                }
+                isCodecFound = true;
                 Log.w("ReactExoPlayerViewFormat", "Codec check: " + info.getName());
                 Log.w("ReactExoPlayerViewFormat", "Format: " + String.valueOf(width) + "x" + String.valueOf(height));
                 CodecCapabilities codecCapabilities = info.getCapabilitiesForType(mimeType);
@@ -1323,7 +1328,8 @@ class ReactExoplayerView extends FrameLayout implements
                 }
             } catch(Exception e) {}
 		}
-        return isSupported;
+        // If no codec was found we let the player decide if this Format is supportd
+        return isSupported || !isCodecFound;
     }
 
     private int getGroupIndexForDefaultLocale(TrackGroupArray groups) {
