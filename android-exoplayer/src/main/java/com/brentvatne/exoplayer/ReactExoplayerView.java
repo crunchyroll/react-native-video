@@ -1311,7 +1311,7 @@ class ReactExoplayerView extends FrameLayout implements
             try {
                 MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
                 Log.w("ReactExoPlayerViewFormat", "Codec check: " + info.getName());
-                Log.w("ReactExoPlayerViewFormat", "Format: " + width.toString() + "x" + height.toString());
+                Log.w("ReactExoPlayerViewFormat", "Format: " + String.valueOf(width) + "x" + String.valueOf(height));
                 Log.w("ReactExoPlayerViewFormat", "*************************");
                 CodecCapabilities codecCapabilities = info.getCapabilitiesForType(mimeType);
                 boolean _isFormatSupported = codecCapabilities.isFormatSupported(mediaFormat);
