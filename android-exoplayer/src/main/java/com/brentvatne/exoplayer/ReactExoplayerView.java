@@ -170,7 +170,6 @@ class ReactExoplayerView extends FrameLayout implements
     private String drmLicenseUrl = null;
     private String[] drmLicenseHeader = null;
     private boolean controls;
-    private String mimeType;
     // \ End props
 
     // React
@@ -468,6 +467,7 @@ class ReactExoplayerView extends FrameLayout implements
                     ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
                     trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
                     trackSelector.setParameters(trackSelector.buildUponParameters()
+                            .setExceedRendererCapabilitiesIfNecessary(true)​
                             .setMaxVideoBitrate(maxBitRate == 0 ? Integer.MAX_VALUE : maxBitRate));
 
                     DefaultAllocator allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
@@ -540,12 +540,6 @@ class ReactExoplayerView extends FrameLayout implements
                     }
                     player.prepare(mediaSource, !haveResumePosition, false);
                     playerNeedsSource = false;
-
-                    try {
-                        mimeType = videoSource.getMediaItem().playbackProperties.mimeType;
-                    } catch (Exception e) {
-                        mimeType = null;
-                    }
 
                     reLayout(exoPlayerView);
                     eventEmitter.loadStart();
@@ -1293,6 +1287,8 @@ class ReactExoplayerView extends FrameLayout implements
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
         int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
 
+        String mimeType = format.sampleMimeType;
+        
         if (mimeType == null) {
             return true;
         }
