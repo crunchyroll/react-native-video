@@ -1258,12 +1258,15 @@ class ReactExoplayerView extends FrameLayout implements
             
             // Valiate list of all tracks and add only supported formats
             int u = 0;
+            ArrayList<int> supportedTrackList = new ArrayList<int>();
             for (int k = 0; k < allTracks.length; k++) {
                 Format format = group.getFormat(k);
                 if (isFormatSupported(format)) {
-                    tracks[u] = allTracks[k];
+                    // tracks[u] = allTracks[k];
+                    supportedTrackList.add(allTracks[k]);
                     u++;
                 }
+                tracks = supportedTrackList.toArray();
             }
         }
 
