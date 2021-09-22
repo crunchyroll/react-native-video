@@ -5,8 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaCodecList;
-import android.media.MediaCodecInfo;
-import android.media.MediaCodecInfo.CodecCapabilities;
+import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
+//import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.Handler;
@@ -1294,9 +1294,10 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean isFormatSupported(Format format) {
         int width = format.width == Format.NO_VALUE ? 0 : format.width;
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
-        int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
+        // int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
+        int framerate = format.framerate == Format.NO_VALUE ? 0 : format.framerate;
         String mimeType = format.sampleMimeType;
-        String codecType = mimeType.replace("video/", "");
+        //String codecType = mimeType.replace("video/", "");
         
         if (mimeType == null) {
             return true;
@@ -1304,12 +1305,13 @@ class ReactExoplayerView extends FrameLayout implements
 
         Log.w("ReactExoPlayerViewFormat", "Detected mime type for current video: " + mimeType);
         Log.w("ReactExoPlayerViewFormat", "Format requires codec type: " + codecType);
-		int codecCount = MediaCodecList.getCodecCount();
-        MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
+		//int codecCount = MediaCodecList.getCodecCount();
+        //MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
         boolean isSupported = false;
-        boolean isCodecFound = false;
-		for (int i = 0; i < codecCount; ++i) {
+        //boolean isCodecFound = false;
+		/*for (int i = 0; i < codecCount; ++i) {
             try {
+                
                 MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
                 if (!info.getName().contains(codecType)) {
                     // Codec is not meant for this Format
@@ -1327,9 +1329,12 @@ class ReactExoplayerView extends FrameLayout implements
                     break;
                 }
             } catch(Exception e) {}
-		}
+		}*/
+        MediaCodecInfo codecInfo = MediaCodecInfo.getDecoderInfo(mimeType, false, false);
+        isSupported = codecInfo.isVideoSizeAndRateSupportedV21(width, height, framerate);
+        Log.w("ReactExoPlayerViewFormat", "isSupported: " + isSupported);
         // If no codec was found we let the player decide if this Format is supportd
-        return isSupported || !isCodecFound;
+        return isSupported;
     }
 
     private int getGroupIndexForDefaultLocale(TrackGroupArray groups) {
