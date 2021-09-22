@@ -1295,15 +1295,15 @@ class ReactExoplayerView extends FrameLayout implements
         int width = format.width == Format.NO_VALUE ? 0 : format.width;
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
         int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
-
+        String codecs = format.codecs;
         String mimeType = format.sampleMimeType;
-        
-        if (mimeType == null) {
+
+        if (mimeType == null || codecs == null) {
             return true;
         }
 
         Log.w("ReactExoPlayerViewFormat", "Detected mime type for current video: " + mimeType);
-        
+        Log.w("ReactExoPlayerViewFormat", "Format requires codecs: " + codecs);)
 		int codecCount = MediaCodecList.getCodecCount();
         MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
         boolean isSupported = false;
