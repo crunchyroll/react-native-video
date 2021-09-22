@@ -170,6 +170,7 @@ class ReactExoplayerView extends FrameLayout implements
     private String drmLicenseUrl = null;
     private String[] drmLicenseHeader = null;
     private boolean controls;
+    private String mimeType;
     // \ End props
 
     // React
@@ -539,6 +540,12 @@ class ReactExoplayerView extends FrameLayout implements
                     }
                     player.prepare(mediaSource, !haveResumePosition, false);
                     playerNeedsSource = false;
+
+                    try {
+                        mimeType = videoSource.getMediaItem().playbackProperties.mimeType
+                    } catch (Exception e) {
+                        mimeType = null;
+                    }
 
                     reLayout(exoPlayerView);
                     eventEmitter.loadStart();
@@ -1286,17 +1293,14 @@ class ReactExoplayerView extends FrameLayout implements
         int height = format.height == Format.NO_VALUE ? 0 : format.height;
         int bitrate = format.bitrate == Format.NO_VALUE ? 0 : format.bitrate; 
 
-        if (this.srcUri == null) {
+        if (mimeType == null) {
             return true;
         }
-        String srcExtension = MimeTypeMap.getFileExtensionFromUrl(this.srcUri.toString());
-        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(srcExtension);
-        Log.w("ReactExoPlayerViewMime", "MimeType " + mimeType);
-        Log.w("ReactExoPlayerViewMime", "Extension " + srcExtension);
+
+        Log.w("ReactExoPlayerViewFormat", "Detected mime type for current video: " + mimeType);
+        
 		int codecCount = MediaCodecList.getCodecCount();
-
         MediaFormat mediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
-
         boolean isSupported = false;
 		for (int i = 0; i < codecCount; ++i) {
             try {
