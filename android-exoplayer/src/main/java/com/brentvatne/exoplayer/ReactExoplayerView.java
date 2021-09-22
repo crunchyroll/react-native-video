@@ -1310,6 +1310,10 @@ class ReactExoplayerView extends FrameLayout implements
 		for (int i = 0; i < codecCount; ++i) {
             try {
                 MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
+                if (info.getName().startsWith("OMX.google.")) {
+                    // Is a software codec - ignore it
+                    break;
+                }
                 Log.w("ReactExoPlayerViewFormat", "Codec check: " + info.getName());
                 Log.w("ReactExoPlayerViewFormat", "Format: " + String.valueOf(width) + "x" + String.valueOf(height));
                 Log.w("ReactExoPlayerViewFormat", "*************************");
