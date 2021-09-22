@@ -1330,8 +1330,13 @@ class ReactExoplayerView extends FrameLayout implements
                 }
             } catch(Exception e) {}
 		}*/
-        MediaCodecInfo codecInfo = MediaCodecUtil.getDecoderInfo(mimeType, false, false);
-        isSupported = codecInfo.isVideoSizeAndRateSupportedV21(width, height, frameRate);
+        try {
+            MediaCodecInfo codecInfo = MediaCodecUtil.getDecoderInfo(mimeType, false, false);
+            isSupported = codecInfo.isVideoSizeAndRateSupportedV21(width, height, frameRate);
+        } catch (Exception e) {
+            // Failed to get decoder info - assume it is supported
+            isSupported = true;
+        }
         Log.w("ReactExoPlayerViewFormat", "isSupported: " + isSupported);
         // If no codec was found we let the player decide if this Format is supportd
         return isSupported;
