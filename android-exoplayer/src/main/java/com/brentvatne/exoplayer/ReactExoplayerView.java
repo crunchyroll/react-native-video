@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
-import android.media.MediaCodecList;
-import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
