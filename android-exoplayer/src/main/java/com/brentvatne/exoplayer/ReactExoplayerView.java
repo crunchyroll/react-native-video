@@ -542,7 +542,7 @@ class ReactExoplayerView extends FrameLayout implements
                     playerNeedsSource = false;
 
                     try {
-                        mimeType = videoSource.getMediaItem().playbackProperties.mimeType
+                        mimeType = videoSource.getMediaItem().playbackProperties.mimeType;
                     } catch (Exception e) {
                         mimeType = null;
                     }
