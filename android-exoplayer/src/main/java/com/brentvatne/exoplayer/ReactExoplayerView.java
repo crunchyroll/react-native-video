@@ -562,8 +562,13 @@ class ReactExoplayerView extends FrameLayout implements
                         keyRequestPropertiesArray[i + 1]);
             }
         }
+
+        FrameworkMediaDrm mediaDrm = FrameworkMediaDrm.newInstance(uuid);
+        // Force L3.
+        mediaDrm.setPropertyString("securityLevel", "L3");
+        
         return new DefaultDrmSessionManager(uuid,
-                FrameworkMediaDrm.newInstance(uuid), drmCallback, null, false, 3);
+                mediaDrm, drmCallback, null, false, 3);
     }
 
     private MediaSource buildMediaSource(Uri uri, String overrideExtension, DrmSessionManager drmSessionManager) {
