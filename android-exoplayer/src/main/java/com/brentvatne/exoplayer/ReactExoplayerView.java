@@ -546,13 +546,16 @@ class ReactExoplayerView extends FrameLayout implements
                     setControls(controls);
                     applyModifiers();
                     startBufferCheckTimer();
-            } catch (Exception ex) {
-                self.playerNeedsSource = true;
-                Log.w("Failed to initialize Player!");
-                Log.e("ExoPlayer Exception", ex.toString());
-                eventEmitter.error("Failed to initialize Player!", ex, "1001");
+                
+                } catch (Exception ex) {
+                    self.playerNeedsSource = true;
+                    Log.w("Failed to initialize Player!");
+                    Log.e("ExoPlayer Exception", ex.toString());
+                    eventEmitter.error("Failed to initialize Player!", ex, "1001");
+                }
             }
         }, 1);
+        
     }
 
     private DrmSessionManager buildDrmSessionManager(UUID uuid,
