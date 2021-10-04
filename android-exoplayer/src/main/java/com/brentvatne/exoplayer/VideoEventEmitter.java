@@ -130,6 +130,7 @@ class VideoEventEmitter {
     private static final String EVENT_PROP_ERROR = "error";
     private static final String EVENT_PROP_ERROR_STRING = "errorString";
     private static final String EVENT_PROP_ERROR_EXCEPTION = "errorException";
+    private static final String EVENT_PROP_ERROR_CODE = "errorCode";
 
     private static final String EVENT_PROP_TIMED_METADATA = "metadata";
 
@@ -242,10 +243,11 @@ class VideoEventEmitter {
         receiveEvent(EVENT_FULLSCREEN_DID_DISMISS, null);
     }
 
-    void error(String errorString, Exception exception) {
+    void error(String errorString, Exception exception, String errorCode = "0001") {
         WritableMap error = Arguments.createMap();
         error.putString(EVENT_PROP_ERROR_STRING, errorString);
         error.putString(EVENT_PROP_ERROR_EXCEPTION, exception.toString());
+        error.putString(EVENT_PROP_ERROR_CODE, errorCode);
         WritableMap event = Arguments.createMap();
         event.putMap(EVENT_PROP_ERROR, error);
         receiveEvent(EVENT_ERROR, event);
