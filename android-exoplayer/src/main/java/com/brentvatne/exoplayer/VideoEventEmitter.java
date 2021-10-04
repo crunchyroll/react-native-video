@@ -243,8 +243,15 @@ class VideoEventEmitter {
         receiveEvent(EVENT_FULLSCREEN_DID_DISMISS, null);
     }
 
-    void error(String errorString, Exception exception, String... code) {
-        String errorCode = code == null ? "0001" : code;
+    void error(String errorString, Exception exception) {
+        _error(errorString, exception, "0001");
+    }
+
+    void error(String errorString, Exception exception, String errorCode) {
+        _error(errorString, exception, errorCode);
+    }
+
+    void _error(String errorString, Exception exception, String errorCode) {
         WritableMap error = Arguments.createMap();
         error.putString(EVENT_PROP_ERROR_STRING, errorString);
         error.putString(EVENT_PROP_ERROR_EXCEPTION, exception.toString());
