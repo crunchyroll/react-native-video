@@ -546,7 +546,6 @@ class ReactExoplayerView extends FrameLayout implements
                     setControls(controls);
                     applyModifiers();
                     startBufferCheckTimer();
-                }
             } catch (Exception ex) {
                 self.playerNeedsSource = true;
                 Log.w("Failed to initialize Player!");
