@@ -551,7 +551,7 @@ class ReactExoplayerView extends FrameLayout implements
                     self.playerNeedsSource = true;
                     Log.e("ExoPlayer Exception", "Failed to initialize Player!");
                     Log.e("ExoPlayer Exception", ex.toString());
-                    eventEmitter.error("Failed to initialize Player!", ex, "1001");
+                    eventEmitter.error(ex.toString(), ex, "1001");
                 }
             }
         }, 1);
