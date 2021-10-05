@@ -31,6 +31,7 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -507,6 +508,7 @@ class ReactExoplayerView extends FrameLayout implements
                             drmSessionManager = buildDrmSessionManager(self.drmUUID, self.drmLicenseUrl,
                                     self.drmLicenseHeader);
                         } catch (UnsupportedDrmException e) {
+                            Log.w("Exception", "UnsupportedDrmException");
                             if (!hasDrmFailed) {
                                 // If DRM has not failed we need to attempt to load using L3 one more time
                                 Log.w("DRM Warning", "Widevine L1 failed... Fallback to L3");
@@ -1054,6 +1056,12 @@ class ReactExoplayerView extends FrameLayout implements
         }
         else if (e.type == ExoPlaybackException.TYPE_SOURCE) {
             errorString = getResources().getString(R.string.unrecognized_media_format);
+        }
+        if (!hasDrmFailed) {
+            Log.w("DRM Warning", "Widevine L1 failed to load... Falling back to L3!");
+            hasDrmFailed = true;
+            initializePlayer();
+            return;
         }
         eventEmitter.error(errorString, ex);
         playerNeedsSource = true;
