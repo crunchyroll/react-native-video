@@ -564,10 +564,9 @@ class ReactExoplayerView extends FrameLayout implements
                         keyRequestPropertiesArray[i + 1]);
             }
         }
+        FrameworkMediaDrm mediaDrm = FrameworkMediaDrm.newInstance(uuid);
         if (hasDrmFailed) {
             // When DRM fails using L1 we want to switch to L3
-            FrameworkMediaDrm mediaDrm = FrameworkMediaDrm.newInstance(uuid);
-            // Force L3.
             mediaDrm.setPropertyString("securityLevel", "L3");
         }
         return new DefaultDrmSessionManager(uuid,
