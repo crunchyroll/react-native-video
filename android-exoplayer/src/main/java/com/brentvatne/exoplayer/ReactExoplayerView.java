@@ -511,7 +511,7 @@ class ReactExoplayerView extends FrameLayout implements
                                 // If DRM has not failed we need to attempt to load using L3 one more time
                                 Log.w("DRM Warning", "Widevine L1 failed... Fallback to L3");
                                 hasDrmFailed = true;
-                                initializePlayer()
+                                initializePlayer();
                                 return;
                             }
                             int errorStringId = Util.SDK_INT < 18 ? R.string.error_drm_not_supported
