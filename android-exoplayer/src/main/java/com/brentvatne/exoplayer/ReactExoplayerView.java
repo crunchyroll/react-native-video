@@ -133,6 +133,7 @@ class ReactExoplayerView extends FrameLayout implements
     private int minLoadRetryCount = 3;
     private int maxBitRate = 0;
     private long seekTime = C.TIME_UNSET;
+    private boolean hasDrmFailed = false;
 
     private int minBufferMs = DefaultLoadControl.DEFAULT_MIN_BUFFER_MS;
     private int maxBufferMs = DefaultLoadControl.DEFAULT_MAX_BUFFER_MS;
@@ -506,6 +507,13 @@ class ReactExoplayerView extends FrameLayout implements
                             drmSessionManager = buildDrmSessionManager(self.drmUUID, self.drmLicenseUrl,
                                     self.drmLicenseHeader);
                         } catch (UnsupportedDrmException e) {
+                            if (!hasDrmFailed) {
+                                // If DRM has not failed we need to attempt to load using L3 one more time
+                                Log.w("DRM Warning", "Widevine L1 failed... Fallback to L3");
+                                hasDrmFailed = true;
+                                initializePlayer()
+                                return;
+                            }
                             int errorStringId = Util.SDK_INT < 18 ? R.string.error_drm_not_supported
                                     : (e.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
                                     ? R.string.error_drm_unsupported_scheme : R.string.error_drm_unknown);
@@ -561,6 +569,12 @@ class ReactExoplayerView extends FrameLayout implements
                 drmCallback.setKeyRequestProperty(keyRequestPropertiesArray[i],
                         keyRequestPropertiesArray[i + 1]);
             }
+        }
+        if (hasDrmFailed = true) {
+            // When DRM fails using L1 we want to switch to L3
+            FrameworkMediaDrm mediaDrm = FrameworkMediaDrm.newInstance(uuid);
+            // Force L3.
+            mediaDrm.setPropertyString("securityLevel", "L3");
         }
         return new DefaultDrmSessionManager(uuid,
                 FrameworkMediaDrm.newInstance(uuid), drmCallback, null, false, 3);
