@@ -508,14 +508,6 @@ class ReactExoplayerView extends FrameLayout implements
                             drmSessionManager = buildDrmSessionManager(self.drmUUID, self.drmLicenseUrl,
                                     self.drmLicenseHeader);
                         } catch (UnsupportedDrmException e) {
-                            Log.w("Exception", "UnsupportedDrmException");
-                            if (!hasDrmFailed) {
-                                // If DRM has not failed we need to attempt to load using L3 one more time
-                                Log.w("DRM Warning", "Widevine L1 failed... Fallback to L3");
-                                hasDrmFailed = true;
-                                initializePlayer();
-                                return;
-                            }
                             int errorStringId = Util.SDK_INT < 18 ? R.string.error_drm_not_supported
                                     : (e.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
                                     ? R.string.error_drm_unsupported_scheme : R.string.error_drm_unknown);
@@ -579,7 +571,7 @@ class ReactExoplayerView extends FrameLayout implements
             mediaDrm.setPropertyString("securityLevel", "L3");
         }
         return new DefaultDrmSessionManager(uuid,
-                FrameworkMediaDrm.newInstance(uuid), drmCallback, null, false, 3);
+                mediaDrm, drmCallback, null, false, 3);
     }
 
     private MediaSource buildMediaSource(Uri uri, String overrideExtension, DrmSessionManager drmSessionManager) {
@@ -1058,7 +1050,7 @@ class ReactExoplayerView extends FrameLayout implements
             errorString = getResources().getString(R.string.unrecognized_media_format);
         }
         if (!hasDrmFailed) {
-            Log.w("DRM Warning", "Widevine L1 failed to load... Falling back to L3!");
+            Log.w("DRM Warning", "Video failed to load using L1... Falling back to L3.");
             hasDrmFailed = true;
             playerNeedsSource = true;
             initializePlayer();
