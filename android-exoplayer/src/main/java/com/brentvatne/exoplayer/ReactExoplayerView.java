@@ -1060,6 +1060,7 @@ class ReactExoplayerView extends FrameLayout implements
         if (!hasDrmFailed) {
             Log.w("DRM Warning", "Widevine L1 failed to load... Falling back to L3!");
             hasDrmFailed = true;
+            playerNeedsSource = true;
             initializePlayer();
             return;
         }
