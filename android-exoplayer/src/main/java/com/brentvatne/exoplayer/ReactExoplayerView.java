@@ -1029,8 +1029,8 @@ class ReactExoplayerView extends FrameLayout implements
         String errorString = "ExoPlaybackException type : " + e.type;
         String errorCode = "2001"; // Playback error code 2xxx (2001 - unknown playback exception)
         Exception ex = e;
-        Exception cause = e.getRendererException();
         if (e.type == ExoPlaybackException.TYPE_RENDERER) {
+            Exception cause = e.getRendererException();
             if (cause instanceof MediaCodecRenderer.DecoderInitializationException) {
                 // Special case for decoder initialization failures.
                 MediaCodecRenderer.DecoderInitializationException decoderInitializationException =
@@ -1056,6 +1056,7 @@ class ReactExoplayerView extends FrameLayout implements
             }
         }
         else if (e.type == ExoPlaybackException.TYPE_SOURCE) {
+            Exception cause = e.getSourceException();
             if (cause instanceof DefaultDrmSessionManager.MissingSchemeDataException) {
                 errorCode = "3004";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
