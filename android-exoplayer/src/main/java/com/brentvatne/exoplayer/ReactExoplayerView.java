@@ -1056,14 +1056,14 @@ class ReactExoplayerView extends FrameLayout implements
             }
         }
         else if (e.type == ExoPlaybackException.TYPE_SOURCE) {
-            /*Exception cause = e.getSourceException();
+            Exception cause = e.getSourceException();
             if (cause instanceof DefaultDrmSessionManager.MissingSchemeDataException) {
                 errorCode = "3004";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
-            } else {*/
+            } else {
                 errorCode = "2021";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
-            //}
+            }
         }
         eventEmitter.error(errorString, ex, errorCode);
         playerNeedsSource = true;
