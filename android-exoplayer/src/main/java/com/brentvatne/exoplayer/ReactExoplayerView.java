@@ -1049,7 +1049,6 @@ class ReactExoplayerView extends FrameLayout implements
             errorString = getResources().getString(R.string.unrecognized_media_format);
             if (!hasDrmFailed) {
                 // When DRM fails to reach the app level certificate server it will fail with a source error so we assume that it is DRM related and try one more time
-                Log.w("DRM Warning", "Video failed to load using L1... Falling back to L3.");
                 hasDrmFailed = true;
                 playerNeedsSource = true;
                 initializePlayer();
