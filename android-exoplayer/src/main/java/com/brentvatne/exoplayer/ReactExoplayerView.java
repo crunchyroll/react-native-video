@@ -1068,6 +1068,13 @@ class ReactExoplayerView extends FrameLayout implements
                 errorCode = "2021";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
             }
+            if (cause != null) {
+                Throwable rootCause = cause.getCause();
+                if (rootCause instanceof MediaDrmCallbackException) {
+                    errorCode = "3005";
+                    errorString = getResources().getString(R.string.unrecognized_media_format);
+                }
+            }
         }
         eventEmitter.error(errorString, ex, errorCode);
         playerNeedsSource = true;
