@@ -43,6 +43,7 @@ import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
+import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.drm.UnsupportedDrmException;
 import com.google.android.exoplayer2.mediacodec.MediaCodecInfo;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
@@ -1059,6 +1060,9 @@ class ReactExoplayerView extends FrameLayout implements
             Exception cause = e.getSourceException();
             if (cause instanceof DefaultDrmSessionManager.MissingSchemeDataException) {
                 errorCode = "3004";
+                errorString = getResources().getString(R.string.unrecognized_media_format);
+            } else if(cause instanceof MediaDrmCallbackException) {
+                errorCode = "3005";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
             } else {
                 errorCode = "2021";
