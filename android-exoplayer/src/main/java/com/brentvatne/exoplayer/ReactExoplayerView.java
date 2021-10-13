@@ -1036,6 +1036,7 @@ class ReactExoplayerView extends FrameLayout implements
     public void onPlayerError(ExoPlaybackException e) {
         String errorString = "ExoPlaybackException type : " + e.type;
         String errorCode = "2001"; // Playback error code 2xxx (2001 - unknown playback exception)
+        Bool needsReInitialization = false;
         Exception ex = e;
         if (e.type == ExoPlaybackException.TYPE_RENDERER) {
             Exception cause = e.getRendererException();
@@ -1064,6 +1065,8 @@ class ReactExoplayerView extends FrameLayout implements
             }
         }
         else if (e.type == ExoPlaybackException.TYPE_SOURCE) {
+            // Re-initialization improves recovery speed and properly resumes
+            needsReInitialization = true;
             errorString = getResources().getString(R.string.unrecognized_media_format);
             Exception cause = e.getSourceException();
             if (cause instanceof DefaultDrmSessionManager.MissingSchemeDataException) {
@@ -1099,6 +1102,9 @@ class ReactExoplayerView extends FrameLayout implements
             initializePlayer();
         } else {
             updateResumePosition();
+            if (needsReInitialization) {
+                initializePlayer();
+            }
         }
     }
 
