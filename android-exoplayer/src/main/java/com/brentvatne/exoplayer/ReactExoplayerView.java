@@ -1036,7 +1036,7 @@ class ReactExoplayerView extends FrameLayout implements
     public void onPlayerError(ExoPlaybackException e) {
         String errorString = "ExoPlaybackException type : " + e.type;
         String errorCode = "2001"; // Playback error code 2xxx (2001 - unknown playback exception)
-        Bool needsReInitialization = false;
+        boolean needsReInitialization = false;
         Exception ex = e;
         if (e.type == ExoPlaybackException.TYPE_RENDERER) {
             Exception cause = e.getRendererException();
