@@ -97,7 +97,7 @@ static int const RCTVideoUnset = -1;
 {
   if ((self = [super init])) {
     _eventDispatcher = eventDispatcher;
-	  _automaticallyWaitsToMinimizeStalling = YES;
+    _automaticallyWaitsToMinimizeStalling = YES;
     _playbackRateObserverRegistered = NO;
     _isExternalPlaybackActiveObserverRegistered = NO;
     _playbackStalled = NO;
@@ -400,10 +400,11 @@ static int const RCTVideoUnset = -1;
       if (self.onVideoLoadStart) {
         id uri = [self->_source objectForKey:@"uri"];
         id type = [self->_source objectForKey:@"type"];
+        id isNetwork = [self->_source objectForKey:@"isNetwork"];
         self.onVideoLoadStart(@{@"src": @{
                                     @"uri": uri ? uri : [NSNull null],
                                     @"type": type ? type : [NSNull null],
-                                    @"isNetwork": [NSNumber numberWithBool:(bool)[self->_source objectForKey:@"isNetwork"]]},
+                                    @"isNetwork": isNetwork},
                                 @"drm": self->_drm ? self->_drm : [NSNull null],
                                 @"target": self.reactTag
                                 });
@@ -1053,8 +1054,8 @@ static int const RCTVideoUnset = -1;
 
 - (void)setAutomaticallyWaitsToMinimizeStalling:(BOOL)waits
 {
-	_automaticallyWaitsToMinimizeStalling = waits;
-	_player.automaticallyWaitsToMinimizeStalling = waits;
+    _automaticallyWaitsToMinimizeStalling = waits;
+    _player.automaticallyWaitsToMinimizeStalling = waits;
 }
 
 

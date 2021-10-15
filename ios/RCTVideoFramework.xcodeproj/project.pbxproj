@@ -1,0 +1,448 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0118A35E271967F700FAACA3 /* UIView+FindUIViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0118A35D271967F700FAACA3 /* UIView+FindUIViewController.m */; };
+		0118A3602719681100FAACA3 /* UIView+FindUIViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0118A35F2719681100FAACA3 /* UIView+FindUIViewController.h */; };
+		0118A61227196F9C00FAACA3 /* RCTVideoPlayerViewControllerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 0118A61127196F9A00FAACA3 /* RCTVideoPlayerViewControllerDelegate.h */; };
+		0118A61427196FBC00FAACA3 /* RCTVideoPlayerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0118A61327196FBC00FAACA3 /* RCTVideoPlayerViewController.h */; };
+		0118A61627196FDD00FAACA3 /* RCTVideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0118A61527196FDD00FAACA3 /* RCTVideoPlayerViewController.m */; };
+		0118A61A27197BF800FAACA3 /* RCTVideoManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0118A61927197BF800FAACA3 /* RCTVideoManager.h */; };
+		0118A61C27197C0900FAACA3 /* RCTVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0118A61B27197C0900FAACA3 /* RCTVideoManager.m */; };
+		0118A61E27197C6D00FAACA3 /* RCTVideo.h in Headers */ = {isa = PBXBuildFile; fileRef = 0118A61D27197C6D00FAACA3 /* RCTVideo.h */; };
+		0118A62027197C9400FAACA3 /* RCTVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = 0118A61F27197C9400FAACA3 /* RCTVideo.m */; };
+		016FD431271923F8002D9D57 /* RCTVideoFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 016FD430271923F8002D9D57 /* RCTVideoFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2F0D3E2667B0F7C0D12B65CF /* Pods_RCTVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EEDD809891450DD499917F8 /* Pods_RCTVideo.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0118A35D271967F700FAACA3 /* UIView+FindUIViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+FindUIViewController.m"; sourceTree = "<group>"; };
+		0118A35F2719681100FAACA3 /* UIView+FindUIViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+FindUIViewController.h"; sourceTree = "<group>"; };
+		0118A61127196F9A00FAACA3 /* RCTVideoPlayerViewControllerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTVideoPlayerViewControllerDelegate.h; sourceTree = "<group>"; };
+		0118A61327196FBC00FAACA3 /* RCTVideoPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTVideoPlayerViewController.h; sourceTree = "<group>"; };
+		0118A61527196FDD00FAACA3 /* RCTVideoPlayerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTVideoPlayerViewController.m; sourceTree = "<group>"; };
+		0118A61927197BF800FAACA3 /* RCTVideoManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTVideoManager.h; sourceTree = "<group>"; };
+		0118A61B27197C0900FAACA3 /* RCTVideoManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTVideoManager.m; sourceTree = "<group>"; };
+		0118A61D27197C6D00FAACA3 /* RCTVideo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTVideo.h; sourceTree = "<group>"; };
+		0118A61F27197C9400FAACA3 /* RCTVideo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTVideo.m; sourceTree = "<group>"; };
+		016FD42D271923F8002D9D57 /* RCTVideoFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RCTVideoFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		016FD430271923F8002D9D57 /* RCTVideoFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTVideoFramework.h; sourceTree = "<group>"; };
+		240E5A201802F2536C1C7828 /* Pods-RCTVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RCTVideo.release.xcconfig"; path = "Target Support Files/Pods-RCTVideo/Pods-RCTVideo.release.xcconfig"; sourceTree = "<group>"; };
+		5403D2EA0F851871BFF2A380 /* Pods-RCTVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RCTVideo.debug.xcconfig"; path = "Target Support Files/Pods-RCTVideo/Pods-RCTVideo.debug.xcconfig"; sourceTree = "<group>"; };
+		5EEDD809891450DD499917F8 /* Pods_RCTVideo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RCTVideo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		016FD42A271923F8002D9D57 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2F0D3E2667B0F7C0D12B65CF /* Pods_RCTVideo.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		016FD423271923F8002D9D57 = {
+			isa = PBXGroup;
+			children = (
+				016FD42F271923F8002D9D57 /* Video */,
+				016FD42E271923F8002D9D57 /* Products */,
+				D820D6E5547BF8B0551A5B90 /* Pods */,
+				A76739179A4D35C95C730217 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		016FD42E271923F8002D9D57 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				016FD42D271923F8002D9D57 /* RCTVideoFramework.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		016FD42F271923F8002D9D57 /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				016FD430271923F8002D9D57 /* RCTVideoFramework.h */,
+				0118A61D27197C6D00FAACA3 /* RCTVideo.h */,
+				0118A61F27197C9400FAACA3 /* RCTVideo.m */,
+				0118A61927197BF800FAACA3 /* RCTVideoManager.h */,
+				0118A61B27197C0900FAACA3 /* RCTVideoManager.m */,
+				0118A61127196F9A00FAACA3 /* RCTVideoPlayerViewControllerDelegate.h */,
+				0118A61327196FBC00FAACA3 /* RCTVideoPlayerViewController.h */,
+				0118A61527196FDD00FAACA3 /* RCTVideoPlayerViewController.m */,
+				0118A35D271967F700FAACA3 /* UIView+FindUIViewController.m */,
+				0118A35F2719681100FAACA3 /* UIView+FindUIViewController.h */,
+			);
+			path = Video;
+			sourceTree = "<group>";
+		};
+		A76739179A4D35C95C730217 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5EEDD809891450DD499917F8 /* Pods_RCTVideo.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D820D6E5547BF8B0551A5B90 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5403D2EA0F851871BFF2A380 /* Pods-RCTVideo.debug.xcconfig */,
+				240E5A201802F2536C1C7828 /* Pods-RCTVideo.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		016FD428271923F8002D9D57 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0118A3602719681100FAACA3 /* UIView+FindUIViewController.h in Headers */,
+				0118A61427196FBC00FAACA3 /* RCTVideoPlayerViewController.h in Headers */,
+				016FD431271923F8002D9D57 /* RCTVideoFramework.h in Headers */,
+				0118A61E27197C6D00FAACA3 /* RCTVideo.h in Headers */,
+				0118A61A27197BF800FAACA3 /* RCTVideoManager.h in Headers */,
+				0118A61227196F9C00FAACA3 /* RCTVideoPlayerViewControllerDelegate.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		016FD42C271923F8002D9D57 /* RCTVideoFramework */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 016FD434271923F8002D9D57 /* Build configuration list for PBXNativeTarget "RCTVideoFramework" */;
+			buildPhases = (
+				7CCE57146743AA3B5713107D /* [CP] Check Pods Manifest.lock */,
+				016FD428271923F8002D9D57 /* Headers */,
+				016FD429271923F8002D9D57 /* Sources */,
+				016FD42A271923F8002D9D57 /* Frameworks */,
+				016FD42B271923F8002D9D57 /* Resources */,
+				539B0B2D687BE6C8B1528E49 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RCTVideoFramework;
+			productName = RCTVideo;
+			productReference = 016FD42D271923F8002D9D57 /* RCTVideoFramework.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		016FD424271923F8002D9D57 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1300;
+				TargetAttributes = {
+					016FD42C271923F8002D9D57 = {
+						CreatedOnToolsVersion = 13.0;
+						LastSwiftMigration = 1300;
+					};
+				};
+			};
+			buildConfigurationList = 016FD427271923F8002D9D57 /* Build configuration list for PBXProject "RCTVideoFramework" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 016FD423271923F8002D9D57;
+			productRefGroup = 016FD42E271923F8002D9D57 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				016FD42C271923F8002D9D57 /* RCTVideoFramework */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		016FD42B271923F8002D9D57 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		539B0B2D687BE6C8B1528E49 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RCTVideo/Pods-RCTVideo-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RCTVideo/Pods-RCTVideo-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RCTVideo/Pods-RCTVideo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7CCE57146743AA3B5713107D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RCTVideo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		016FD429271923F8002D9D57 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0118A35E271967F700FAACA3 /* UIView+FindUIViewController.m in Sources */,
+				0118A61C27197C0900FAACA3 /* RCTVideoManager.m in Sources */,
+				0118A62027197C9400FAACA3 /* RCTVideo.m in Sources */,
+				0118A61627196FDD00FAACA3 /* RCTVideoPlayerViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		016FD432271923F8002D9D57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		016FD433271923F8002D9D57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		016FD435271923F8002D9D57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5403D2EA0F851871BFF2A380 /* Pods-RCTVideo.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.video.RCTVideo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		016FD436271923F8002D9D57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 240E5A201802F2536C1C7828 /* Pods-RCTVideo.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.video.RCTVideo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		016FD427271923F8002D9D57 /* Build configuration list for PBXProject "RCTVideoFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				016FD432271923F8002D9D57 /* Debug */,
+				016FD433271923F8002D9D57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		016FD434271923F8002D9D57 /* Build configuration list for PBXNativeTarget "RCTVideoFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				016FD435271923F8002D9D57 /* Debug */,
+				016FD436271923F8002D9D57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 016FD424271923F8002D9D57 /* Project object */;
+}
