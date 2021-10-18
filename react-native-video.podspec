@@ -16,8 +16,7 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = "9.0"
 
   s.subspec "Video" do |ss|
-    ss.source_files  = "ios/Video/*.{h,m}"
-    s.static_framework = true
+    ss.source_files  = "ios/Video/**/*.{h,m,swift}"
   end
 
   s.subspec "VideoCaching" do |ss|
@@ -26,12 +25,13 @@ Pod::Spec.new do |s|
     ss.dependency "DVAssetLoaderDelegate", "~> 0.3.1"
 
     ss.source_files = "ios/VideoCaching/**/*.{h,m}"
-    s.static_framework = true
   end
 
   s.dependency "React-Core"
 
   s.default_subspec = "Video"
+
+  s.static_framework = true
 
   s.xcconfig = {
     'OTHER_LDFLAGS': '-ObjC',
