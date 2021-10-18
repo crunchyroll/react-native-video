@@ -1792,15 +1792,15 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
     
     // MARK: - AVAssetResourceLoaderDelegate
     
-    func resourceLoader(resourceLoader:AVAssetResourceLoader!, shouldWaitForRenewalOfRequestedResource renewalRequest:AVAssetResourceRenewalRequest!) -> Bool {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, shouldWaitForRenewalOfRequestedResource renewalRequest:AVAssetResourceRenewalRequest!) -> Bool {
         return self.loadingRequestHandling(loadingRequest: renewalRequest)
     }
     
-    func resourceLoader(resourceLoader:AVAssetResourceLoader!, shouldWaitForLoadingOfRequestedResource loadingRequest:AVAssetResourceLoadingRequest!) -> Bool {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, shouldWaitForLoadingOfRequestedResource loadingRequest:AVAssetResourceLoadingRequest!) -> Bool {
         return self.loadingRequestHandling(loadingRequest: loadingRequest)
     }
     
-    func resourceLoader(resourceLoader:AVAssetResourceLoader!, didCancelLoadingRequest loadingRequest:AVAssetResourceLoadingRequest!) {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, didCancelLoadingRequest loadingRequest:AVAssetResourceLoadingRequest!) {
         NSLog("didCancelLoadingRequest")
     }
     
