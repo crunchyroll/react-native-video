@@ -39,7 +39,7 @@ enum RCTVideoError : Int {
 //#else
 //@interface RCTVideo : UIView <RCTVideoPlayerViewControllerDelegate, AVAssetResourceLoaderDelegate, AVPictureInPictureControllerDelegate>
 //#endif
-class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPictureControllerDelegate, AVAssetResourceLoaderDelegate, URLSessionDelegate {
+class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVAssetResourceLoaderDelegate, URLSessionDelegate {
     // #endif
     private var _player:AVPlayer?
     private var _playerItem:AVPlayerItem?
@@ -91,7 +91,6 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
     private var _preventsDisplaySleepDuringVideoPlayback:Bool = true
     private var _preferredForwardBufferDuration:Float = 0.0
     private var _playWhenInactive:Bool = false
-    private var _pictureInPicture:Bool = false
     private var _ignoreSilentSwitch:String! = "inherit" // inherit, ignore, obey
     private var _mixWithOthers:String! = "inherit" // inherit, mix, duck
     private var _resizeMode:String! = "AVLayerVideoGravityResizeAspectFill"
@@ -108,10 +107,8 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
 #endif
     
 #if TARGET_OS_IOS
-    private var _restoreUserInterfaceForPIPStopCompletionHandler:Bool = nil
-    private var _pipController:AVPictureInPictureController!
+    private let _pip: RCTPictureInPicture = RCTPictureInPicture(onPictureInPictureStatusChanged: self.onPictureInPictureStatusChanged, onRestoreUserInterfaceForPictureInPictureStop: self.onVideoError)
 #endif
-    
     
     // Events
     @objc var onVideoLoadStart: RCTDirectEventBlock?
@@ -141,14 +138,6 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
         super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         
         _eventDispatcher = eventDispatcher
-        
-#if TARGET_OS_IOS
-        _restoreUserInterfaceForPIPStopCompletionHandler = nil
-#endif
-        
-#if canImport(RCTVideoCache)
-        _videoCache = RCTVideoCache.sharedInstance()
-#endif
         
         NotificationCenter.default.addObserver(
             self,
@@ -358,7 +347,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
         guard let _playerItem = _playerItem else {
             return
         }
-
+        
         _playerItem.addObserver(self, forKeyPath:statusKeyPath, options:NSKeyValueObservingOptions(), context:nil)
         _playerItem.addObserver(self, forKeyPath:playbackBufferEmptyKeyPath, options:NSKeyValueObservingOptions(), context:nil)
         _playerItem.addObserver(self, forKeyPath:playbackLikelyToKeepUpKeyPath, options:NSKeyValueObservingOptions(), context:nil)
@@ -916,40 +905,16 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
     @objc
     func setPictureInPicture(_ pictureInPicture:Bool) {
 #if TARGET_OS_IOS
-        if _pictureInPicture == pictureInPicture {
-            return
-        }
-        
-        _pictureInPicture = pictureInPicture
-        if _pipController && _pictureInPicture && !_pipController.isPictureInPictureActive() {
-            dispatch_async(dispatch_get_main_queue(), {
-                _pipController.startPictureInPicture()
-            })
-        } else if _pipController && !_pictureInPicture && _pipController.isPictureInPictureActive() {
-            dispatch_async(dispatch_get_main_queue(), {
-                _pipController.stopPictureInPicture()
-            })
-        }
+        _pip.setPictureInPicture(pictureInPicture)
 #endif
     }
     
-#if TARGET_OS_IOS
     @objc
     func setRestoreUserInterfaceForPIPStopCompletionHandler(_ restore:Bool) {
-        if _restoreUserInterfaceForPIPStopCompletionHandler != nil {
-            _restoreUserInterfaceForPIPStopCompletionHandler(restore)
-            _restoreUserInterfaceForPIPStopCompletionHandler = nil
-        }
-    }
-    
-    func setupPipController() {
-        if !_pipController && _playerLayer && AVPictureInPictureController.isPictureInPictureSupported() {
-            // Create new controller passing reference to the AVPlayerLayer
-            _pipController = AVPictureInPictureController(playerLayer:_playerLayer)
-            _pipController.delegate = self
-        }
-    }
+#if TARGET_OS_IOS
+        _pip.setRestoreUserInterfaceForPIPStopCompletionHandler(restore)
 #endif
+    }
     
     @objc
     func setIgnoreSilentSwitch(_ ignoreSilentSwitch:String!) {
@@ -1035,36 +1000,37 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
         let timeScale:Int = 1000
         
         let item:AVPlayerItem! = _player?.currentItem
-        if (item != nil) && item.status == AVPlayerItem.Status.readyToPlay {
-            // TODO check loadedTimeRanges
-            
-            let cmSeekTime:CMTime = CMTimeMakeWithSeconds(Float64(seekTime.floatValue), preferredTimescale: Int32(timeScale))
-            let current:CMTime = item.currentTime()
-            // TODO figure out a good tolerance level
-            let tolerance:CMTime = CMTimeMake(value: Int64(seekTolerance.floatValue), timescale: Int32(timeScale))
-            let wasPaused:Bool = _paused
-            
-            if CMTimeCompare(current, cmSeekTime) != 0 {
-                if !wasPaused {_player?.pause()}
-                _player?.seek(to: cmSeekTime, toleranceBefore:tolerance, toleranceAfter:tolerance, completionHandler:{ (finished:Bool) in
-                    if (self._timeObserver == nil) {
-                        self.addPlayerTimeObserver()
-                    }
-                    if !wasPaused {
-                        self.setPaused(false)
-                    }
-                    self.onVideoSeek?(["currentTime": NSNumber(value: Float(CMTimeGetSeconds(item.currentTime()))),
-                                       "seekTime": seekTime,
-                                       "target": self.reactTag])
-                })
-                
-                _pendingSeek = false
-            }
-            
-        } else {
+        guard item != nil && item.status == AVPlayerItem.Status.readyToPlay else {
             _pendingSeek = true
             _pendingSeekTime = seekTime.floatValue
+            return
         }
+        
+        // TODO check loadedTimeRanges
+        let cmSeekTime:CMTime = CMTimeMakeWithSeconds(Float64(seekTime.floatValue), preferredTimescale: Int32(timeScale))
+        let current:CMTime = item.currentTime()
+        // TODO figure out a good tolerance level
+        let tolerance:CMTime = CMTimeMake(value: Int64(seekTolerance.floatValue), timescale: Int32(timeScale))
+        let wasPaused:Bool = _paused
+        
+        guard CMTimeCompare(current, cmSeekTime) != 0 else { return }
+        if !wasPaused { _player?.pause() }
+        
+        _player?.seek(to: cmSeekTime, toleranceBefore:tolerance, toleranceAfter:tolerance, completionHandler:{ [weak self] (finished:Bool) in
+            guard let self = self else { return }
+            
+            if (self._timeObserver == nil) {
+                self.addPlayerTimeObserver()
+            }
+            if !wasPaused {
+                self.setPaused(false)
+            }
+            self.onVideoSeek?(["currentTime": NSNumber(value: Float(CMTimeGetSeconds(item.currentTime()))),
+                               "seekTime": seekTime,
+                               "target": self.reactTag])
+        })
+        
+        _pendingSeek = false
     }
     
     @objc
@@ -1438,27 +1404,26 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
     }
     
     func usePlayerViewController() {
-        if (_player != nil)
-        {
-            if _playerViewController == nil {
-                _playerViewController = self.createPlayerViewController(player: _player, withPlayerItem:_playerItem)
-            }
-            // to prevent video from being animated when resizeMode is 'cover'
-            // resize mode must be set before subview is added
-            setResizeMode(_resizeMode)
-            
-            if let _playerViewController = _playerViewController {
-                if _controls {
-                    let viewController:UIViewController! = self.reactViewController()
-                    viewController.addChild(_playerViewController)
-                    self.addSubview(_playerViewController.view)
-                }
-                
-                _playerViewController.addObserver(self, forKeyPath: readyForDisplayKeyPath, options: .new, context: nil)
-                
-                _playerViewController.contentOverlayView?.addObserver(self, forKeyPath: "frame", options: [.new, .old], context: nil)
-            }
+        guard _player != nil else { return }
+        
+        if _playerViewController == nil {
+            _playerViewController = self.createPlayerViewController(player: _player, withPlayerItem:_playerItem)
         }
+        // to prevent video from being animated when resizeMode is 'cover'
+        // resize mode must be set before subview is added
+        setResizeMode(_resizeMode)
+        
+        guard let _playerViewController = _playerViewController else { return }
+        
+        if _controls {
+            let viewController:UIViewController! = self.reactViewController()
+            viewController.addChild(_playerViewController)
+            self.addSubview(_playerViewController.view)
+        }
+        
+        _playerViewController.addObserver(self, forKeyPath: readyForDisplayKeyPath, options: .new, context: nil)
+        
+        _playerViewController.contentOverlayView?.addObserver(self, forKeyPath: "frame", options: [.new, .old], context: nil)
     }
     
     func usePlayerLayer() {
@@ -1478,7 +1443,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
             }
             self.layer.needsDisplayOnBoundsChange = true
 #if TARGET_OS_IOS
-            self.setupPipController()
+            _pip.setupPipController(_playerLayer)
 #endif
         }
     }
@@ -1749,15 +1714,15 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
             _loadingRequest.finishLoading(with: licenseError)
             
             onVideoError?([
-                    "error": [
-                        "code": NSNumber(value: error.code),
-                        "localizedDescription": error.localizedDescription == nil ? "" : error.localizedDescription,
-                        "localizedFailureReason": ((error as NSError).localizedFailureReason == nil ? "" : (error as NSError).localizedFailureReason) ?? "",
-                        "localizedRecoverySuggestion": ((error as NSError).localizedRecoverySuggestion == nil ? "" : (error as NSError).localizedRecoverySuggestion) ?? "",
-                        "domain": (error as NSError).domain
-                    ],
-                    "target": reactTag
-                ])
+                "error": [
+                    "code": NSNumber(value: error.code),
+                    "localizedDescription": error.localizedDescription == nil ? "" : error.localizedDescription,
+                    "localizedFailureReason": ((error as NSError).localizedFailureReason == nil ? "" : (error as NSError).localizedFailureReason) ?? "",
+                    "localizedRecoverySuggestion": ((error as NSError).localizedRecoverySuggestion == nil ? "" : (error as NSError).localizedRecoverySuggestion) ?? "",
+                    "domain": (error as NSError).domain
+                ],
+                "target": reactTag
+            ])
             
         }
         return false
@@ -1816,7 +1781,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
         guard let _drm = _drm else {
             return finishLoadingWithError(error: RCTVideoErrorHandler.noDRMData)
         }
-            
+        
         var contentId:String!
         let contentIdOverride:String! = _drm["contentId"] as? String
         if contentIdOverride != nil {
@@ -1833,12 +1798,13 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
         }
         
         let certificateStringUrl:String! = _drm["certificateUrl"] as? String
-        guard let certificateStringUrl = certificateStringUrl, let certificateURL = URL(string: certificateStringUrl.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "") else {
+        guard let certificateStringUrl = certificateStringUrl, let certificateURL = URL(string: certificateStringUrl.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? "") else {
             return finishLoadingWithError(error: RCTVideoErrorHandler.noCertificateURL)
         }
         DispatchQueue.global(qos: .default)
         do {
             var certificateData:Data? = try Data(contentsOf: certificateURL)
+            // 1255 bytes - same
             if (_drm["base64Certificate"] != nil) {
                 certificateData = Data(base64Encoded: certificateData! as Data, options: .ignoreUnknownCharacters)
             }
@@ -1854,6 +1820,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
                 contentIdData = contentId.data(using: .utf8) as NSData?
             } else {
                 contentIdData = NSData(bytes: contentId.cString(using: String.Encoding.utf8), length:contentId.lengthOfBytes(using: String.Encoding.utf8))
+                // 48 bytes
             }
             
             let dataRequest:AVAssetResourceLoadingDataRequest! = loadingRequest.dataRequest
@@ -1867,7 +1834,9 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
             var spcData: Data? = nil
             do {
                 spcData = try loadingRequest.streamingContentKeyRequestData(forApp: certificateData as Data, contentIdentifier: contentIdData as Data, options: nil)
+                // 7148 bytes
             } catch let spcError {
+                print("SPC error")
             }
             // Request CKC to the server
             var licenseServer:String! = _drm["licenseServer"] as? String
@@ -1894,7 +1863,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
                               "spcBase64": base64Encoded,
                               "target": reactTag])
                 
-            // license fetching will be handled inside RNV with the given parameters
+                // license fetching will be handled inside RNV with the given parameters
             } else if licenseServer != nil {
                 let request:NSMutableURLRequest! = NSMutableURLRequest()
                 request.httpMethod = "POST"
@@ -1923,15 +1892,16 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
                 
                 let configuration:URLSessionConfiguration! = URLSessionConfiguration.default
                 let session:URLSession! = URLSession(configuration: configuration, delegate:self, delegateQueue:nil)
-                let postDataTask:URLSessionDataTask! = session.dataTask(with: request as URLRequest, completionHandler:{ (data:Data!,response:URLResponse!,error:Error!) in
+                let postDataTask:URLSessionDataTask! = session.dataTask(with: request as URLRequest, completionHandler:{ [weak self] (data:Data!,response:URLResponse!,error:Error!) in
+                    guard let self = self else { return }
                     let httpResponse:HTTPURLResponse! = response as! HTTPURLResponse
                     if error != nil {
-                        print(String(format: "Error getting license from %@, HTTP status code %li", url as! CVarArg, httpResponse.statusCode))
+                        print("Error getting license from \(url?.absoluteString), HTTP status code \(httpResponse.statusCode)")
                         self.finishLoadingWithError(error: error as NSError?)
                         self._requestingCertificateErrored = true
                     } else {
                         if httpResponse.statusCode != 200 {
-                            print(String(format: "Error getting license from %@, HTTP status code %li", url as! CVarArg, httpResponse.statusCode))
+                            print("Error getting license from \(url?.absoluteString), HTTP status code \(httpResponse.statusCode)")
                             self.finishLoadingWithError(error: RCTVideoErrorHandler.licenseRequestNotOk(httpResponse.statusCode))
                             self._requestingCertificateErrored = true
                         } else if data != nil {
@@ -1953,7 +1923,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
                 })
                 postDataTask.resume()
             }
-                
+            
         } catch {
         }
         return true
@@ -1967,45 +1937,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, AVPictureInPicture
         }
         return nil
     }
-    // MARK: - Picture in Picture
     
-#if TARGET_OS_IOS
-    func pictureInPictureControllerDidStopPictureInPicture(pictureInPictureController:AVPictureInPictureController!) {
-        if self.onPictureInPictureStatusChanged {
-            self.onPictureInPictureStatusChanged([
-                "isActive": NSNumber.numberWithBool(false)
-            ])
-        }
-    }
-    
-    func pictureInPictureControllerDidStartPictureInPicture(pictureInPictureController:AVPictureInPictureController!) {
-        if self.onPictureInPictureStatusChanged {
-            self.onPictureInPictureStatusChanged([
-                "isActive": NSNumber.numberWithBool(true)
-            ])
-        }
-    }
-    
-    func pictureInPictureControllerWillStopPictureInPicture(pictureInPictureController:AVPictureInPictureController!) {
-        
-    }
-    
-    func pictureInPictureControllerWillStartPictureInPicture(pictureInPictureController:AVPictureInPictureController!) {
-        
-    }
-    
-    func pictureInPictureController(pictureInPictureController:AVPictureInPictureController!, failedToStartPictureInPictureWithError error:NSError!) {
-        
-    }
-    
-    func pictureInPictureController(pictureInPictureController:AVPictureInPictureController!, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler:(Bool)->Void) {
-        NSAssert(_restoreUserInterfaceForPIPStopCompletionHandler == nil, "restoreUserInterfaceForPIPStopCompletionHandler was not called after picture in picture was exited.")
-        if self.onRestoreUserInterfaceForPictureInPictureStop {
-            self.onRestoreUserInterfaceForPictureInPictureStop([])
-        }
-        _restoreUserInterfaceForPIPStopCompletionHandler = completionHandler
-    }
-#endif
 }
 
 
