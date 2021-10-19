@@ -52,7 +52,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
     private var _videoURL:NSURL?
     
     /* DRM */
-    private var _drm:NSDictionary?
+    private var _drm:DRMParams?
     
     /* Required to publish events */
     private var _eventDispatcher:RCTEventDispatcher?
@@ -106,7 +106,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
 #endif
     
 #if TARGET_OS_IOS
-    private let _pip: RCTPictureInPicture = RCTPictureInPicture(onPictureInPictureStatusChanged: self.onPictureInPictureStatusChanged, onRestoreUserInterfaceForPictureInPictureStop: self.onVideoError)
+    private let _pip: RCTPictureInPicture = RCTPictureInPicture(self.onPictureInPictureStatusChanged, self.onRestoreUserInterfaceForPictureInPictureStop)
 #endif
     
     // Events
@@ -428,7 +428,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
                         "type": type ?? NSNull(),
                         "isNetwork": NSNumber(value: self._source?["isNetwork"] as! Bool)
                     ],
-                    "drm": self._drm ?? NSNull(),
+                    "drm": self._drm?.json ?? NSNull(),
                     "target": self.reactTag
                 ])
                 
@@ -439,7 +439,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
     
     @objc
     func setDrm(_ drm:NSDictionary!) {
-        _drm = drm
+        _drm = DRMParams(drm)
     }
     
     func urlFilePath(filepath:NSString!) -> NSURL! {
@@ -1554,30 +1554,23 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
     func insertReactSubview(view:UIView!, atIndex:Int) {
         // We are early in the game and somebody wants to set a subview.
         // That can only be in the context of playerViewController.
-        if !_controls && (_playerLayer == nil) && (_playerViewController == nil)
-        {
+        if !_controls && (_playerLayer == nil) && (_playerViewController == nil) {
             setControls(true)
         }
         
-        if _controls
-        {
+        if _controls {
             view.frame = self.bounds
             _playerViewController?.contentOverlayView?.insertSubview(view, at:atIndex)
-        }
-        else
-        {
+        } else {
             RCTLogError("video cannot have any subviews")
         }
         return
     }
     
     func removeReactSubview(subview:UIView!) {
-        if _controls
-        {
+        if _controls {
             subview.removeFromSuperview()
-        }
-        else
-        {
+        } else {
             RCTLog("video cannot have any subviews")
         }
         return

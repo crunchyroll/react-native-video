@@ -5,7 +5,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
     private var _loadingRequest:AVAssetResourceLoadingRequest?
     private var _requestingCertificate:Bool = false
     private var _requestingCertificateErrored:Bool = false
-    private var _drm: NSDictionary?
+    private var _drm: DRMParams?
     private var _reactTag: NSNumber?
     private var _onVideoError: RCTDirectEventBlock?
     private var _onGetLicense: RCTDirectEventBlock?
@@ -13,7 +13,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
     
     init(
         asset: AVURLAsset,
-        drm: NSDictionary?,
+        drm: DRMParams?,
         onVideoError: RCTDirectEventBlock?,
         onGetLicense: RCTDirectEventBlock?,
         reactTag: NSNumber
@@ -103,7 +103,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
         }
         
         var contentId:String!
-        let contentIdOverride:String! = _drm["contentId"] as? String
+        let contentIdOverride:String! = _drm.contentId
         if contentIdOverride != nil {
             contentId = contentIdOverride
         } else if (_onGetLicense != nil) {
@@ -112,12 +112,12 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
             contentId = url?.absoluteString.replacingOccurrences(of: "skd://", with:"")
         }
         
-        let drmType:String! = _drm["type"] as? String
+        let drmType:String! = _drm.type
         guard drmType == "fairplay" else {
             return finishLoadingWithError(error: RCTVideoErrorHandler.noDRMData)
         }
         
-        let certificateStringUrl:String! = _drm["certificateUrl"] as? String
+        let certificateStringUrl:String! = _drm.certificateUrl
         guard let certificateStringUrl = certificateStringUrl, let certificateURL = URL(string: certificateStringUrl.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? "") else {
             return finishLoadingWithError(error: RCTVideoErrorHandler.noCertificateURL)
         }
@@ -125,7 +125,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
         do {
             var certificateData:Data? = try Data(contentsOf: certificateURL)
             // 1255 bytes - same
-            if (_drm["base64Certificate"] != nil) {
+            if (_drm.base64Certificate != nil) {
                 certificateData = Data(base64Encoded: certificateData! as Data, options: .ignoreUnknownCharacters)
             }
             
@@ -159,7 +159,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
                 print("SPC error")
             }
             // Request CKC to the server
-            var licenseServer:String! = _drm["licenseServer"] as? String
+            var licenseServer:String! = _drm.licenseServer
             if spcError != nil {
                 finishLoadingWithError(error: spcError)
                 _requestingCertificateErrored = true
@@ -189,7 +189,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
                 request.httpMethod = "POST"
                 request.url = NSURL(string: licenseServer) as URL?
                 // HEADERS
-                let headers = _drm["headers"] as? [AnyHashable : Any]
+                let headers = _drm.headers
                 if let headers = headers {
                     for key in headers {
                         guard let key = key as? String else {

@@ -12,7 +12,7 @@ class RCTPictureInPicture: NSObject, AVPictureInPictureControllerDelegate {
     private var _pipController:AVPictureInPictureController?
     private var _isActive:Bool = false
     
-    init(onPictureInPictureStatusChanged: @escaping RCTDirectEventBlock, onRestoreUserInterfaceForPictureInPictureStop: @escaping RCTDirectEventBlock) {
+    init(_ onPictureInPictureStatusChanged: @escaping RCTDirectEventBlock, _ onRestoreUserInterfaceForPictureInPictureStop: @escaping RCTDirectEventBlock) {
         _onPictureInPictureStatusChanged = onPictureInPictureStatusChanged
         _onRestoreUserInterfaceForPictureInPictureStop = onRestoreUserInterfaceForPictureInPictureStop
     }
@@ -70,22 +70,6 @@ class RCTPictureInPicture: NSObject, AVPictureInPictureControllerDelegate {
                 _pipController.stopPictureInPicture()
             })
         }
-    }
-    
-    func test() {
-        guard let _onRestoreUserInterfaceForPictureInPictureStop = _onRestoreUserInterfaceForPictureInPictureStop else { return }
-        
-        _onRestoreUserInterfaceForPictureInPictureStop(
-            [
-                "error": [
-                    "code": NSNumber(value: 123),
-                    "localizedDescription": "hello",
-                    "localizedFailureReason": "goodbye",
-                    "localizedRecoverySuggestion": "",
-                    "domain": ""
-                ],
-                "target": reactTag
-            ])
     }
 }
 #endif
