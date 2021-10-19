@@ -20,6 +20,8 @@
 		01F60C9D271EAD5200C47344 /* RCTResourceLoaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F60C9B271EAD5200C47344 /* RCTResourceLoaderDelegate.swift */; };
 		01F60C9F271EC20F00C47344 /* DRMParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F60C9E271EC20F00C47344 /* DRMParams.swift */; };
 		01F60CA0271EC20F00C47344 /* DRMParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F60C9E271EC20F00C47344 /* DRMParams.swift */; };
+		01F60CA2271EC9B500C47344 /* RCTVideoSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F60CA1271EC9B500C47344 /* RCTVideoSave.swift */; };
+		01F60CA3271EC9B500C47344 /* RCTVideoSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F60CA1271EC9B500C47344 /* RCTVideoSave.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,6 +59,7 @@
 		01F60C99271E945100C47344 /* RCTPictureInPicture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RCTPictureInPicture.swift; path = Video/RCTPictureInPicture.swift; sourceTree = "<group>"; };
 		01F60C9B271EAD5200C47344 /* RCTResourceLoaderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RCTResourceLoaderDelegate.swift; path = Video/RCTResourceLoaderDelegate.swift; sourceTree = "<group>"; };
 		01F60C9E271EC20F00C47344 /* DRMParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DRMParams.swift; path = Video/DRMParams.swift; sourceTree = "<group>"; };
+		01F60CA1271EC9B500C47344 /* RCTVideoSave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RCTVideoSave.swift; path = Video/RCTVideoSave.swift; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libRCTVideo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTVideo.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -104,6 +107,7 @@
 				0177D39727170A7A00F5BE18 /* RCTVideoManager.m */,
 				0177D39227170A7A00F5BE18 /* RCTVideoManager.swift */,
 				01F60C9B271EAD5200C47344 /* RCTResourceLoaderDelegate.swift */,
+				01F60CA1271EC9B500C47344 /* RCTVideoSave.swift */,
 				0177D39427170A7A00F5BE18 /* RCTVideoPlayerViewController.swift */,
 				0177D39627170A7A00F5BE18 /* RCTVideoPlayerViewControllerDelegate.swift */,
 				0177D39327170A7A00F5BE18 /* UIView+FindUIViewController.swift */,
@@ -205,6 +209,7 @@
 				0177D39F27170A7A00F5BE18 /* RCTVideo.swift in Sources */,
 				0177D39E27170A7A00F5BE18 /* RCTVideoManager.m in Sources */,
 				0177D39A27170A7A00F5BE18 /* RCTVideoManager.swift in Sources */,
+				01F60CA2271EC9B500C47344 /* RCTVideoSave.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,6 +217,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				01F60CA3271EC9B500C47344 /* RCTVideoSave.swift in Sources */,
 				01450CB8271D586D005D8F6B /* RCTVideoErrorHandling.swift in Sources */,
 				01F60CA0271EC20F00C47344 /* DRMParams.swift in Sources */,
 				01F60C9D271EAD5200C47344 /* RCTResourceLoaderDelegate.swift in Sources */,

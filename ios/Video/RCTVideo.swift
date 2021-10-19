@@ -1631,51 +1631,12 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
     
     @objc
     func save(options:NSDictionary!, resolve: @escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
-        
-        let asset:AVAsset! = _playerItem?.asset
-        
-        if asset != nil {
-            
-            let exportSession:AVAssetExportSession! = AVAssetExportSession(asset: asset, presetName:AVAssetExportPresetHighestQuality)
-            
-            if exportSession != nil {
-                var path:String! = nil
-                let array = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).map(\.path)
-                path = generatePathInDirectory(
-                    directory: URL(fileURLWithPath: cacheDirectoryPath() ?? "").appendingPathComponent("Videos").path,
-                    withExtension: ".mp4")
-                let url:NSURL! = NSURL.fileURL(withPath: path) as NSURL
-                exportSession.outputFileType = AVFileType.mp4
-                exportSession.outputURL = url as URL?
-                exportSession.videoComposition = _playerItem?.videoComposition
-                exportSession.shouldOptimizeForNetworkUse = true
-                exportSession.exportAsynchronously(completionHandler: {
-                    
-                    switch (exportSession.status) {
-                    case .failed:
-                        reject("ERROR_COULD_NOT_EXPORT_VIDEO", "Could not export video", exportSession.error)
-                        break
-                    case .cancelled:
-                        reject("ERROR_EXPORT_SESSION_CANCELLED", "Export session was cancelled", exportSession.error)
-                        break
-                    default:
-                        resolve(["uri": url.absoluteString])
-                        break
-                    }
-                    
-                })
-                
-            } else {
-                
-                reject("ERROR_COULD_NOT_CREATE_EXPORT_SESSION", "Could not create export session", nil)
-                
-            }
-            
-        } else {
-            
-            reject("ERROR_ASSET_NIL", "Asset is nil", nil)
-            
-        }
+        RCTVideoSave.save(
+            options:options,
+            resolve:resolve,
+            reject:reject,
+            playerItem:_playerItem
+        )
     }
     
     func setLicenseResult(_ license:String!) {
@@ -1686,33 +1647,4 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
         _resouceLoaderDelegate?.setLicenseResultError(error)
     }
     
-    func ensureDirExists(withPath path: String?) -> Bool {
-        var isDir: ObjCBool = false
-        var error: Error?
-        let exists = FileManager.default.fileExists(atPath: path ?? "", isDirectory: &isDir)
-        if !(exists && isDir.boolValue) {
-            do {
-                try FileManager.default.createDirectory(atPath: path ?? "", withIntermediateDirectories: true, attributes: nil)
-            } catch {
-            }
-            if error != nil {
-                return false
-            }
-        }
-        return true
-    }
-    
-    func generatePathInDirectory(directory: String?, withExtension `extension`: String?) -> String? {
-        let fileName = UUID().uuidString + (`extension` ?? "")
-        ensureDirExists(withPath: directory)
-        return URL(fileURLWithPath: directory ?? "").appendingPathComponent(fileName).path
-    }
-    
-    func cacheDirectoryPath() -> String? {
-        let array = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).map(\.path)
-        return array[0]
-    }
-    
 }
-
-
