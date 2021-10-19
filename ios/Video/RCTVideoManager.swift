@@ -31,7 +31,7 @@ class RCTVideoManager: RCTViewManager {
             if !(view is RCTVideo) {
                 RCTLogError("Invalid view returned from registry, expecting RCTVideo, got: %@", String(describing: view))
             } else if let view = view as? RCTVideo {
-                view.setLicenseResult(license: license as String)
+                view.setLicenseResult(license as String)
             }
         })
     }
@@ -43,7 +43,7 @@ class RCTVideoManager: RCTViewManager {
             if !(view is RCTVideo) {
                 RCTLogError("Invalid view returned from registry, expecting RCTVideo, got: %@", String(describing: view))
             } else if let view = view as? RCTVideo {
-                view.setLicenseResultError(error: error as String)
+                view.setLicenseResultError(error as String)
             }
         })
     }
