@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
     ss.dependency "SPTPersistentCache", "~> 1.1.0"
     ss.dependency "DVAssetLoaderDelegate", "~> 0.3.1"
 
-    ss.source_files = "ios/VideoCaching/**/*.{h,m}"
+    ss.source_files = "ios/VideoCaching/**/*.{h,m,swift}"
   end
 
   s.dependency "React-Core"

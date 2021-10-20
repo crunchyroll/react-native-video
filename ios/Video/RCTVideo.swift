@@ -26,24 +26,11 @@ enum RCTVideoError : Int {
     case noDRMData
 }
 
-// #if DEBUG
-// #define DebugLog(...) NSLog(__VA_ARGS__)
-// #else
-// #define DebugLog(...) (void)0
-// #endif
-
-//#if __has_include(<react-native-video/RCTVideoCache.h>)
-//@interface RCTVideo : UIView <RCTVideoPlayerViewControllerDelegate, AVAssetResourceLoaderDelegate, DVAssetLoaderDelegatesDelegate>
-//#elif TARGET_OS_TV
-//@interface RCTVideo : UIView <RCTVideoPlayerViewControllerDelegate, AVAssetResourceLoaderDelegate>
-//#else
-//@interface RCTVideo : UIView <RCTVideoPlayerViewControllerDelegate, AVAssetResourceLoaderDelegate, AVPictureInPictureControllerDelegate>
-//#endif
 class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
     // #endif
     private var _player:AVPlayer?
     private var _playerItem:AVPlayerItem?
-    private var _source:NSDictionary?
+    private var _source:VideoSource?
     private var _playerItemObserversSet:Bool = false
     private var _playerBufferEmpty:Bool = true
     private var _playerLayer:AVPlayerLayer?
@@ -102,11 +89,11 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
     private var _resouceLoaderDelegate: RCTResourceLoaderDelegate?
     
 #if canImport(RCTVideoCache)
-    private var _videoCache:RCTVideoCache! = RCTVideoCache.sharedInstance()
+    private var _videoCache:RCTVideoCachingHandler = RCTVideoCachingHandler(self.playerItemPrepareText)
 #endif
     
 #if TARGET_OS_IOS
-    private let _pip: RCTPictureInPicture = RCTPictureInPicture(self.onPictureInPictureStatusChanged, self.onRestoreUserInterfaceForPictureInPictureStop)
+    private let _pip:RCTPictureInPicture = RCTPictureInPicture(self.onPictureInPictureStatusChanged, self.onRestoreUserInterfaceForPictureInPictureStop)
 #endif
     
     // Events
@@ -367,23 +354,18 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
         }
     }
     
-    
-    func delay(_ delay:Double, closure:@escaping ()->()) {
-        let when = DispatchTime.now() + delay
-        DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
-    }
     // MARK: - Player and source
     
     @objc
     func setSrc(_ source:NSDictionary!) {
-        _source = source
+        _source = VideoSource(source)
         removePlayerLayer()
         removePlayerTimeObserver()
         removePlayerItemObservers()
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(0)) / Double(NSEC_PER_SEC), execute: { [weak self] in
             guard let self = self else {return}
             // perform on next run loop, otherwise other passed react-props may not be set
-            self.playerItemForSource(source: self._source, withCallback:{ (playerItem:AVPlayerItem!) in
+            self.playerItemForSource(withCallback:{ (playerItem:AVPlayerItem!) in
                 self._playerItem = playerItem
                 self.setPreferredForwardBufferDuration(self._preferredForwardBufferDuration)
                 self.addPlayerItemObservers()
@@ -419,14 +401,11 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
                 }
                 
                 //Perform on next run loop, otherwise onVideoLoadStart is nil
-                
-                let uri:AnyObject! = self._source?["uri"] as AnyObject
-                let type:AnyObject! = self._source?["type"] as AnyObject
                 self.onVideoLoadStart?([
                     "src": [
-                        "uri": uri ?? NSNull(),
-                        "type": type ?? NSNull(),
-                        "isNetwork": NSNumber(value: self._source?["isNetwork"] as! Bool)
+                        "uri": self._source?.uri ?? NSNull(),
+                        "type": self._source?.type ?? NSNull(),
+                        "isNetwork": NSNumber(value: self._source?.isNetwork ?? false)
                     ],
                     "drm": self._drm?.json ?? NSNull(),
                     "target": self.reactTag
@@ -526,47 +505,35 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
         handler(AVPlayerItem(asset: mixComposition))
     }
     
-    func playerItemForSource(source:NSDictionary!, withCallback handler:(AVPlayerItem?)->Void) {
-        let isNetwork:Bool = RCTConvert.bool(source.object(forKey: "isNetwork"))
-        let isAsset:Bool = RCTConvert.bool(source.object(forKey: "isAsset"))
-        let shouldCache:Bool = RCTConvert.bool(source.object(forKey: "shouldCache"))
-        let uri:String! = (source.object(forKey: "uri") as! String)
-        let type:String! = (source.object(forKey: "type") as! String)
+    func playerItemForSource(withCallback handler:(AVPlayerItem?)->Void) {
         var asset:AVURLAsset!
-        if (uri == nil) || (uri == "") {
-            //            DebugLog("Could not find video URL in source '%@'", source)
+        guard let source = _source, source.uri != nil && source.uri != "" else {
+            DebugLog("Could not find video URL in source '\(_source)'")
             return
         }
         
-        let url:NSURL! = isNetwork || isAsset
-        ? NSURL(string: uri)
-        : NSURL.init(fileURLWithPath: Bundle.main.path(forResource: uri, ofType:type)!)
+        let bundlePath = Bundle.main.path(forResource: source.uri, ofType: source.type) ?? ""
+        let url = source.isNetwork || source.isAsset
+        ? URL(string: source.uri ?? "")
+        : URL(fileURLWithPath: bundlePath)
+        
         let assetOptions:NSMutableDictionary! = NSMutableDictionary()
         
-        if isNetwork {
-            let headers:NSDictionary! = (source.object(forKey: "requestHeaders") as! NSDictionary)
-            if headers.count > 0 {
+        if url != nil && source.isNetwork {
+            if let headers = source.requestHeaders, headers.count > 0 {
                 assetOptions.setObject(headers, forKey:"AVURLAssetHTTPHeaderFieldsKey" as NSCopying)
             }
             let cookies:[AnyObject]! = HTTPCookieStorage.shared.cookies
             assetOptions.setObject(cookies, forKey:AVURLAssetHTTPCookiesKey as NSCopying)
 #if canImport(RCTVideoCache)
-            if shouldCache && ((_textTracks == nil) || !_textTracks.count) {
-                /* The DVURLAsset created by cache doesn't have a tracksWithMediaType property, so trying
-                 * to bring in the text track code will crash. I suspect this is because the asset hasn't fully loaded.
-                 * Until this is fixed, we need to bypass caching when text tracks are specified.
-                 */
-                DebugLog("Caching is not supported for uri '%@' because text tracks are not compatible with the cache. Checkout https://github.com/react-native-community/react-native-video/blob/master/docs/caching.md", uri)
-                self.playerItemForSourceUsingCache(uri, assetOptions:assetOptions, withCallback:handler)
+            if _videoCache.playerItemForSourceUsingCache(shouldCache:shouldCache, textTracks:_textTracks, uri:uri, assetOptions:assetOptions, handler:handler) {
                 return
             }
 #endif
             
-            asset = AVURLAsset(url: url as URL, options:assetOptions as! [String : Any])
-        } else if isAsset {
-            asset = AVURLAsset(url: url as URL, options:nil)
+            asset = AVURLAsset(url: url!, options:assetOptions as! [String : Any])
         } else {
-            asset = AVURLAsset(url: NSURL.init(fileURLWithPath:Bundle.main.path(forResource: uri, ofType:type)!) as URL, options:nil)
+            asset = AVURLAsset(url: url!)
         }
         
         if _drm != nil {
@@ -581,62 +548,6 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
         
         self.playerItemPrepareText(asset: asset, assetOptions:assetOptions, withCallback:handler)
     }
-    
-#if canImport(RCTVideoCache)
-    
-    func playerItemForSourceUsingCache(uri:String!, assetOptions options:NSDictionary!, withCallback handler:(AVPlayerItem!)->Void) {
-        let url:NSURL! = NSURL.URLWithString(uri)
-        _videoCache.getItemForUri(uri, withCallback:{ (videoCacheStatus:RCTVideoCacheStatus,cachedAsset:AVAsset?) in
-            switch (videoCacheStatus) {
-            case RCTVideoCacheStatusMissingFileExtension:
-                DebugLog("Could not generate cache key for uri '%@'. It is currently not supported to cache urls that do not include a file extension. The video file will not be cached. Checkout https://github.com/react-native-community/react-native-video/blob/master/docs/caching.md", uri)
-                let asset:AVURLAsset! = AVURLAsset.URLAssetWithURL(url, options:options)
-                self.playerItemPrepareText(asset, assetOptions:options, withCallback:handler)
-                return
-                
-            case RCTVideoCacheStatusUnsupportedFileExtension:
-                DebugLog("Could not generate cache key for uri '%@'. The file extension of that uri is currently not supported. The video file will not be cached. Checkout https://github.com/react-native-community/react-native-video/blob/master/docs/caching.md", uri)
-                let asset:AVURLAsset! = AVURLAsset.URLAssetWithURL(url, options:options)
-                self.playerItemPrepareText(asset, assetOptions:options, withCallback:handler)
-                return
-                
-            default:
-                if cachedAsset {
-                    DebugLog("Playing back uri '%@' from cache", uri)
-                    // See note in playerItemForSource about not being able to support text tracks & caching
-                    handler(AVPlayerItem.playerItemWithAsset(cachedAsset))
-                    return
-                }
-            }
-            
-            let asset:DVURLAsset! = DVURLAsset(URL:url, options:options, networkTimeout:10000)
-            asset.loaderDelegate = self
-            
-            /* More granular code to have control over the DVURLAsset
-             let resourceLoaderDelegate = DVAssetLoaderDelegate(url: url)
-             resourceLoaderDelegate.delegate = self
-             let components = NSURLComponents(url: url, resolvingAgainstBaseURL: false)
-             components?.scheme = DVAssetLoaderDelegate.scheme()
-             var asset: AVURLAsset? = nil
-             if let url = components?.url {
-             asset = AVURLAsset(url: url, options: options)
-             }
-             asset?.resourceLoader.setDelegate(resourceLoaderDelegate, queue: DispatchQueue.main)
-             */
-            
-            handler(AVPlayerItem.playerItemWithAsset(asset))
-        })
-    }
-    
-    // MARK: - DVAssetLoaderDelegate
-    
-    func dvAssetLoaderDelegate(loaderDelegate:DVAssetLoaderDelegate!, didLoadData data:NSData!, forURL url:NSURL!) {
-        _videoCache.storeItem(data, forUri:url.absoluteString(), withCallback:{ (success:Bool) in
-            DebugLog("Cache data stored successfully 🎉")
-        })
-    }
-    
-#endif
     
     override func observeValue(forKeyPath keyPath:String?, of object:Any?, change:[NSKeyValueChangeKey : Any]?, context:UnsafeMutableRawPointer?) {
         
@@ -1519,7 +1430,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
         
         if !_filterEnabled {
             return
-        } else if (_source?.object(forKey: "uri") as! NSString).range(of: "m3u8").location != NSNotFound {
+        } else if let uri = _source?.uri, uri.contains("m3u8") {
             return // filters don't work for HLS... return
         } else if _playerItem?.asset == nil {
             return

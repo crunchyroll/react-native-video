@@ -44,3 +44,10 @@ func RCTLog(_ message: String, _ file: String=#file, _ line: UInt=#line) {
 func RCTLogTrace(_ message: String, _ file: String=#file, _ line: UInt=#line) {
     RCTSwiftLog.trace(message, file: file, line: line)
 }
+
+func DebugLog(_ message: String) {
+#if DEBUG
+    print(message)
+#endif
+}
+

@@ -30,6 +30,8 @@ project.xcworkspace
 local.properties
 *.hprof
 .project
+.settings
+.classpath
 
 # node.js
 #

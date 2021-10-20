@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01101EDB271FDC5100A5D59C /* RCTVideoCachingAssetLoaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01101EDA271FDC5100A5D59C /* RCTVideoCachingAssetLoaderDelegate.swift */; };
+		01101EDC271FDC5100A5D59C /* RCTVideoCachingAssetLoaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01101EDA271FDC5100A5D59C /* RCTVideoCachingAssetLoaderDelegate.swift */; };
+		01101EDE271FE13100A5D59C /* VideoSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01101EDD271FE13100A5D59C /* VideoSource.swift */; };
+		01101EDF271FE13100A5D59C /* VideoSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01101EDD271FE13100A5D59C /* VideoSource.swift */; };
 		01450CB7271D586D005D8F6B /* RCTVideoErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01450CB6271D586D005D8F6B /* RCTVideoErrorHandling.swift */; };
 		01450CB8271D586D005D8F6B /* RCTVideoErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01450CB6271D586D005D8F6B /* RCTVideoErrorHandling.swift */; };
 		0177D39A27170A7A00F5BE18 /* RCTVideoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0177D39227170A7A00F5BE18 /* RCTVideoManager.swift */; };
@@ -46,6 +50,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		01101EDA271FDC5100A5D59C /* RCTVideoCachingAssetLoaderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RCTVideoCachingAssetLoaderDelegate.swift; path = VideoCaching/RCTVideoCachingAssetLoaderDelegate.swift; sourceTree = "<group>"; };
+		01101EDD271FE13100A5D59C /* VideoSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VideoSource.swift; path = Video/VideoSource.swift; sourceTree = "<group>"; };
 		01450CB5271D5738005D8F6B /* libRCTVideo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTVideo.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		01450CB6271D586D005D8F6B /* RCTVideoErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RCTVideoErrorHandling.swift; path = Video/RCTVideoErrorHandling.swift; sourceTree = "<group>"; };
 		0177D39227170A7A00F5BE18 /* RCTVideoManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RCTVideoManager.swift; path = Video/RCTVideoManager.swift; sourceTree = "<group>"; };
@@ -107,6 +113,8 @@
 				0177D39727170A7A00F5BE18 /* RCTVideoManager.m */,
 				0177D39227170A7A00F5BE18 /* RCTVideoManager.swift */,
 				01F60C9B271EAD5200C47344 /* RCTResourceLoaderDelegate.swift */,
+				01101EDA271FDC5100A5D59C /* RCTVideoCachingAssetLoaderDelegate.swift */,
+				01101EDD271FE13100A5D59C /* VideoSource.swift */,
 				01F60CA1271EC9B500C47344 /* RCTVideoSave.swift */,
 				0177D39427170A7A00F5BE18 /* RCTVideoPlayerViewController.swift */,
 				0177D39627170A7A00F5BE18 /* RCTVideoPlayerViewControllerDelegate.swift */,
@@ -201,6 +209,8 @@
 			files = (
 				0177D39D27170A7A00F5BE18 /* RCTVideoPlayerViewControllerDelegate.swift in Sources */,
 				01450CB7271D586D005D8F6B /* RCTVideoErrorHandling.swift in Sources */,
+				01101EDB271FDC5100A5D59C /* RCTVideoCachingAssetLoaderDelegate.swift in Sources */,
+				01101EDE271FE13100A5D59C /* VideoSource.swift in Sources */,
 				0177D39C27170A7A00F5BE18 /* RCTVideoPlayerViewController.swift in Sources */,
 				0177D39B27170A7A00F5BE18 /* UIView+FindUIViewController.swift in Sources */,
 				01F60C9A271E945100C47344 /* RCTPictureInPicture.swift in Sources */,
@@ -219,6 +229,8 @@
 			files = (
 				01F60CA3271EC9B500C47344 /* RCTVideoSave.swift in Sources */,
 				01450CB8271D586D005D8F6B /* RCTVideoErrorHandling.swift in Sources */,
+				01101EDF271FE13100A5D59C /* VideoSource.swift in Sources */,
+				01101EDC271FDC5100A5D59C /* RCTVideoCachingAssetLoaderDelegate.swift in Sources */,
 				01F60CA0271EC20F00C47344 /* DRMParams.swift in Sources */,
 				01F60C9D271EAD5200C47344 /* RCTResourceLoaderDelegate.swift in Sources */,
 			);
@@ -316,7 +328,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RCTVideo;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RCTVideo-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Video/RCTVideo-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -336,7 +348,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RCTVideo;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RCTVideo-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Video/RCTVideo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
