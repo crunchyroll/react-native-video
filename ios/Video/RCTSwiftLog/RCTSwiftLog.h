@@ -1,11 +1,3 @@
-//
-//  RCTLogWrapper.h
-//
-//
-//  Created by Jimmy Dee on 4/5/17.
-//
-//
-
 #import <Foundation/Foundation.h>
 
 @interface RCTSwiftLog : NSObject

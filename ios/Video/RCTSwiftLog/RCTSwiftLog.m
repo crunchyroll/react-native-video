@@ -1,11 +1,3 @@
-//
-//  RCTLogWrapper.m
-//
-//
-//  Created by Jimmy Dee on 4/5/17.
-//
-//
-
 #import <React/RCTLog.h>
 
 #import "RCTSwiftLog.h"

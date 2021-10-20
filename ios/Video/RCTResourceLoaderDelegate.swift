@@ -121,131 +121,140 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
         guard let certificateStringUrl = certificateStringUrl, let certificateURL = URL(string: certificateStringUrl.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? "") else {
             return finishLoadingWithError(error: RCTVideoErrorHandler.noCertificateURL)
         }
-        DispatchQueue.global(qos: .default)
-        do {
-            var certificateData:Data? = try Data(contentsOf: certificateURL)
-            // 1255 bytes - same
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            var certificateData:Data?
             if (_drm.base64Certificate != nil) {
                 certificateData = Data(base64Encoded: certificateData! as Data, options: .ignoreUnknownCharacters)
+            } else {
+                do {
+                   certificateData = try Data(contentsOf: certificateURL)
+                } catch {}
             }
             
             guard let certificateData = certificateData else {
-                finishLoadingWithError(error: RCTVideoErrorHandler.noCertificateData)
-                _requestingCertificateErrored = true
-                return true
+                self.finishLoadingWithError(error: RCTVideoErrorHandler.noCertificateData)
+                self._requestingCertificateErrored = true
+                return
             }
             
             var contentIdData:NSData!
-            if _onGetLicense != nil {
+            if self._onGetLicense != nil {
                 contentIdData = contentId.data(using: .utf8) as NSData?
             } else {
-                contentIdData = NSData(bytes: contentId.cString(using: String.Encoding.utf8), length:contentId.lengthOfBytes(using: String.Encoding.utf8))
-                // 48 bytes
+               contentIdData = NSData(bytes: contentId.cString(using: String.Encoding.utf8), length:contentId.lengthOfBytes(using: String.Encoding.utf8))
             }
             
             let dataRequest:AVAssetResourceLoadingDataRequest! = loadingRequest.dataRequest
             guard dataRequest != nil else {
-                finishLoadingWithError(error: RCTVideoErrorHandler.noCertificateData)
-                _requestingCertificateErrored = true
-                return true
+                self.finishLoadingWithError(error: RCTVideoErrorHandler.noCertificateData)
+                self._requestingCertificateErrored = true
+                return
             }
             
-            var spcError:NSError! = nil
-            var spcData: Data? = nil
+            var spcError:NSError!
+            var spcData: Data?
             do {
-                spcData = try loadingRequest.streamingContentKeyRequestData(forApp: certificateData as Data, contentIdentifier: contentIdData as Data, options: nil)
-                // 7148 bytes
+                spcData = try loadingRequest.streamingContentKeyRequestData(forApp: certificateData, contentIdentifier: contentIdData as Data, options: nil)
             } catch let spcError {
                 print("SPC error")
             }
             // Request CKC to the server
             var licenseServer:String! = _drm.licenseServer
             if spcError != nil {
-                finishLoadingWithError(error: spcError)
-                _requestingCertificateErrored = true
+                self.finishLoadingWithError(error: spcError)
+                self._requestingCertificateErrored = true
             }
             
             guard spcData != nil else {
-                finishLoadingWithError(error: RCTVideoErrorHandler.noSPC)
-                _requestingCertificateErrored = true
-                return true
+                self.finishLoadingWithError(error: RCTVideoErrorHandler.noSPC)
+                self._requestingCertificateErrored = true
+                return
             }
             
             // js client has a onGetLicense callback and will handle license fetching
-            if let _onGetLicense = _onGetLicense {
+            if let _onGetLicense = self._onGetLicense {
                 let base64Encoded = spcData?.base64EncodedString(options: [])
-                _requestingCertificate = true
+                self._requestingCertificate = true
                 if licenseServer == nil {
                     licenseServer = ""
                 }
                 _onGetLicense(["licenseUrl": licenseServer,
-                              "contentId": contentId,
-                              "spcBase64": base64Encoded,
-                              "target": _reactTag])
+                               "contentId": contentId,
+                               "spcBase64": base64Encoded,
+                               "target": self._reactTag])
                 
-                // license fetching will be handled inside RNV with the given parameters
+                
             } else if licenseServer != nil {
-                let request:NSMutableURLRequest! = NSMutableURLRequest()
-                request.httpMethod = "POST"
-                request.url = NSURL(string: licenseServer) as URL?
-                // HEADERS
-                let headers = _drm.headers
-                if let headers = headers {
-                    for key in headers {
-                        guard let key = key as? String else {
-                            continue
-                        }
-                        let value = headers[key] as? String
-                        request.setValue(value, forHTTPHeaderField: key)
-                    }
-                }
-                
-                if (_onGetLicense != nil) {
-                    request.httpBody = spcData
-                } else {
-                    let spcEncoded = spcData?.base64EncodedString(options: [])
-                    let spcUrlEncoded = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, spcEncoded as? CFString? as! CFString, nil, "?=&+" as CFString, CFStringBuiltInEncodings.UTF8.rawValue) as? String
-                    let post:String! = String(format:"spc=%@&%@", spcUrlEncoded as! CVarArg, contentId)
-                    let postData:NSData! = post.data(using: String.Encoding.utf8, allowLossyConversion:true) as NSData?
-                    request.httpBody = postData as Data?
-                }
-                
-                let configuration:URLSessionConfiguration! = URLSessionConfiguration.default
-                let session:URLSession! = URLSession(configuration: configuration, delegate:self, delegateQueue:nil)
-                let postDataTask:URLSessionDataTask! = session.dataTask(with: request as URLRequest, completionHandler:{ [weak self] (data:Data!,response:URLResponse!,error:Error!) in
-                    guard let self = self else { return }
-                    let httpResponse:HTTPURLResponse! = response as! HTTPURLResponse
-                    if error != nil {
-                        print("Error getting license from \(url?.absoluteString), HTTP status code \(httpResponse.statusCode)")
-                        self.finishLoadingWithError(error: error as NSError?)
-                        self._requestingCertificateErrored = true
-                    } else {
-                        if httpResponse.statusCode != 200 {
-                            print("Error getting license from \(url?.absoluteString), HTTP status code \(httpResponse.statusCode)")
-                            self.finishLoadingWithError(error: RCTVideoErrorHandler.licenseRequestNotOk(httpResponse.statusCode))
-                            self._requestingCertificateErrored = true
-                        } else if data != nil {
-                            if (self._onGetLicense != nil) {
-                                dataRequest.respond(with: data)
-                            } else {
-                                let decodedData = Data(base64Encoded: data, options: [])
-                                if let decodedData = decodedData {
-                                    dataRequest.respond(with: decodedData)
-                                }
-                            }
-                            loadingRequest.finishLoading()
-                        } else {
-                            self.finishLoadingWithError(error: RCTVideoErrorHandler.noDataFromLicenseRequest)
-                            self._requestingCertificateErrored = true
-                        }
-                        
-                    }
-                })
-                postDataTask.resume()
+                self.fetchLicense(
+                    licenseServer: licenseServer,
+                    spcData: spcData,
+                    contentId: contentId,
+                    dataRequest: dataRequest
+                )
             }
-            
-        } catch {
         }
         return true
+    }
+    
+    func fetchLicense(
+        licenseServer: String,
+        spcData: Data?,
+        contentId: String,
+        dataRequest: AVAssetResourceLoadingDataRequest!
+    ) {
+        var request = URLRequest(url: URL(string: licenseServer)!)
+        request.httpMethod = "POST"
+        
+        // HEADERS
+        if let headers = _drm?.headers {
+            for item in headers {
+                guard let key = item.key as? String, let value = item.value as? String else {
+                    continue
+                }
+                request.setValue(value, forHTTPHeaderField: key)
+            }
+        }
+        
+        if (_onGetLicense != nil) {
+            request.httpBody = spcData
+        } else {
+            let spcEncoded = spcData?.base64EncodedString(options: [])
+            let spcUrlEncoded = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, spcEncoded as? CFString? as! CFString, nil, "?=&+" as CFString, CFStringBuiltInEncodings.UTF8.rawValue) as? String
+            let post = String(format:"spc=%@&%@", spcUrlEncoded as! CVarArg, contentId)
+            let postData = post.data(using: String.Encoding.utf8, allowLossyConversion:true)
+            request.httpBody = postData
+        }
+        
+        let postDataTask = URLSession.shared.dataTask(with: request as URLRequest, completionHandler:{ [weak self] (data:Data!,response:URLResponse!,error:Error!) in
+            guard let self = self else { return }
+            let httpResponse:HTTPURLResponse! = response as! HTTPURLResponse
+            guard error == nil else {
+                print("Error getting license from \(licenseServer), HTTP status code \(httpResponse.statusCode)")
+                self.finishLoadingWithError(error: error as NSError?)
+                self._requestingCertificateErrored = true
+                return
+            }
+            guard httpResponse.statusCode == 200 else {
+                print("Error getting license from \(licenseServer), HTTP status code \(httpResponse.statusCode)")
+                self.finishLoadingWithError(error: RCTVideoErrorHandler.licenseRequestNotOk(httpResponse.statusCode))
+                self._requestingCertificateErrored = true
+                return
+            }
+            
+            guard data != nil else {
+                self.finishLoadingWithError(error: RCTVideoErrorHandler.noDataFromLicenseRequest)
+                self._requestingCertificateErrored = true
+                return
+            }
+            
+            if (self._onGetLicense != nil) {
+                dataRequest.respond(with: data)
+            } else if let decodedData = Data(base64Encoded: data, options: []) {
+                dataRequest.respond(with: decodedData)
+            }
+            self._loadingRequest?.finishLoading()
+        })
+        postDataTask.resume()
     }
 }
