@@ -27,7 +27,7 @@ enum RCTVideoError : Int {
 }
 
 class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate {
-    // #endif
+
     private var _player:AVPlayer?
     private var _playerItem:AVPlayerItem?
     private var _source:VideoSource?
