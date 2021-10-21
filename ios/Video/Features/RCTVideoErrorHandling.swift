@@ -1,3 +1,14 @@
+enum RCTVideoError : Int {
+    case fromJSPart
+    case licenseRequestNotOk
+    case noDataFromLicenseRequest
+    case noSPC
+    case noDataRequest
+    case noCertificateData
+    case noCertificateURL
+    case noFairplayDRM
+    case noDRMData
+}
 
 struct RCTVideoErrorHandler {
     @available(*, unavailable) private init() {}
