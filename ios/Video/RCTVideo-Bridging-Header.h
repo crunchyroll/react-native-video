@@ -1,3 +1,7 @@
 #import <React/RCTViewManager.h>
 #import "RCTSwiftLog.h"
-// #import "RCTVideoCache.h"
+
+#if __has_include(<react-native-video/RCTVideoCache.h>)
+#import "RCTVideoCache.h"
+#endif
+
