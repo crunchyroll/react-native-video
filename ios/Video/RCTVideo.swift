@@ -38,9 +38,9 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     private var _paused:Bool = false
     private var _repeat:Bool = false
     private var _allowsExternalPlayback:Bool = true
-    private var _textTracks:[AnyObject]?
-    private var _selectedTextTrack:NSDictionary?
-    private var _selectedAudioTrack:NSDictionary?
+    private var _textTracks:[TextTrack]?
+    private var _selectedTextTrackCriteria:SelectedTrackCriteria?
+    private var _selectedAudioTrackCriteria:SelectedTrackCriteria?
     private var _playbackStalled:Bool = false
     private var _playInBackground:Bool = false
     private var _preventsDisplaySleepDuringVideoPlayback:Bool = true
@@ -291,11 +291,11 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         } catch {
         }
         
-        let validTextTracks:NSMutableArray! = NSMutableArray()
+        var validTextTracks:[TextTrack] = []
         if let textTracks = _textTracks, let textTrackCount = _textTracks?.count {
             for i in 0..<textTracks.count {
                 var textURLAsset:AVURLAsset!
-                let textUri:String! = (textTracks[i]["uri"] as! String)
+                let textUri:String = textTracks[i].uri
                 if textUri.lowercased().hasPrefix("http") {
                     textURLAsset = AVURLAsset(url: NSURL(string: textUri)! as URL, options:(assetOptions as! [String : Any]))
                 } else {
@@ -303,7 +303,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                 }
                 let textTrackAsset:AVAssetTrack! = textURLAsset.tracks(withMediaType: AVMediaType.text).first
                 if (textTrackAsset == nil) {continue} // fix when there's no textTrackAsset
-                validTextTracks.add(textTracks[i])
+                validTextTracks.append(textTracks[i])
                 let textCompTrack:AVMutableCompositionTrack! = mixComposition.addMutableTrack(withMediaType: AVMediaType.text,
                                                                                               preferredTrackID:kCMPersistentTrackID_Invalid)
                 do {
@@ -316,7 +316,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             }
         }
         if validTextTracks.count != _textTracks?.count {
-            setTextTracks(validTextTracks as [AnyObject]?)
+            setTextTracks(validTextTracks)
         }
         
         handler(AVPlayerItem(asset: mixComposition))
@@ -591,8 +591,8 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             setMaxBitRate(_maxBitRate)
         }
         
-        setSelectedAudioTrack(_selectedAudioTrack)
-        setSelectedTextTrack(_selectedTextTrack)
+        setSelectedAudioTrack(_selectedAudioTrackCriteria)
+        setSelectedTextTrack(_selectedTextTrackCriteria)
         setResizeMode(_resizeMode)
         setRepeat(_repeat)
         setPaused(_paused)
@@ -605,73 +605,44 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         _repeat = `repeat`
     }
     
-    func setMediaSelectionTrackForCharacteristic(characteristic:AVMediaCharacteristic, withCriteria criteria:NSDictionary?) {
-        let type:String! = criteria?["type"] as? String
-        let group:AVMediaSelectionGroup! = _player?.currentItem?.asset.mediaSelectionGroup(forMediaCharacteristic: characteristic)
-        var mediaOption:AVMediaSelectionOption!
-        
-        if (type == "disabled") {
-            // Do nothing. We want to ensure option is nil
-        } else if (type == "language") || (type == "title") {
-            let value:String! = criteria?["value"] as? String
-            for i in 0..<group.options.count {
-                let currentOption:AVMediaSelectionOption! = group.options[i]
-                var optionValue:String!
-                if (type == "language") {
-                    optionValue = currentOption.extendedLanguageTag
-                } else {
-                    optionValue = currentOption.commonMetadata.map(\.value)[0] as? String
-                }
-                if (value == optionValue) {
-                    mediaOption = currentOption
-                    break
-                }
-            }
-            //} else if ([type isEqualToString:@"default"]) {
-            //  option = group.defaultOption; */
-        } else if type == "index" {
-            if (criteria?["value"] is NSNumber) {
-                let index:Int = (criteria?["value"] as! NSNumber).intValue
-                if group.options.count > index {
-                    mediaOption = group.options[index]
-                }
-            }
-        } else if let group = group { // default. invalid type or "system"
-            _player?.currentItem?.selectMediaOptionAutomatically(in: group)
-            return
-        }
-        
-        if let group = group {
-            // If a match isn't found, option will be nil and text tracks will be disabled
-            _player?.currentItem?.select(mediaOption, in:group)
-        }
-        
-    }
+
     
     @objc
     func setSelectedAudioTrack(_ selectedAudioTrack:NSDictionary!) {
-        _selectedAudioTrack = selectedAudioTrack
-        self.setMediaSelectionTrackForCharacteristic(characteristic: AVMediaCharacteristic.audible,
-                                                     withCriteria:_selectedAudioTrack)
+        setSelectedAudioTrack(SelectedTrackCriteria(selectedAudioTrack))
+    }
+    
+    func setSelectedAudioTrack(_ selectedAudioTrack:SelectedTrackCriteria!) {
+        _selectedAudioTrackCriteria = selectedAudioTrack
+        RCTPlayerOperations.setMediaSelectionTrackForCharacteristic(player:_player, characteristic: AVMediaCharacteristic.audible,
+                                                     criteria:_selectedAudioTrackCriteria)
     }
     
     @objc
     func setSelectedTextTrack(_ selectedTextTrack:NSDictionary!) {
-        _selectedTextTrack = selectedTextTrack
+        setSelectedTextTrack(SelectedTrackCriteria(selectedTextTrack))
+    }
+    
+    func setSelectedTextTrack(_ selectedTextTrack:SelectedTrackCriteria!) {
+        _selectedTextTrackCriteria = selectedTextTrack
         if (_textTracks != nil) { // sideloaded text tracks
-            RCTPlayerOperations.setSideloadedText(player:_player, textTracks:_textTracks, selectedTextTrack:_selectedTextTrack)
+            RCTPlayerOperations.setSideloadedText(player:_player, textTracks:_textTracks, criteria:_selectedTextTrackCriteria)
         } else { // text tracks included in the HLS playlist
-            self.setMediaSelectionTrackForCharacteristic(characteristic: AVMediaCharacteristic.legible,
-                                                         withCriteria:_selectedTextTrack)
+            RCTPlayerOperations.setMediaSelectionTrackForCharacteristic(player:_player, characteristic: AVMediaCharacteristic.legible,
+                                                         criteria:_selectedTextTrackCriteria)
         }
     }
     
     @objc
-    func setTextTracks(_ textTracks:[AnyObject]!) {
+    func setTextTracks(_ textTracks:[NSDictionary]!) {
+        setTextTracks(textTracks.map { TextTrack($0) })
+    }
+    
+    func setTextTracks(_ textTracks:[TextTrack]!) {
         _textTracks = textTracks
         
         // in case textTracks was set after selectedTextTrack
-        if (_selectedTextTrack != nil) {setSelectedTextTrack(_selectedTextTrack)}
+        if (_selectedTextTrackCriteria != nil) {setSelectedTextTrack(_selectedTextTrackCriteria)}
     }
 
     @objc
@@ -982,19 +953,19 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             return
         }
         
-         var array1: [[String:String?]?] = []
+         var metadata: [[String:String?]?] = []
          for item in _items {
              let value = item.value as? String
              let identifier = item.identifier?.rawValue
             
              if let value = value {
-                 array1.append(["value":value, "identifier":identifier])
+                 metadata.append(["value":value, "identifier":identifier])
              }
          }
         
          onTimedMetadata?([
              "target": reactTag,
-             "metadata": array1
+             "metadata": metadata
          ])
     }
     

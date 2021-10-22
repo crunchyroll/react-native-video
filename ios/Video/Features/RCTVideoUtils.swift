@@ -111,13 +111,13 @@ struct RCTVideoUtils {
         return audioTracks as [AnyObject]?
     }
     
-    static func getTextTrackInfo(_ player:AVPlayer?) -> [AnyObject]! {
+    static func getTextTrackInfo(_ player:AVPlayer?) -> [TextTrack]! {
         guard let player = player else {
             return []
         }
 
         // if streaming video, we extract the text tracks
-        let textTracks:NSMutableArray! = NSMutableArray()
+        var textTracks:[TextTrack] = []
         let group = player.currentItem?.asset.mediaSelectionGroup(forMediaCharacteristic: .legible)
         for i in 0..<(group?.options.count ?? 0) {
             let currentOption = group?.options[i]
@@ -127,14 +127,14 @@ struct RCTVideoUtils {
                 title = value as! String
             }
             let language:String! = currentOption?.extendedLanguageTag ?? ""
-            let textTrack:NSDictionary! = [
+            let textTrack = TextTrack([
                 "index": NSNumber(value: i),
                 "title": title,
                 "language": language
-            ]
-            textTracks.add(textTrack)
+            ])
+            textTracks.append(textTrack)
         }
-        return textTracks as [AnyObject]?
+        return textTracks
     }
     
     // UNUSED

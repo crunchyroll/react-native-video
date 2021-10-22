@@ -9,9 +9,9 @@ let RCTVideoUnset = -1
 struct RCTPlayerOperations {
     @available(*, unavailable) private init() {}
     
-    static func setSideloadedText(player:AVPlayer?, textTracks:[AnyObject]?, selectedTextTrack:NSDictionary?) {
-        let type:String! = selectedTextTrack?["type"] as? String
-        let textTracks:[AnyObject]! = textTracks ?? RCTVideoUtils.getTextTrackInfo(player)
+    static func setSideloadedText(player:AVPlayer?, textTracks:[TextTrack]?, criteria:SelectedTrackCriteria?) {
+        let type = criteria?.type
+        let textTracks:[TextTrack]! = textTracks ?? RCTVideoUtils.getTextTrackInfo(player)
         
         // The first few tracks will be audio & video track
         let firstTextIndex:Int = 0
@@ -26,26 +26,25 @@ struct RCTPlayerOperations {
         if (type == "disabled") {
             // Do nothing. We want to ensure option is nil
         } else if (type == "language") {
-            let selectedValue:String! = selectedTextTrack?["value"] as? String
+            let selectedValue = criteria?.value as? String
             for i in 0..<textTracks.count {
-                let currentTextTrack:NSDictionary! = textTracks[i] as? NSDictionary
-                if (selectedValue == currentTextTrack["language"] as? String) {
+                let currentTextTrack = textTracks[i]
+                if (selectedValue == currentTextTrack.language) {
                     selectedTrackIndex = i
                     break
                 }
             }
         } else if (type == "title") {
-            let selectedValue:String! = selectedTextTrack?["value"] as? String
+            let selectedValue = criteria?.value as? String
             for i in 0..<textTracks.count {
-                let currentTextTrack:NSDictionary! = textTracks[i] as! NSDictionary
-                if (selectedValue == currentTextTrack["title"] as! String) {
+                let currentTextTrack = textTracks[i]
+                if (selectedValue == currentTextTrack.title) {
                     selectedTrackIndex = i
                     break
                 }
             }
         } else if (type == "index") {
-            if (selectedTextTrack?["value"] is NSNumber) {
-                let index:Int = (selectedTextTrack?["value"] as? NSNumber)!.intValue
+            if let value = criteria?.value, let index = value as? Int {
                 if textTracks.count > index {
                     selectedTrackIndex = index
                 }
@@ -60,8 +59,8 @@ struct RCTPlayerOperations {
                 selectedTrackIndex = 0 // If we can't find a match, use the first available track
                 let systemLanguage = NSLocale.preferredLanguages.first
                 for i in 0..<textTracks.count {
-                    let currentTextTrack = textTracks[i] as? [AnyHashable : Any]
-                    if systemLanguage == currentTextTrack?["language"] as? String {
+                    let currentTextTrack = textTracks[i]
+                    if systemLanguage == currentTextTrack.language {
                         selectedTrackIndex = i
                         break
                     }
@@ -79,15 +78,15 @@ struct RCTPlayerOperations {
     }
     
     // UNUSED
-    static func setStreamingText(player:AVPlayer?, selectedTextTrack:NSDictionary?) {
-        let type:String! = selectedTextTrack?["type"] as! String
+    static func setStreamingText(player:AVPlayer?, criteria:SelectedTrackCriteria?) {
+        let type = criteria?.type
         let group:AVMediaSelectionGroup! = player?.currentItem?.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.legible)
         var mediaOption:AVMediaSelectionOption!
         
         if (type == "disabled") {
             // Do nothing. We want to ensure option is nil
         } else if (type == "language") || (type == "title") {
-            let value:String! = selectedTextTrack?["value"] as! String
+            let value = criteria?.value as? String
             for i in 0..<group.options.count {
                 let currentOption:AVMediaSelectionOption! = group.options[i]
                 var optionValue:String!
@@ -104,8 +103,7 @@ struct RCTPlayerOperations {
             //} else if ([type isEqualToString:@"default"]) {
             //  option = group.defaultOption; */
         } else if (type == "index") {
-            if (selectedTextTrack?["value"] is NSNumber) {
-                let index:Int = (selectedTextTrack?["value"] as! NSNumber).intValue
+            if let value = criteria?.value, let index = value as? Int {
                 if group.options.count > index {
                     mediaOption = group.options[index]
                 }
@@ -117,5 +115,47 @@ struct RCTPlayerOperations {
         
         // If a match isn't found, option will be nil and text tracks will be disabled
         player?.currentItem?.select(mediaOption, in:group)
+    }
+    
+    static func setMediaSelectionTrackForCharacteristic(player:AVPlayer?, characteristic:AVMediaCharacteristic, criteria:SelectedTrackCriteria?) {
+        let type = criteria?.type
+        let group:AVMediaSelectionGroup! = player?.currentItem?.asset.mediaSelectionGroup(forMediaCharacteristic: characteristic)
+        var mediaOption:AVMediaSelectionOption!
+        
+        if (type == "disabled") {
+            // Do nothing. We want to ensure option is nil
+        } else if (type == "language") || (type == "title") {
+            let value = criteria?.value as? String
+            for i in 0..<group.options.count {
+                let currentOption:AVMediaSelectionOption! = group.options[i]
+                var optionValue:String!
+                if (type == "language") {
+                    optionValue = currentOption.extendedLanguageTag
+                } else {
+                    optionValue = currentOption.commonMetadata.map(\.value)[0] as? String
+                }
+                if (value == optionValue) {
+                    mediaOption = currentOption
+                    break
+                }
+            }
+            //} else if ([type isEqualToString:@"default"]) {
+            //  option = group.defaultOption; */
+        } else if type == "index" {
+            if let value = criteria?.value, let index = value as? Int {
+                if group.options.count > index {
+                    mediaOption = group.options[index]
+                }
+            }
+        } else if let group = group { // default. invalid type or "system"
+            player?.currentItem?.selectMediaOptionAutomatically(in: group)
+            return
+        }
+        
+        if let group = group {
+            // If a match isn't found, option will be nil and text tracks will be disabled
+            player?.currentItem?.select(mediaOption, in:group)
+        }
+        
     }
 }
