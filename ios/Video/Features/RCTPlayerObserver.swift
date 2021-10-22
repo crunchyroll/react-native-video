@@ -80,7 +80,7 @@ class RCTPlayerObserver: NSObject {
     private var _playerViewControllerOverlayFrameObserver:NSKeyValueObservation?
     
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        NotificationCenter.default.removeObserver(_handlers)
     }
     
     func addPlayerObservers() {
@@ -171,34 +171,34 @@ class RCTPlayerObserver: NSObject {
     
     func attachPlayerEventListeners() {
 
-        NotificationCenter.default.removeObserver(self,
+        NotificationCenter.default.removeObserver(_handlers,
                                                   name:NSNotification.Name.AVPlayerItemDidPlayToEndTime,
                                                   object:player?.currentItem)
-        NotificationCenter.default.addObserver(self,
-                                               selector:#selector(_handlers.handlePlayerItemDidReachEnd(notification:)),
+        NotificationCenter.default.addObserver(_handlers,
+                                               selector:#selector(RCTPlayerObserverHandler.handlePlayerItemDidReachEnd(notification:)),
                                                name:NSNotification.Name.AVPlayerItemDidPlayToEndTime,
                                                object:player?.currentItem)
         
-        NotificationCenter.default.removeObserver(self,
+        NotificationCenter.default.removeObserver(_handlers,
                                                   name:NSNotification.Name.AVPlayerItemPlaybackStalled,
                                                   object:nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector:#selector(_handlers.handlePlaybackStalled(notification:)),
+        NotificationCenter.default.addObserver(_handlers,
+                                               selector:#selector(RCTPlayerObserverHandler.handlePlaybackStalled(notification:)),
                                                name:NSNotification.Name.AVPlayerItemPlaybackStalled,
                                                object:nil)
-        NotificationCenter.default.removeObserver(self,
+        NotificationCenter.default.removeObserver(_handlers,
                                                   name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime,
                                                   object:nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector:#selector(_handlers.handleDidFailToFinishPlaying(notification:)),
+        NotificationCenter.default.addObserver(_handlers,
+                                               selector:#selector(RCTPlayerObserverHandler.handleDidFailToFinishPlaying(notification:)),
                                                name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime,
                                                object:nil)
         // Unused
-//        NotificationCenter.default.removeObserver(self,
+//        NotificationCenter.default.removeObserver(_handlers,
 //                                                  name:NSNotification.Name.AVPlayerItemNewAccessLogEntry,
 //                                                  object:nil)
-//        NotificationCenter.default.addObserver(self,
-//                                               selector: #selector(_handlers.handleAVPlayerAccess(notification:)),
+//        NotificationCenter.default.addObserver(_handlers,
+//                                               selector: #selector(RCTPlayerObserverHandler.handleAVPlayerAccess(notification:)),
 //                                               name:NSNotification.Name.AVPlayerItemNewAccessLogEntry,
 //                                               object:nil)
         
@@ -207,6 +207,6 @@ class RCTPlayerObserver: NSObject {
     func clearPlayer() {
         player = nil
         playerItem = nil
-        NotificationCenter.default.removeObserver(self)
+        NotificationCenter.default.removeObserver(_handlers)
     }
 }
