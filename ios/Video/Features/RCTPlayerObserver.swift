@@ -2,7 +2,16 @@ import AVFoundation
 import AVKit
 import Foundation
 
-protocol RCTPlayerObserverHandler {
+@objc
+protocol RCTPlayerObserverHandlerObjc {
+    func handleDidFailToFinishPlaying(notification:NSNotification!)
+    func handlePlaybackStalled(notification:NSNotification!)
+    func handlePlayerItemDidReachEnd(notification:NSNotification!)
+    // unused
+//    func handleAVPlayerAccess(notification:NSNotification!)
+}
+
+protocol RCTPlayerObserverHandler: RCTPlayerObserverHandlerObjc {
     func handleTimeUpdate(time:CMTime)
     func handleReadyForDisplay(changeObject: Any, change:NSKeyValueObservedChange<Bool>)
     func handleTimeMetadataChange(playerItem:AVPlayerItem, change:NSKeyValueObservedChange<[AVMetadataItem]?>)
@@ -158,5 +167,46 @@ class RCTPlayerObserver: NSObject {
         if (_timeObserver != nil) {
             addPlayerTimeObserver()
         }
+    }
+    
+    func attachPlayerEventListeners() {
+
+        NotificationCenter.default.removeObserver(self,
+                                                  name:NSNotification.Name.AVPlayerItemDidPlayToEndTime,
+                                                  object:player?.currentItem)
+        NotificationCenter.default.addObserver(self,
+                                               selector:#selector(_handlers.handlePlayerItemDidReachEnd(notification:)),
+                                               name:NSNotification.Name.AVPlayerItemDidPlayToEndTime,
+                                               object:player?.currentItem)
+        
+        NotificationCenter.default.removeObserver(self,
+                                                  name:NSNotification.Name.AVPlayerItemPlaybackStalled,
+                                                  object:nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector:#selector(_handlers.handlePlaybackStalled(notification:)),
+                                               name:NSNotification.Name.AVPlayerItemPlaybackStalled,
+                                               object:nil)
+        NotificationCenter.default.removeObserver(self,
+                                                  name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime,
+                                                  object:nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector:#selector(_handlers.handleDidFailToFinishPlaying(notification:)),
+                                               name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime,
+                                               object:nil)
+        // Unused
+//        NotificationCenter.default.removeObserver(self,
+//                                                  name:NSNotification.Name.AVPlayerItemNewAccessLogEntry,
+//                                                  object:nil)
+//        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(_handlers.handleAVPlayerAccess(notification:)),
+//                                               name:NSNotification.Name.AVPlayerItemNewAccessLogEntry,
+//                                               object:nil)
+        
+    }
+    
+    func clearPlayer() {
+        player = nil
+        playerItem = nil
+        NotificationCenter.default.removeObserver(self)
     }
 }

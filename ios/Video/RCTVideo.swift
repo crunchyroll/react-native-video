@@ -131,13 +131,10 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         super.init(coder: aDecoder)
     }
     
-    // MARK: - Progress
-    
-    func dealloc() {
+    deinit {
         NotificationCenter.default.removeObserver(self)
         self.removePlayerLayer()
-        _playerObserver.player = nil
-        _playerObserver.playerItem = nil
+        _playerObserver.clearPlayer()
     }
     
     // MARK: - App lifecycle handlers
@@ -367,84 +364,6 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         }
         
         self.playerItemPrepareText(asset: asset, assetOptions:assetOptions, withCallback:handler)
-    }
-    
-    func attachListeners() {
-        // listen for end of file
-        NotificationCenter.default.removeObserver(self,
-                                                  name:NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-                                                  object:_player?.currentItem)
-        NotificationCenter.default.addObserver(self,
-                                               selector:#selector(playerItemDidReachEnd(notification:)),
-                                               name:NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-                                               object:_player?.currentItem)
-        
-        NotificationCenter.default.removeObserver(self,
-                                                  name:NSNotification.Name.AVPlayerItemPlaybackStalled,
-                                                  object:nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector:#selector(playbackStalled(notification:)),
-                                               name:NSNotification.Name.AVPlayerItemPlaybackStalled,
-                                               object:nil)
-        
-        NotificationCenter.default.removeObserver(self,
-                                                  name:NSNotification.Name.AVPlayerItemNewAccessLogEntry,
-                                                  object:nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(handleAVPlayerAccess(notification:)),
-                                               name:NSNotification.Name.AVPlayerItemNewAccessLogEntry,
-                                               object:nil)
-        NotificationCenter.default.removeObserver(self,
-                                                  name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime,
-                                                  object:nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector:#selector(didFailToFinishPlaying(notification:)),
-                                               name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime,
-                                               object:nil)
-        
-    }
-    
-    @objc func handleAVPlayerAccess(notification:NSNotification!) {
-        let accessLog:AVPlayerItemAccessLog! = (notification.object as! AVPlayerItem).accessLog()
-        let lastEvent:AVPlayerItemAccessLogEvent! = accessLog.events.last
-        
-        /* TODO: get this working
-         if (self.onBandwidthUpdate) {
-         self.onBandwidthUpdate(@{@"bitrate": [NSNumber numberWithFloat:lastEvent.observedBitrate]});
-         }
-         */
-    }
-    
-    @objc func didFailToFinishPlaying(notification:NSNotification!) {
-        let error:NSError! = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError
-        onVideoError?(
-            [
-                "error": [
-                    "code": NSNumber(value: (error as NSError).code),
-                    "localizedDescription": error.localizedDescription ?? "",
-                    "localizedFailureReason": (error as NSError).localizedFailureReason ?? "",
-                    "localizedRecoverySuggestion": (error as NSError).localizedRecoverySuggestion ?? "",
-                    "domain": (error as NSError).domain
-                ],
-                "target": reactTag
-            ])
-    }
-    
-    @objc func playbackStalled(notification:NSNotification!) {
-        onPlaybackStalled?(["target": reactTag as Any])
-        _playbackStalled = true
-    }
-    
-    @objc func playerItemDidReachEnd(notification:NSNotification!) {
-        onVideoEnd?(["target": reactTag as Any])
-        
-        if _repeat {
-            let item:AVPlayerItem! = notification.object as? AVPlayerItem
-            item.seek(to: CMTime.zero)
-            self.applyModifiers()
-        } else {
-            _playerObserver.removePlayerTimeObserver()
-        }
     }
     
     // MARK: - Prop setters
@@ -1007,8 +926,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     override func removeFromSuperview() {
         _player?.pause()
         _player = nil
-        _playerObserver.player = nil
-        _playerObserver.playerItem = nil
+        _playerObserver.clearPlayer()
         
         self.removePlayerLayer()
         
@@ -1149,7 +1067,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                           "target": reactTag as Any])
         }
         _videoLoadStarted = false
-        attachListeners()
+        _playerObserver.attachPlayerEventListeners()
         applyModifiers()
     }
     
@@ -1211,4 +1129,48 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             } else {NSLog("not fullscreen")}
         }
     }
+    
+    @objc func handleDidFailToFinishPlaying(notification:NSNotification!) {
+        let error:NSError! = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError
+        onVideoError?(
+            [
+                "error": [
+                    "code": NSNumber(value: (error as NSError).code),
+                    "localizedDescription": error.localizedDescription ?? "",
+                    "localizedFailureReason": (error as NSError).localizedFailureReason ?? "",
+                    "localizedRecoverySuggestion": (error as NSError).localizedRecoverySuggestion ?? "",
+                    "domain": (error as NSError).domain
+                ],
+                "target": reactTag
+            ])
+    }
+    
+    @objc func handlePlaybackStalled(notification:NSNotification!) {
+        onPlaybackStalled?(["target": reactTag as Any])
+        _playbackStalled = true
+    }
+    
+    @objc func handlePlayerItemDidReachEnd(notification:NSNotification!) {
+        onVideoEnd?(["target": reactTag as Any])
+        
+        if _repeat {
+            let item:AVPlayerItem! = notification.object as? AVPlayerItem
+            item.seek(to: CMTime.zero)
+            self.applyModifiers()
+        } else {
+            _playerObserver.removePlayerTimeObserver()
+        }
+    }
+    
+    //unused
+//    @objc func handleAVPlayerAccess(notification:NSNotification!) {
+//        let accessLog:AVPlayerItemAccessLog! = (notification.object as! AVPlayerItem).accessLog()
+//        let lastEvent:AVPlayerItemAccessLogEvent! = accessLog.events.last
+//        
+//        /* TODO: get this working
+//         if (self.onBandwidthUpdate) {
+//         self.onBandwidthUpdate(@{@"bitrate": [NSNumber numberWithFloat:lastEvent.observedBitrate]});
+//         }
+//         */
+//    }
 }
