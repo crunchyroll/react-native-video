@@ -141,4 +141,13 @@ struct RCTVideoUtils {
     static func getCurrentTime(playerItem:AVPlayerItem?) -> Float {
         return Float(CMTimeGetSeconds(playerItem?.currentTime() ?? .zero))
     }
+    
+    static func base64DataFromBase64String(base64String:String!) -> NSData! {
+        if base64String != nil {
+            // NSData from the Base64 encoded str
+            let base64Data:NSData! = NSData.init(base64Encoded:base64String)
+            return base64Data
+        }
+        return nil
+    }
 }
