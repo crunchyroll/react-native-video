@@ -10,8 +10,7 @@ enum RCTVideoError : Int {
     case noDRMData
 }
 
-struct RCTVideoErrorHandler {
-    @available(*, unavailable) private init() {}
+enum RCTVideoErrorHandler {
     
     static let noDRMData: NSError = NSError(
         domain: "RCTVideo",

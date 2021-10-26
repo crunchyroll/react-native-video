@@ -3,10 +3,10 @@
 extension UIView {
     func firstAvailableUIViewController() -> UIViewController? {
         // convenience function for casting and to "mask" the recursive function
-        return traverseResponderChainForUIViewController() as? UIViewController
+        return traverseResponderChainForUIViewController()
     }
 
-    func traverseResponderChainForUIViewController() -> Any? {
+    func traverseResponderChainForUIViewController() -> UIViewController? {
         if let nextUIViewController = next as? UIViewController {
             return nextUIViewController
         } else if let nextUIView = next as? UIView {

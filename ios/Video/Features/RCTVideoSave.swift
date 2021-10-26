@@ -1,7 +1,6 @@
 import AVFoundation
 
-struct RCTVideoSave {
-    @available(*, unavailable) private init() {}
+enum RCTVideoSave {
 
     static func save(
         options:NSDictionary!,

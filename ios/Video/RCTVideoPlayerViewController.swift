@@ -30,9 +30,9 @@ class RCTVideoPlayerViewController: AVPlayerViewController {
     }
 
     func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
-        if preferredOrientation!.lowercased() == "landscape" {
+        if preferredOrientation?.lowercased() == "landscape" {
             return .landscapeRight
-        } else if preferredOrientation!.lowercased() == "portrait" {
+        } else if preferredOrientation?.lowercased() == "portrait" {
             return .portrait
         } else {
             // default case

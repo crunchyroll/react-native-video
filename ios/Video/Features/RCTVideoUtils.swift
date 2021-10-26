@@ -3,8 +3,7 @@ import AVFoundation
 /*!
  * Collection of pure functions
  */
-struct RCTVideoUtils {
-    @available(*, unavailable) private init() {}
+enum RCTVideoUtils {
     
     /*!
      * Calculates and returns the playable duration of the current player item using its loaded time ranges.

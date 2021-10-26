@@ -31,35 +31,33 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
         _loadingRequest?.finishLoading()
     }
     
-    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, shouldWaitForRenewalOfRequestedResource renewalRequest:AVAssetResourceRenewalRequest!) -> Bool {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest:AVAssetResourceRenewalRequest) -> Bool {
         return loadingRequestHandling(renewalRequest)
     }
     
-    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, shouldWaitForLoadingOfRequestedResource loadingRequest:AVAssetResourceLoadingRequest!) -> Bool {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest:AVAssetResourceLoadingRequest) -> Bool {
         return loadingRequestHandling(loadingRequest)
     }
     
-    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, didCancelLoadingRequest loadingRequest:AVAssetResourceLoadingRequest!) {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader, didCancel loadingRequest:AVAssetResourceLoadingRequest) {
         NSLog("didCancelLoadingRequest")
     }
     
-    func base64DataFromBase64String(base64String:String!) -> NSData! {
-        if base64String != nil {
-            // NSData from the Base64 encoded str
-            let base64Data:NSData! = NSData.init(base64Encoded:base64String)
-            return base64Data
+    func base64DataFromBase64String(base64String:String?) -> Data? {
+        if let base64String = base64String {
+            return Data(base64Encoded:base64String)
         }
         return nil
     }
     
     func setLicenseResult(_ license:String!) {
-        guard let respondData:NSData? = self.base64DataFromBase64String(base64String: license),
+        guard let respondData = self.base64DataFromBase64String(base64String: license),
               let _loadingRequest = _loadingRequest else {
                   setLicenseResultError("No data from JS license response")
                   return
               }
         let dataRequest:AVAssetResourceLoadingDataRequest! = _loadingRequest.dataRequest
-        dataRequest.respond(with: respondData as! Data)
+        dataRequest.respond(with: respondData)
         _loadingRequest.finishLoading()
     }
     
@@ -131,7 +129,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
                    certificateData = try Data(contentsOf: certificateURL)
                 } catch {}
             }
-            
+
             guard let certificateData = certificateData else {
                 self.finishLoadingWithError(error: RCTVideoErrorHandler.noCertificateData)
                 self._requestingCertificateErrored = true

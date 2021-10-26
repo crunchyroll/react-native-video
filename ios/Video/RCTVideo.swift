@@ -680,10 +680,10 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                     
                 })
             }
-        } else if !fullscreen && _fullscreenPlayerPresented {
+        } else if !fullscreen && _fullscreenPlayerPresented, let _playerViewController = _playerViewController {
             self.videoPlayerViewControllerWillDismiss(playerViewController: _playerViewController)
             _presentingViewController?.dismiss(animated: true, completion:{
-                self.videoPlayerViewControllerDidDismiss(playerViewController: self._playerViewController)
+                self.videoPlayerViewControllerDidDismiss(playerViewController: _playerViewController)
             })
         }
     }
@@ -792,7 +792,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     
     // MARK: - RCTVideoPlayerViewControllerDelegate
     
-    func videoPlayerViewControllerWillDismiss(playerViewController:AVPlayerViewController!) {
+    func videoPlayerViewControllerWillDismiss(playerViewController:AVPlayerViewController) {
         if _playerViewController == playerViewController && _fullscreenPlayerPresented, let onVideoFullscreenPlayerWillDismiss = onVideoFullscreenPlayerWillDismiss {
             _playerObserver.removePlayerViewControllerObservers()
             onVideoFullscreenPlayerWillDismiss(["target": reactTag as Any])
@@ -800,7 +800,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     }
     
     
-    func videoPlayerViewControllerDidDismiss(playerViewController:AVPlayerViewController!) {
+    func videoPlayerViewControllerDidDismiss(playerViewController:AVPlayerViewController) {
         if _playerViewController == playerViewController && _fullscreenPlayerPresented {
             _fullscreenPlayerPresented = false
             _presentingViewController = nil
