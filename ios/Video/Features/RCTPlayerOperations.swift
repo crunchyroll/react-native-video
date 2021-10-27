@@ -6,8 +6,7 @@ let RCTVideoUnset = -1
 /*!
  * Collection of mutating functions
  */
-struct RCTPlayerOperations {
-    @available(*, unavailable) private init() {}
+enum RCTPlayerOperations {
     
     static func setSideloadedText(player:AVPlayer?, textTracks:[TextTrack]?, criteria:SelectedTrackCriteria?) {
         let type = criteria?.type

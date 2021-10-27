@@ -32,15 +32,15 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
         _loadingRequest?.finishLoading()
     }
     
-    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, shouldWaitForRenewalOfRequestedResource renewalRequest:AVAssetResourceRenewalRequest!) -> Bool {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest:AVAssetResourceRenewalRequest) -> Bool {
         return loadingRequestHandling(renewalRequest)
     }
     
-    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, shouldWaitForLoadingOfRequestedResource loadingRequest:AVAssetResourceLoadingRequest!) -> Bool {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest:AVAssetResourceLoadingRequest) -> Bool {
         return loadingRequestHandling(loadingRequest)
     }
     
-    func resourceLoader(_ resourceLoader:AVAssetResourceLoader!, didCancelLoadingRequest loadingRequest:AVAssetResourceLoadingRequest!) {
+    func resourceLoader(_ resourceLoader:AVAssetResourceLoader, didCancel loadingRequest:AVAssetResourceLoadingRequest) {
         NSLog("didCancelLoadingRequest")
     }
 
@@ -51,7 +51,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
                   return
               }
         let dataRequest:AVAssetResourceLoadingDataRequest! = _loadingRequest.dataRequest
-        dataRequest.respond(with: respondData as! Data)
+        dataRequest.respond(with: respondData)
         _loadingRequest.finishLoading()
     }
     
