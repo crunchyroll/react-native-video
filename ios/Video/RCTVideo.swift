@@ -2,6 +2,7 @@ import AVFoundation
 import AVKit
 import Foundation
 import React
+import Promises
 
 class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverHandler {
 
@@ -218,10 +219,39 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         removePlayerLayer()
         _playerObserver.player = nil
         _playerObserver.playerItem = nil
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(0)) / Double(NSEC_PER_SEC), execute: { [weak self] in
-            guard let self = self else {return}
-            // perform on next run loop, otherwise other passed react-props may not be set
-            self.playerItemForSource(withCallback:{ (playerItem:AVPlayerItem!) in
+        
+        // perform on next run loop, otherwise other passed react-props may not be set
+        RCTVideoUtils.delay()
+            .then{ [weak self] in
+                guard let self = self else {throw NSError(domain: "", code: 0, userInfo: nil)}
+                guard let source = self._source,
+                let assetResult = RCTVideoUtils.prepareAsset(source: source),
+                let asset = assetResult.asset,
+                let assetOptions = assetResult.assetOptions else {
+                      DebugLog("Could not find video URL in source '\(self._source)'")
+                      throw NSError(domain: "", code: 0, userInfo: nil)
+                  }
+                
+#if canImport(RCTVideoCache)
+                if _videoCache.shouldCache(source:source, textTracks:_textTracks) {
+                    return _videoCache.playerItemForSourceUsingCache(uri: uri, assetOptions:assetOptions)
+                }
+#endif
+                
+                if self._drm != nil || self._localSourceEncryptionKeyScheme != nil {
+                    self._resouceLoaderDelegate = RCTResourceLoaderDelegate(
+                        asset: asset,
+                        drm: self._drm,
+                        localSourceEncryptionKeyScheme: self._localSourceEncryptionKeyScheme,
+                        onVideoError: self.onVideoError,
+                        onGetLicense: self.onGetLicense,
+                        reactTag: self.reactTag
+                    )
+                }
+                return Promise { return self.playerItemPrepareText(asset: asset, assetOptions:assetOptions) }
+            }.then{[weak self] (playerItem:AVPlayerItem!) in
+                guard let self = self else {throw  NSError(domain: "", code: 0, userInfo: nil)}
+                
                 self._player?.pause()
                 self._playerItem = playerItem
                 self._playerObserver.playerItem = self._playerItem
@@ -235,7 +265,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                 self._playerObserver.player = self._player
                 
                 self._player?.actionAtItemEnd = .none
-
+                
                 if #available(iOS 10.0, *) {
                     self.setAutomaticallyWaitsToMinimizeStalling(self._automaticallyWaitsToMinimizeStalling)
                 }
@@ -250,9 +280,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                     "drm": self._drm?.json ?? NSNull(),
                     "target": self.reactTag
                 ])
-                
-            })
-        })
+            }.catch{_ in }
         _videoLoadStarted = true
     }
     
@@ -266,112 +294,24 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         _localSourceEncryptionKeyScheme = keyScheme
     }
     
-    func playerItemPrepareText(asset:AVAsset!, assetOptions:NSDictionary?, withCallback handler:(AVPlayerItem?)->Void) {
+    func playerItemPrepareText(asset:AVAsset!, assetOptions:NSDictionary?) -> AVPlayerItem {
         if (_textTracks == nil) || _textTracks?.count==0 {
-            handler(AVPlayerItem(asset: asset))
-            return
+            return AVPlayerItem(asset: asset)
         }
         
         // AVPlayer can't airplay AVMutableCompositions
         _allowsExternalPlayback = false
-        
-        // sideload text tracks
-        let mixComposition:AVMutableComposition! = AVMutableComposition()
-        
-        let videoAsset:AVAssetTrack! = asset.tracks(withMediaType: AVMediaType.video).first
-        let videoCompTrack:AVMutableCompositionTrack! = mixComposition.addMutableTrack(withMediaType: AVMediaType.video, preferredTrackID:kCMPersistentTrackID_Invalid)
-        do {
-            try videoCompTrack.insertTimeRange(
-                CMTimeRangeMake(start: .zero, duration: videoAsset.timeRange.duration),
-                of: videoAsset,
-                at: .zero)
-        } catch {
-        }
-        
-        let audioAsset:AVAssetTrack! = asset.tracks(withMediaType: AVMediaType.audio).first
-        let audioCompTrack:AVMutableCompositionTrack! = mixComposition.addMutableTrack(withMediaType: AVMediaType.audio, preferredTrackID:kCMPersistentTrackID_Invalid)
-        do {
-            try audioCompTrack.insertTimeRange(
-                CMTimeRangeMake(start: .zero, duration: videoAsset.timeRange.duration),
-                of: audioAsset,
-                at: .zero)
-        } catch {
-        }
-        
-        var validTextTracks:[TextTrack] = []
-        if let textTracks = _textTracks, let textTrackCount = _textTracks?.count {
-            for i in 0..<textTracks.count {
-                var textURLAsset:AVURLAsset!
-                let textUri:String = textTracks[i].uri
-                if textUri.lowercased().hasPrefix("http") {
-                    textURLAsset = AVURLAsset(url: NSURL(string: textUri)! as URL, options:(assetOptions as! [String : Any]))
-                } else {
-                    textURLAsset = AVURLAsset(url: RCTVideoUtils.urlFilePath(filepath: textUri as NSString?) as URL, options:nil)
-                }
-                let textTrackAsset:AVAssetTrack! = textURLAsset.tracks(withMediaType: AVMediaType.text).first
-                if (textTrackAsset == nil) {continue} // fix when there's no textTrackAsset
-                validTextTracks.append(textTracks[i])
-                let textCompTrack:AVMutableCompositionTrack! = mixComposition.addMutableTrack(withMediaType: AVMediaType.text,
-                                                                                              preferredTrackID:kCMPersistentTrackID_Invalid)
-                do {
-                    try textCompTrack.insertTimeRange(
-                        CMTimeRangeMake(start: .zero, duration: videoAsset.timeRange.duration),
-                        of: textTrackAsset,
-                        at: .zero)
-                } catch {
-                }
-            }
-        }
+        let mixComposition = RCTVideoUtils.generateMixComposition(asset)
+        let validTextTracks = RCTVideoUtils.getValidTextTracks(
+            asset:asset,
+            assetOptions:assetOptions,
+            mixComposition:mixComposition,
+            textTracks:_textTracks)
         if validTextTracks.count != _textTracks?.count {
             setTextTracks(validTextTracks)
         }
         
-        handler(AVPlayerItem(asset: mixComposition))
-    }
-    
-    func playerItemForSource(withCallback handler:(AVPlayerItem?)->Void) {
-        var asset:AVURLAsset!
-        guard let source = _source, source.uri != nil && source.uri != "" else {
-            DebugLog("Could not find video URL in source '\(_source)'")
-            return
-        }
-        
-        let bundlePath = Bundle.main.path(forResource: source.uri, ofType: source.type) ?? ""
-        let url = source.isNetwork || source.isAsset
-        ? URL(string: source.uri ?? "")
-        : URL(fileURLWithPath: bundlePath)
-        
-        let assetOptions:NSMutableDictionary! = NSMutableDictionary()
-        
-        if url != nil && source.isNetwork {
-            if let headers = source.requestHeaders, headers.count > 0 {
-                assetOptions.setObject(headers, forKey:"AVURLAssetHTTPHeaderFieldsKey" as NSCopying)
-            }
-            let cookies:[AnyObject]! = HTTPCookieStorage.shared.cookies
-            assetOptions.setObject(cookies, forKey:AVURLAssetHTTPCookiesKey as NSCopying)
-#if canImport(RCTVideoCache)
-            if _videoCache.playerItemForSourceUsingCache(shouldCache:shouldCache, textTracks:_textTracks, uri:uri, assetOptions:assetOptions, handler:handler) {
-                return
-            }
-#endif
-            
-            asset = AVURLAsset(url: url!, options:assetOptions as! [String : Any])
-        } else {
-            asset = AVURLAsset(url: url!)
-        }
-        
-        if _drm != nil || _localSourceEncryptionKeyScheme != nil {
-            _resouceLoaderDelegate = RCTResourceLoaderDelegate(
-                asset: asset,
-                drm: _drm,
-                localSourceEncryptionKeyScheme: _localSourceEncryptionKeyScheme,
-                onVideoError: onVideoError,
-                onGetLicense: onGetLicense,
-                reactTag: reactTag
-            )
-        }
-        
-        self.playerItemPrepareText(asset: asset, assetOptions:assetOptions, withCallback:handler)
+        return AVPlayerItem(asset: mixComposition)
     }
     
     // MARK: - Prop setters
@@ -498,37 +438,31 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     func setSeek(_ info:NSDictionary!) {
         let seekTime:NSNumber! = info["time"] as! NSNumber
         let seekTolerance:NSNumber! = info["tolerance"] as! NSNumber
-        
-        let timeScale:Int = 1000
-        
-        let item:AVPlayerItem! = _player?.currentItem
-        guard item != nil && item.status == AVPlayerItem.Status.readyToPlay else {
+        let item:AVPlayerItem? = _player?.currentItem
+        guard item != nil, let player = _player, let item = item, item.status == AVPlayerItem.Status.readyToPlay else {
             _pendingSeek = true
             _pendingSeekTime = seekTime.floatValue
             return
         }
+        let wasPaused = _paused
         
-        // TODO check loadedTimeRanges
-        let cmSeekTime:CMTime = CMTimeMakeWithSeconds(Float64(seekTime.floatValue), preferredTimescale: Int32(timeScale))
-        let current:CMTime = item.currentTime()
-        // TODO figure out a good tolerance level
-        let tolerance:CMTime = CMTimeMake(value: Int64(seekTolerance.floatValue), timescale: Int32(timeScale))
-        let wasPaused:Bool = _paused
-        
-        guard CMTimeCompare(current, cmSeekTime) != 0 else { return }
-        if !wasPaused { _player?.pause() }
-        
-        _player?.seek(to: cmSeekTime, toleranceBefore:tolerance, toleranceAfter:tolerance, completionHandler:{ [weak self] (finished:Bool) in
-            guard let self = self else { return }
-            
-            self._playerObserver.addTimeObserverIfNotSet()
-            if !wasPaused {
-                self.setPaused(false)
-            }
-            self.onVideoSeek?(["currentTime": NSNumber(value: Float(CMTimeGetSeconds(item.currentTime()))),
-                               "seekTime": seekTime,
-                               "target": self.reactTag])
-        })
+        RCTPlayerOperations.seek(
+            player:player,
+            playerItem:item,
+            paused:wasPaused,
+            seekTime:seekTime.floatValue,
+            seekTolerance:seekTolerance.floatValue)
+            .then{ [weak self] (finished:Bool) in
+                guard let self = self else { return }
+                
+                self._playerObserver.addTimeObserverIfNotSet()
+                if !wasPaused {
+                    self.setPaused(false)
+                }
+                self.onVideoSeek?(["currentTime": NSNumber(value: Float(CMTimeGetSeconds(item.currentTime()))),
+                                   "seekTime": seekTime,
+                                   "target": self.reactTag])
+            }.catch{_ in }
         
         _pendingSeek = false
     }
