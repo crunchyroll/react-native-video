@@ -7,6 +7,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
     private var _requestingCertificate:Bool = false
     private var _requestingCertificateErrored:Bool = false
     private var _drm: DRMParams?
+    private var _localSourceEncryptionKeyScheme: String?
     private var _reactTag: NSNumber?
     private var _onVideoError: RCTDirectEventBlock?
     private var _onGetLicense: RCTDirectEventBlock?
@@ -15,6 +16,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
     init(
         asset: AVURLAsset,
         drm: DRMParams?,
+        localSourceEncryptionKeyScheme: String?,
         onVideoError: RCTDirectEventBlock?,
         onGetLicense: RCTDirectEventBlock?,
         reactTag: NSNumber
@@ -26,6 +28,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
         _onVideoError = onVideoError
         _onGetLicense = onGetLicense
         _drm = drm
+        _localSourceEncryptionKeyScheme = localSourceEncryptionKeyScheme
     }
     
     deinit {
@@ -45,7 +48,7 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
     }
 
     func setLicenseResult(_ license:String!) {
-        guard let respondData:NSData? = RCTVideoUtils.base64DataFromBase64String(base64String: license),
+        guard let respondData = RCTVideoUtils.base64DataFromBase64String(base64String: license),
               let _loadingRequest = _loadingRequest else {
                   setLicenseResultError("No data from JS license response")
                   return
@@ -81,10 +84,32 @@ class RCTResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate, URLSes
     }
     
     func loadingRequestHandling(_ loadingRequest:AVAssetResourceLoadingRequest!) -> Bool {
+        if handleEmbeddedKey(loadingRequest) {
+            return true
+        }
+        
         if _drm != nil {
             return handleDrm(loadingRequest)
         }
-        return false
+        
+       return false
+    }
+    
+    func handleEmbeddedKey(_ loadingRequest:AVAssetResourceLoadingRequest!) -> Bool {
+        guard let url = loadingRequest.request.url,
+              let _localSourceEncryptionKeyScheme = _localSourceEncryptionKeyScheme,
+              let persistentKeyData = RCTVideoUtils.extractDataFromCustomSchemeUrl(from: url, scheme: _localSourceEncryptionKeyScheme)
+        else {
+            return false
+        }
+        
+        loadingRequest.contentInformationRequest?.contentType = AVStreamingKeyDeliveryPersistentContentKeyType
+        loadingRequest.contentInformationRequest?.isByteRangeAccessSupported = true
+        loadingRequest.contentInformationRequest?.contentLength = Int64(persistentKeyData.count)
+        loadingRequest.dataRequest?.respond(with: persistentKeyData)
+        loadingRequest.finishLoading()
+        
+        return true
     }
     
     func handleDrm(_ loadingRequest:AVAssetResourceLoadingRequest!) -> Bool {

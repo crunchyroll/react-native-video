@@ -141,12 +141,24 @@ enum RCTVideoUtils {
         return Float(CMTimeGetSeconds(playerItem?.currentTime() ?? .zero))
     }
     
-    static func base64DataFromBase64String(base64String:String!) -> NSData! {
-        if base64String != nil {
-            // NSData from the Base64 encoded str
-            let base64Data:NSData! = NSData.init(base64Encoded:base64String)
-            return base64Data
+    static func base64DataFromBase64String(base64String:String?) -> Data? {
+        if let base64String = base64String {
+            return Data(base64Encoded:base64String)
         }
         return nil
+    }
+
+    static func replaceURLScheme(url: URL, scheme: String?) -> URL? {
+        var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        urlComponents?.scheme = scheme
+
+        return urlComponents?.url
+    }
+
+    static func extractDataFromCustomSchemeUrl(from url: URL, scheme: String) -> Data? {
+        guard url.scheme == scheme,
+              let adoptURL = RCTVideoUtils.replaceURLScheme(url:url, scheme: nil) else { return nil }
+
+        return Data(base64Encoded: adoptURL.absoluteString)
     }
 }

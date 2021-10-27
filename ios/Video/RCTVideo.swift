@@ -17,6 +17,8 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     /* DRM */
     private var _drm:DRMParams?
     
+    private var _localSourceEncryptionKeyScheme:String?
+    
     /* Required to publish events */
     private var _eventDispatcher:RCTEventDispatcher?
     private var _videoLoadStarted:Bool = false
@@ -255,8 +257,13 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     }
     
     @objc
-    func setDrm(_ drm:NSDictionary!) {
+    func setDrm(_ drm:NSDictionary) {
         _drm = DRMParams(drm)
+    }
+    
+    @objc
+    func setLocalSourceEncryptionKeyScheme(_ keyScheme:String) {
+        _localSourceEncryptionKeyScheme = keyScheme
     }
     
     func playerItemPrepareText(asset:AVAsset!, assetOptions:NSDictionary?, withCallback handler:(AVPlayerItem?)->Void) {
@@ -353,10 +360,11 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             asset = AVURLAsset(url: url!)
         }
         
-        if _drm != nil {
+        if _drm != nil || _localSourceEncryptionKeyScheme != nil {
             _resouceLoaderDelegate = RCTResourceLoaderDelegate(
                 asset: asset,
                 drm: _drm,
+                localSourceEncryptionKeyScheme: _localSourceEncryptionKeyScheme,
                 onVideoError: onVideoError,
                 onGetLicense: onGetLicense,
                 reactTag: reactTag
@@ -415,13 +423,13 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     }
     
     @objc
-    func setIgnoreSilentSwitch(_ ignoreSilentSwitch:String!) {
+    func setIgnoreSilentSwitch(_ ignoreSilentSwitch:String?) {
         _ignoreSilentSwitch = ignoreSilentSwitch
         self.applyModifiers()
     }
     
     @objc
-    func setMixWithOthers(_ mixWithOthers:String!) {
+    func setMixWithOthers(_ mixWithOthers:String?) {
         _mixWithOthers = mixWithOthers
         self.applyModifiers()
     }
@@ -479,7 +487,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     
     @objc
     func setCurrentTime(_ currentTime:Float) {
-        let info:NSDictionary! = [
+        let info:NSDictionary = [
             "time": NSNumber(value: currentTime),
             "tolerance": NSNumber(value: 100)
         ]
@@ -605,46 +613,46 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         _repeat = `repeat`
     }
     
-
+    
     
     @objc
-    func setSelectedAudioTrack(_ selectedAudioTrack:NSDictionary!) {
+    func setSelectedAudioTrack(_ selectedAudioTrack:NSDictionary?) {
         setSelectedAudioTrack(SelectedTrackCriteria(selectedAudioTrack))
     }
     
-    func setSelectedAudioTrack(_ selectedAudioTrack:SelectedTrackCriteria!) {
+    func setSelectedAudioTrack(_ selectedAudioTrack:SelectedTrackCriteria?) {
         _selectedAudioTrackCriteria = selectedAudioTrack
         RCTPlayerOperations.setMediaSelectionTrackForCharacteristic(player:_player, characteristic: AVMediaCharacteristic.audible,
-                                                     criteria:_selectedAudioTrackCriteria)
+                                                                    criteria:_selectedAudioTrackCriteria)
     }
     
     @objc
-    func setSelectedTextTrack(_ selectedTextTrack:NSDictionary!) {
+    func setSelectedTextTrack(_ selectedTextTrack:NSDictionary?) {
         setSelectedTextTrack(SelectedTrackCriteria(selectedTextTrack))
     }
     
-    func setSelectedTextTrack(_ selectedTextTrack:SelectedTrackCriteria!) {
+    func setSelectedTextTrack(_ selectedTextTrack:SelectedTrackCriteria?) {
         _selectedTextTrackCriteria = selectedTextTrack
         if (_textTracks != nil) { // sideloaded text tracks
             RCTPlayerOperations.setSideloadedText(player:_player, textTracks:_textTracks, criteria:_selectedTextTrackCriteria)
         } else { // text tracks included in the HLS playlist
             RCTPlayerOperations.setMediaSelectionTrackForCharacteristic(player:_player, characteristic: AVMediaCharacteristic.legible,
-                                                         criteria:_selectedTextTrackCriteria)
+                                                                        criteria:_selectedTextTrackCriteria)
         }
     }
     
     @objc
-    func setTextTracks(_ textTracks:[NSDictionary]!) {
-        setTextTracks(textTracks.map { TextTrack($0) })
+    func setTextTracks(_ textTracks:[NSDictionary]?) {
+        setTextTracks(textTracks?.map { TextTrack($0) })
     }
     
-    func setTextTracks(_ textTracks:[TextTrack]!) {
+    func setTextTracks(_ textTracks:[TextTrack]?) {
         _textTracks = textTracks
         
         // in case textTracks was set after selectedTextTrack
         if (_selectedTextTrackCriteria != nil) {setSelectedTextTrack(_selectedTextTrackCriteria)}
     }
-
+    
     @objc
     func setFullscreen(_ fullscreen:Bool) {
         if fullscreen && !_fullscreenPlayerPresented && _player != nil {
@@ -697,7 +705,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     }
     
     @objc
-    func setFullscreenOrientation(_ orientation:String!) {
+    func setFullscreenOrientation(_ orientation:String?) {
         _fullscreenOrientation = orientation
         if _fullscreenPlayerPresented {
             _playerViewController?.preferredOrientation = orientation
@@ -705,18 +713,17 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     }
     
     func usePlayerViewController() {
-        guard _player != nil else { return }
+        guard let _player = _player, let _playerItem = _playerItem else { return }
         
         if _playerViewController == nil {
-            _playerViewController = createPlayerViewController(player: _player, withPlayerItem:_playerItem)
-            
+            _playerViewController = createPlayerViewController(player:_player, withPlayerItem:_playerItem)
         }
         // to prevent video from being animated when resizeMode is 'cover'
         // resize mode must be set before subview is added
         setResizeMode(_resizeMode)
         
         guard let _playerViewController = _playerViewController else { return }
-
+        
         if _controls {
             let viewController:UIViewController! = self.reactViewController()
             viewController.addChild(_playerViewController)
@@ -726,8 +733,8 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         _playerObserver.playerViewController = _playerViewController
     }
     
-    func createPlayerViewController(player:AVPlayer!, withPlayerItem playerItem:AVPlayerItem!) -> RCTVideoPlayerViewController! {
-        let viewController:RCTVideoPlayerViewController! = RCTVideoPlayerViewController()
+    func createPlayerViewController(player:AVPlayer, withPlayerItem playerItem:AVPlayerItem) -> RCTVideoPlayerViewController {
+        let viewController = RCTVideoPlayerViewController()
         viewController.showsPlaybackControls = true
         viewController.rctDelegate = self
         viewController.preferredOrientation = _fullscreenOrientation
@@ -953,20 +960,20 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             return
         }
         
-         var metadata: [[String:String?]?] = []
-         for item in _items {
-             let value = item.value as? String
-             let identifier = item.identifier?.rawValue
+        var metadata: [[String:String?]?] = []
+        for item in _items {
+            let value = item.value as? String
+            let identifier = item.identifier?.rawValue
             
-             if let value = value {
-                 metadata.append(["value":value, "identifier":identifier])
-             }
-         }
+            if let value = value {
+                metadata.append(["value":value, "identifier":identifier])
+            }
+        }
         
-         onTimedMetadata?([
-             "target": reactTag,
-             "metadata": metadata
-         ])
+        onTimedMetadata?([
+            "target": reactTag,
+            "metadata": metadata
+        ])
     }
     
     // Handle player item status change.
@@ -1134,14 +1141,14 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     }
     
     //unused
-//    @objc func handleAVPlayerAccess(notification:NSNotification!) {
-//        let accessLog:AVPlayerItemAccessLog! = (notification.object as! AVPlayerItem).accessLog()
-//        let lastEvent:AVPlayerItemAccessLogEvent! = accessLog.events.last
-//        
-//        /* TODO: get this working
-//         if (self.onBandwidthUpdate) {
-//         self.onBandwidthUpdate(@{@"bitrate": [NSNumber numberWithFloat:lastEvent.observedBitrate]});
-//         }
-//         */
-//    }
+    //    @objc func handleAVPlayerAccess(notification:NSNotification!) {
+    //        let accessLog:AVPlayerItemAccessLog! = (notification.object as! AVPlayerItem).accessLog()
+    //        let lastEvent:AVPlayerItemAccessLogEvent! = accessLog.events.last
+    //
+    //        /* TODO: get this working
+    //         if (self.onBandwidthUpdate) {
+    //         self.onBandwidthUpdate(@{@"bitrate": [NSNumber numberWithFloat:lastEvent.observedBitrate]});
+    //         }
+    //         */
+    //    }
 }
