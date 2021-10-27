@@ -64,7 +64,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     private var _playerObserver: RCTPlayerObserver = RCTPlayerObserver()
     
 #if canImport(RCTVideoCache)
-    private var _videoCache:RCTVideoCachingHandler = RCTVideoCachingHandler(self.playerItemPrepareText)
+    private let _videoCache:RCTVideoCachingHandler = RCTVideoCachingHandler()
 #endif
     
 #if TARGET_OS_IOS
@@ -128,6 +128,9 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             object: nil
         )
         _playerObserver._handlers = self
+#if canImport(RCTVideoCache)
+        _videoCache.playerItemPrepareText = playerItemPrepareText
+#endif
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -233,8 +236,8 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                   }
                 
 #if canImport(RCTVideoCache)
-                if _videoCache.shouldCache(source:source, textTracks:_textTracks) {
-                    return _videoCache.playerItemForSourceUsingCache(uri: uri, assetOptions:assetOptions)
+                if self._videoCache.shouldCache(source:source, textTracks:self._textTracks) {
+                    return self._videoCache.playerItemForSourceUsingCache(uri: source.uri, assetOptions:assetOptions)
                 }
 #endif
                 
@@ -248,7 +251,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                         reactTag: self.reactTag
                     )
                 }
-                return Promise { return self.playerItemPrepareText(asset: asset, assetOptions:assetOptions) }
+                return Promise{self.playerItemPrepareText(asset: asset, assetOptions:assetOptions)}
             }.then{[weak self] (playerItem:AVPlayerItem!) in
                 guard let self = self else {throw  NSError(domain: "", code: 0, userInfo: nil)}
                 
