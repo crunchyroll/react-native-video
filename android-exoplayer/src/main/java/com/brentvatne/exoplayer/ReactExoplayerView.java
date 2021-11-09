@@ -83,7 +83,6 @@ import com.google.android.exoplayer2.source.dash.manifest.Period;
 import com.google.android.exoplayer2.source.dash.manifest.AdaptationSet;
 import com.google.android.exoplayer2.source.dash.manifest.Representation;
 import com.google.android.exoplayer2.source.dash.manifest.Descriptor;
-import com.google.android.exoplayer2.util.EventLogger;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -507,7 +506,6 @@ class ReactExoplayerView extends FrameLayout implements
                                     .setBandwidthMeter(bandwidthMeter)
                                     .setLoadControl(loadControl)
                                     .build();
-                        player.addAnalyticsListener(new EventLogger(trackSelector));
                         player.addListener(self);
                         player.addMetadataOutput(self);
                         exoPlayerView.setPlayer(player);
