@@ -176,6 +176,7 @@ class ReactExoplayerView extends FrameLayout implements
     private ReadableArray textTracks;
     private boolean disableFocus;
     private boolean disableBuffering;
+    private long contentStartTime;
     private boolean disableDisconnectError;
     private boolean preventsDisplaySleepDuringVideoPlayback = true;
     private float mProgressUpdateInterval = 250.0f;
@@ -985,11 +986,14 @@ class ReactExoplayerView extends FrameLayout implements
         final DataSource dataSource = this.mediaDataSourceFactory.createDataSource();
         final Uri sourceUri = this.srcUri;
         final Timeline timelineRef = this.player.getCurrentTimeline();
+        final long startTime = this.contentStartTime * 1000 - 100; // s -> ms with 100ms offset
 
         Future<WritableArray> result = es.submit(new Callable<WritableArray>() {
             DataSource ds = dataSource;
             Uri uri = sourceUri;
             Timeline timeline = timelineRef;
+            long startTimeUs = startTime * 1000; // ms -> us
+
             public WritableArray call() throws Exception {
                 WritableArray videoTracks = Arguments.createArray();
                 try  {
@@ -1006,8 +1010,7 @@ class ReactExoplayerView extends FrameLayout implements
                             for (int representationIndex = 0; representationIndex < adaptation.representations.size(); representationIndex++) {
                                 Representation representation = adaptation.representations.get(representationIndex);
                                 Format format = representation.format;
-                                boolean hasDrm = format.drmInitData != null;
-                                if (!hasDrm) {
+                                if (representation.presentationTimeOffsetUs <= startTimeUs) {
                                     break;
                                 }
                                 hasFoundContentPeriod = true;
@@ -1603,6 +1606,10 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setBackBufferDurationMs(int backBufferDurationMs) {
         this.backBufferDurationMs = backBufferDurationMs;
+    }
+
+    public void setContentStartTime(int contentStartTime) {
+        this.contentStartTime = (long)contentStartTime;
     }
 
     public void setDisableBuffering(boolean disableBuffering) {
