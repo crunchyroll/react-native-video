@@ -15,10 +15,10 @@ import android.view.Window;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
 import com.brentvatne.receiver.BecomingNoisyListener;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -28,6 +28,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.util.RNLog;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -70,10 +71,16 @@ import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerControlView;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSinkFactory;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
+import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.FileDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.Util;
@@ -85,6 +92,9 @@ import com.google.android.exoplayer2.source.dash.manifest.AdaptationSet;
 import com.google.android.exoplayer2.source.dash.manifest.Representation;
 import com.google.android.exoplayer2.source.dash.manifest.Descriptor;
 
+import java.io.File;
+import java.lang.Integer;
+import java.lang.Thread;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -95,12 +105,10 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.List;
-import java.lang.Thread;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.lang.Integer;
 
 @SuppressLint("ViewConstructor")
 class ReactExoplayerView extends FrameLayout implements
@@ -113,6 +121,7 @@ class ReactExoplayerView extends FrameLayout implements
         DrmSessionEventListener {
 
     public static final double DEFAULT_MAX_HEAP_ALLOCATION_PERCENT = 1;
+    public static final int DEFAULT_MAX_CACHE_SIZE = 30;
 
     private static final String TAG = "ReactExoplayerView";
 
@@ -141,10 +150,12 @@ class ReactExoplayerView extends FrameLayout implements
     private int resumeWindow;
     private long resumePosition;
     private boolean loadVideoStarted;
+    private boolean isCacheEnabled = false;
     private boolean isFullscreen;
     private boolean isInBackground;
     private boolean isPaused;
     private boolean isBuffering;
+    private int maxCacheSize = ReactExoplayerView.DEFAULT_MAX_CACHE_SIZE;
     private boolean muted = false;
     private boolean hasAudioFocus = false;
     private float rate = 1f;
@@ -1273,7 +1284,9 @@ class ReactExoplayerView extends FrameLayout implements
             this.mediaDataSourceFactory =
                     DataSourceUtil.getDefaultDataSourceFactory(this.themedReactContext, bandwidthMeter,
                             this.requestHeaders);
-
+            if (isCacheEnabled) {
+                enableCacheOnDataSource();
+            }
             if (!isSourceEqual) {
                 reloadSource();
             }
@@ -1306,7 +1319,9 @@ class ReactExoplayerView extends FrameLayout implements
             this.srcUri = uri;
             this.extension = extension;
             this.mediaDataSourceFactory = buildDataSourceFactory(true);
-
+            if (isCacheEnabled) {
+                enableCacheOnDataSource();
+            }
             if (!isSourceEqual) {
                 reloadSource();
             }
@@ -1739,5 +1754,38 @@ class ReactExoplayerView extends FrameLayout implements
                 removeViewAt(indexOfPC);
             }
         }
+    }
+    
+    private void enableCacheOnDataSource() {
+        LeastRecentlyUsedCacheEvictor evictor = new LeastRecentlyUsedCacheEvictor(maxCacheSize * 1024 * 1024);
+        File file = new File(getContext().getCacheDir(), "media");
+        SimpleCache simpleCache = new SimpleCache(file, evictor);
+        Log.i("ExoPlayer Info", "Cache enabled with " + maxCacheSize + "MB");
+        this.mediaDataSourceFactory = new CacheDataSourceFactory(
+                simpleCache,
+                mediaDataSourceFactory,
+                new FileDataSourceFactory(),
+                new CacheDataSinkFactory(simpleCache, maxCacheSize * 1024 * 1024),
+                CacheDataSource.FLAG_BLOCK_ON_CACHE | CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
+                new CacheDataSource.EventListener() {
+                    @Override
+                    public void onCacheIgnored(int reason) {
+                        Log.i("ExoPlayer Info", "Cache ignored");
+                    }
+
+                    @Override
+                    public void onCachedBytesRead(long cacheSizeBytes, long cachedBytesRead) {
+                        Log.i("ExoPlayer Info", "Cache answer, cacheSizeBytes: " + cacheSizeBytes + "   cachedBytesRead: " + cachedBytesRead);
+                    }
+                });
+    }
+
+    public void enableCache(int maxCacheSizeMb) {
+        isCacheEnabled = true;
+        maxCacheSize = maxCacheSizeMb;
+    }
+
+    public void disableCache() {
+        isCacheEnabled = false;
     }
 }
