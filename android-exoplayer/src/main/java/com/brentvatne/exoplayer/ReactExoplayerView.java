@@ -449,6 +449,15 @@ class ReactExoplayerView extends FrameLayout implements
             if (isHeapReached) {
                 return false;
             }
+            long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+            long freeMemory = runtime.maxMemory() - usedMemory;
+            long RESERVE_MEMORY = 0.2 * runtime.maxMemory();
+            if (RESERVE_MEMORY < freeMemory) {
+                // We have less than 20% of app memory available to use, we want to keep that in reserve
+                Log.w("ExoPlayer Warning", "Free memory reached <20%, forcing garbage collection");
+                runtime.gc();
+                return false;
+            }
             if (runtime.freeMemory() == 0) {
                 Log.w("ExoPlayer Warning", "Free memory reached 0, forcing garbage collection");
                 runtime.gc();
