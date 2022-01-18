@@ -455,7 +455,6 @@ class ReactExoplayerView extends FrameLayout implements
             long bufferedMs = bufferedDurationUs / (long)1000;
             if (reserveMemory > freeMemory && bufferedMs > 2000) {
                 // We have less than 20% of app memory available to use, we want to keep that in reserve
-                Log.w("ExoPlayer Warning", "Free memory reached <20%, forcing garbage collection");
                 return false;
             }
             if (runtime.freeMemory() == 0) {
@@ -1634,10 +1633,10 @@ class ReactExoplayerView extends FrameLayout implements
         Runtime runtime = Runtime.getRuntime();
         long usedMemory = runtime.totalMemory() - runtime.freeMemory();
         long freeMemory = runtime.maxMemory() - usedMemory;
-        long RESERVE_MEMORY = (long)0.3 * runtime.maxMemory();
-        if (RESERVE_MEMORY > freeMemory) {
+        long reserveMemory = (long)0.3 * runtime.maxMemory();
+        if (reserveMemory > freeMemory) {
             // We have less than 5% of app memory available to use, we want to keep that in reserve
-            Log.w("ExoPlayer Warning", "Free memory reached <5%, setting back buffer to 0ms to reduce memory pressure!");
+            Log.w("ExoPlayer Warning", "Free memory is <30%, setting back buffer to 0ms to reduce memory pressure!");
             this.backBufferDurationMs = 0;
             return;
         }
