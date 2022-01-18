@@ -1632,6 +1632,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     public void setBackBufferDurationMs(int backBufferDurationMs) {
+        private Runtime runtime = Runtime.getRuntime();
         long usedMemory = runtime.totalMemory() - runtime.freeMemory();
         long freeMemory = runtime.maxMemory() - usedMemory;
         long RESERVE_MEMORY = (long)0.05 * runtime.maxMemory();
