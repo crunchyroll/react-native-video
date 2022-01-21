@@ -457,7 +457,7 @@ class ReactExoplayerView extends FrameLayout implements
             long reserveMemory = (long)minBufferMemoryReservePercent * runtime.maxMemory();
             long bufferedMs = bufferedDurationUs / (long)1000;
             if (reserveMemory > freeMemory && bufferedMs > 2000) {
-                // We have less than 20% of app memory available to use, we want to keep that in reserve
+                // We don't have enough memory in reserve so we stop buffering to allow other components to use it instead
                 return false;
             }
             if (runtime.freeMemory() == 0) {
