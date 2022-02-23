@@ -133,6 +133,7 @@ public class ReactVideoView extends ScalableVideoView implements
     private boolean mPlayInBackground = false;
     private boolean mBackgroundPaused = false;
     private boolean mIsFullscreen = false;
+    private boolean mIsFullscreenHandlingDisabled = false;
 
     private int mMainVer = 0;
     private int mPatchVer = 0;
@@ -490,6 +491,10 @@ public class ReactVideoView extends ScalableVideoView implements
         }
     }
 
+    public void setDisableFullscreenHandling(boolean isFullscreenHandlingDisabled) {
+        mIsFullscreenHandlingDisabled = isFullscreenHandlingDisabled;
+    }
+
     public void setFullscreen(boolean isFullscreen) {
         if (isFullscreen == mIsFullscreen) {
             return; // Avoid generating events when nothing is changing
@@ -513,12 +518,18 @@ public class ReactVideoView extends ScalableVideoView implements
                         | SYSTEM_UI_FLAG_FULLSCREEN;
             }
             mEventEmitter.receiveEvent(getId(), Events.EVENT_FULLSCREEN_WILL_PRESENT.toString(), null);
-            decorView.setSystemUiVisibility(uiOptions);
+            if (!mIsFullscreenHandlingDisabled) {
+                // Do not modify system UI when fullscreen handling is disabled
+                decorView.setSystemUiVisibility(uiOptions);
+            }
             mEventEmitter.receiveEvent(getId(), Events.EVENT_FULLSCREEN_DID_PRESENT.toString(), null);
         } else {
             uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
             mEventEmitter.receiveEvent(getId(), Events.EVENT_FULLSCREEN_WILL_DISMISS.toString(), null);
-            decorView.setSystemUiVisibility(uiOptions);
+            if (!mIsFullscreenHandlingDisabled) {
+            // Do not modify system UI when fullscreen handling is disabled
+                decorView.setSystemUiVisibility(uiOptions);
+            }
             mEventEmitter.receiveEvent(getId(), Events.EVENT_FULLSCREEN_DID_DISMISS.toString(), null);
         }
     }
