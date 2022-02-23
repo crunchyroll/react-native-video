@@ -144,6 +144,7 @@ class ReactExoplayerView extends FrameLayout implements
     private long resumePosition;
     private boolean loadVideoStarted;
     private boolean isFullscreen;
+    private boolean isFullscreenHandlingDisabled;
     private boolean isInBackground;
     private boolean isPaused;
     private boolean isBuffering;
@@ -1658,6 +1659,10 @@ class ReactExoplayerView extends FrameLayout implements
         this.disableDisconnectError = disableDisconnectError;
     }
 
+    public void setDisableFullscreenHandling(boolean isFullscreenHandlingDisabled) {
+        this.isFullscreenHandlingDisabled = isFullscreenHandlingDisabled;
+    }
+
     public void setFullscreen(boolean fullscreen) {
         if (fullscreen == isFullscreen) {
             return; // Avoid generating events when nothing is changing
@@ -1681,12 +1686,16 @@ class ReactExoplayerView extends FrameLayout implements
                         | SYSTEM_UI_FLAG_FULLSCREEN;
             }
             eventEmitter.fullscreenWillPresent();
-            decorView.setSystemUiVisibility(uiOptions);
+            if (!isFullscreenHandlingDisabled) {
+                decorView.setSystemUiVisibility(uiOptions);
+            }
             eventEmitter.fullscreenDidPresent();
         } else {
             uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
             eventEmitter.fullscreenWillDismiss();
-            decorView.setSystemUiVisibility(uiOptions);
+            if (!isFullscreenHandlingDisabled) {
+                decorView.setSystemUiVisibility(uiOptions);
+            }
             eventEmitter.fullscreenDidDismiss();
         }
     }

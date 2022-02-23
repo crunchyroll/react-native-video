@@ -527,7 +527,7 @@ public class ReactVideoView extends ScalableVideoView implements
             uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
             mEventEmitter.receiveEvent(getId(), Events.EVENT_FULLSCREEN_WILL_DISMISS.toString(), null);
             if (!mIsFullscreenHandlingDisabled) {
-            // Do not modify system UI when fullscreen handling is disabled
+                // Do not modify system UI when fullscreen handling is disabled
                 decorView.setSystemUiVisibility(uiOptions);
             }
             mEventEmitter.receiveEvent(getId(), Events.EVENT_FULLSCREEN_DID_DISMISS.toString(), null);
