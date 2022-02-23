@@ -37,6 +37,7 @@ public class ReactVideoViewManager extends SimpleViewManager<ReactVideoView> {
     public static final String PROP_SEEK = "seek";
     public static final String PROP_RATE = "rate";
     public static final String PROP_FULLSCREEN = "fullscreen";
+    public static final String PROP_DISABLE_FULLSCREEN_HANDLING = "disableFullscreenHandling";
     public static final String PROP_PLAY_IN_BACKGROUND = "playInBackground";
     public static final String PROP_CONTROLS = "controls";
 
@@ -153,6 +154,11 @@ public class ReactVideoViewManager extends SimpleViewManager<ReactVideoView> {
     @ReactProp(name = PROP_RATE)
     public void setRate(final ReactVideoView videoView, final float rate) {
         videoView.setRateModifier(rate);
+    }
+
+    @ReactProp(name = PROP_DISABLE_FULLSCREEN_HANDLING, defaultBoolean = false)
+    public void setDisableFullscreenHandling(final ReactExoplayerView videoView, final boolean fullscreenHandlingDisabled) {
+        videoView.setDisableFullscreenHandling(fullscreenHandlingDisabled);
     }
 
     @ReactProp(name = PROP_FULLSCREEN, defaultBoolean = false)
