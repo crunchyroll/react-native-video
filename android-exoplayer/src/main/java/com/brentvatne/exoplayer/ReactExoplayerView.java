@@ -100,6 +100,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.lang.Integer;
 
 @SuppressLint("ViewConstructor")
@@ -943,8 +944,15 @@ class ReactExoplayerView extends FrameLayout implements
             int width = videoFormat != null ? videoFormat.width : 0;
             int height = videoFormat != null ? videoFormat.height : 0;
             String trackId = videoFormat != null ? videoFormat.id : "-1";
-            eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
-                    getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
+
+            ExecutorService es = Executors.newSingleThreadExecutor();
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
+                        getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
+                }
+            });
         }
     }
 
@@ -1010,6 +1018,10 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private WritableArray getVideoTrackInfoFromManifest() {
+        this.getVideoTrackInfoFromManifest(0);
+    }
+
+    private WritableArray getVideoTrackInfoFromManifest(int retryCount) {
         ExecutorService es = Executors.newSingleThreadExecutor();
         final DataSource dataSource = this.mediaDataSourceFactory.createDataSource();
         final Uri sourceUri = this.srcUri;
@@ -1064,7 +1076,10 @@ class ReactExoplayerView extends FrameLayout implements
         });
 
         try {
-            WritableArray results = result.get();
+            WritableArray results = result.get(3000, TimeUnit.MILLISECONDS);
+            if (results == null && retryCount < 1) {
+                return this.getVideoTrackInfoFromManifest(++retryCount);
+            }
             es.shutdown();
             return results;
         } catch (Exception e) {}
