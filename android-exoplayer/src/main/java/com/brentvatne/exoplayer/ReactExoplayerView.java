@@ -1006,8 +1006,7 @@ class ReactExoplayerView extends FrameLayout implements
                 videoTrack.putInt("height",format.height == Format.NO_VALUE ? 0 : format.height);
                 videoTrack.putInt("bitrate", format.bitrate == Format.NO_VALUE ? 0 : format.bitrate);
                 videoTrack.putString("codecs", format.codecs != null ? format.codecs : "");
-                videoTrack.putString("trackId",
-                        format.id == null ? String.valueOf(trackIndex) : format.id);
+                videoTrack.putString("trackId", format.id == null ? String.valueOf(trackIndex) : format.id);
                 if (isFormatSupported(format)) {
                     videoTracks.pushMap(videoTrack);
                 }
@@ -1018,7 +1017,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private WritableArray getVideoTrackInfoFromManifest() {
-        this.getVideoTrackInfoFromManifest(0);
+        return this.getVideoTrackInfoFromManifest(0);
     }
 
     private WritableArray getVideoTrackInfoFromManifest(int retryCount) {
