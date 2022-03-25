@@ -947,10 +947,17 @@ class ReactExoplayerView extends FrameLayout implements
 
             ExecutorService es = Executors.newSingleThreadExecutor();
             es.execute(new Runnable() {
+
+                long duration = player.getDuration();
+                long currentPosition = player.getCurrentPosition();
+                WritableArray audioTrackInfo = getAudioTrackInfo();
+                WritableArray textTrackInfo = getTextTrackInfo();
+                Timeline timelineRef = player.getCurrentTimeline();
+
                 @Override
                 public void run() {
-                    eventEmitter.load(player.getDuration(), player.getCurrentPosition(), width, height,
-                        getAudioTrackInfo(), getTextTrackInfo(), getVideoTrackInfo(), trackId);
+                    eventEmitter.load(duration, currentPosition, width, height,
+                        audioTrackInfo, textTrackInfo, getVideoTrackInfo(timelineRef), trackId);
                 }
             });
         }
@@ -1016,15 +1023,14 @@ class ReactExoplayerView extends FrameLayout implements
         return videoTracks;
     }
 
-    private WritableArray getVideoTrackInfoFromManifest() {
-        return this.getVideoTrackInfoFromManifest(0);
+    private WritableArray getVideoTrackInfoFromManifest(Timeline timeline) {
+        return this.getVideoTrackInfoFromManifest(timeline, 0);
     }
 
-    private WritableArray getVideoTrackInfoFromManifest(int retryCount) {
+    private WritableArray getVideoTrackInfoFromManifest(Timeline timelineRef, int retryCount) {
         ExecutorService es = Executors.newSingleThreadExecutor();
         final DataSource dataSource = this.mediaDataSourceFactory.createDataSource();
         final Uri sourceUri = this.srcUri;
-        final Timeline timelineRef = this.player.getCurrentTimeline();
         final long startTime = this.contentStartTime * 1000 - 100; // s -> ms with 100ms offset
 
         Future<WritableArray> result = es.submit(new Callable<WritableArray>() {
@@ -1077,7 +1083,7 @@ class ReactExoplayerView extends FrameLayout implements
         try {
             WritableArray results = result.get(3000, TimeUnit.MILLISECONDS);
             if (results == null && retryCount < 1) {
-                return this.getVideoTrackInfoFromManifest(++retryCount);
+                return this.getVideoTrackInfoFromManifest(timelineRef, ++retryCount);
             }
             es.shutdown();
             return results;
