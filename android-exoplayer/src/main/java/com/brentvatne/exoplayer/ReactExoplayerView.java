@@ -945,6 +945,7 @@ class ReactExoplayerView extends FrameLayout implements
             int height = videoFormat != null ? videoFormat.height : 0;
             String trackId = videoFormat != null ? videoFormat.id : "-1";
 
+            // Properties that must be accessed on the main thread
             long duration = player.getDuration();
             long currentPosition = player.getCurrentPosition();
             WritableArray audioTrackInfo = getAudioTrackInfo();
@@ -954,9 +955,9 @@ class ReactExoplayerView extends FrameLayout implements
 
             ExecutorService es = Executors.newSingleThreadExecutor();
             es.execute(new Runnable() {
-
                 @Override
                 public void run() {
+                    // To prevent ANRs caused by getVideoTrackInfo we run this on a different thread and notify the player only when we're done
                     eventEmitter.load(duration, currentPosition, width, height,
                         audioTrackInfo, textTrackInfo, getVideoTrackInfo(timelineRef, trackRendererIndex), trackId);
                 }
@@ -1042,7 +1043,6 @@ class ReactExoplayerView extends FrameLayout implements
 
             public WritableArray call() throws Exception {
                 WritableArray videoTracks = Arguments.createArray();
-                Thread.sleep(3500);
                 try  {
                     DashManifest manifest = DashUtil.loadManifest(this.ds, this.uri);
                     int periodCount = manifest.getPeriodCount();
