@@ -945,14 +945,14 @@ class ReactExoplayerView extends FrameLayout implements
             int height = videoFormat != null ? videoFormat.height : 0;
             String trackId = videoFormat != null ? videoFormat.id : "-1";
 
+            long duration = player.getDuration();
+            long currentPosition = player.getCurrentPosition();
+            WritableArray audioTrackInfo = getAudioTrackInfo();
+            WritableArray textTrackInfo = getTextTrackInfo();
+            Timeline timelineRef = player.getCurrentTimeline();
+
             ExecutorService es = Executors.newSingleThreadExecutor();
             es.execute(new Runnable() {
-
-                long duration = player.getDuration();
-                long currentPosition = player.getCurrentPosition();
-                WritableArray audioTrackInfo = getAudioTrackInfo();
-                WritableArray textTrackInfo = getTextTrackInfo();
-                Timeline timelineRef = player.getCurrentTimeline();
 
                 @Override
                 public void run() {
