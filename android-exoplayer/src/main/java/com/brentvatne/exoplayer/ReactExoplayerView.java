@@ -986,9 +986,9 @@ class ReactExoplayerView extends FrameLayout implements
         }
         return audioTracks;
     }
-    private WritableArray getVideoTrackInfo() {
+    private WritableArray getVideoTrackInfo(Timeline timelineRef) {
 
-        WritableArray contentVideoTracks = this.getVideoTrackInfoFromManifest();
+        WritableArray contentVideoTracks = this.getVideoTrackInfoFromManifest(timelineRef);
         if (contentVideoTracks != null) {
             isUsingContentResolution = true;
             return contentVideoTracks;
