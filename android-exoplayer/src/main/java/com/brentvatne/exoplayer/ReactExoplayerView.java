@@ -1041,6 +1041,7 @@ class ReactExoplayerView extends FrameLayout implements
 
             public WritableArray call() throws Exception {
                 WritableArray videoTracks = Arguments.createArray();
+                Thread.sleep(3500);
                 try  {
                     DashManifest manifest = DashUtil.loadManifest(this.ds, this.uri);
                     int periodCount = manifest.getPeriodCount();
