@@ -950,6 +950,7 @@ class ReactExoplayerView extends FrameLayout implements
             WritableArray audioTrackInfo = getAudioTrackInfo();
             WritableArray textTrackInfo = getTextTrackInfo();
             Timeline timelineRef = player.getCurrentTimeline();
+            int trackRendererIndex = getTrackRendererIndex(C.TRACK_TYPE_VIDEO);
 
             ExecutorService es = Executors.newSingleThreadExecutor();
             es.execute(new Runnable() {
@@ -957,7 +958,7 @@ class ReactExoplayerView extends FrameLayout implements
                 @Override
                 public void run() {
                     eventEmitter.load(duration, currentPosition, width, height,
-                        audioTrackInfo, textTrackInfo, getVideoTrackInfo(timelineRef), trackId);
+                        audioTrackInfo, textTrackInfo, getVideoTrackInfo(timelineRef, trackRendererIndex), trackId);
                 }
             });
         }
@@ -986,7 +987,7 @@ class ReactExoplayerView extends FrameLayout implements
         }
         return audioTracks;
     }
-    private WritableArray getVideoTrackInfo(Timeline timelineRef) {
+    private WritableArray getVideoTrackInfo(Timeline timelineRef, int trackRendererIndex) {
 
         WritableArray contentVideoTracks = this.getVideoTrackInfoFromManifest(timelineRef);
         if (contentVideoTracks != null) {
@@ -997,12 +998,12 @@ class ReactExoplayerView extends FrameLayout implements
         WritableArray videoTracks = Arguments.createArray();
 
         MappingTrackSelector.MappedTrackInfo info = trackSelector.getCurrentMappedTrackInfo();
-        int index = getTrackRendererIndex(C.TRACK_TYPE_VIDEO);
-        if (info == null || index == C.INDEX_UNSET) {
+        
+        if (info == null || trackRendererIndex == C.INDEX_UNSET) {
             return videoTracks;
         }
 
-        TrackGroupArray groups = info.getTrackGroups(index);
+        TrackGroupArray groups = info.getTrackGroups(trackRendererIndex);
         for (int i = 0; i < groups.length; ++i) {
             TrackGroup group = groups.get(i);
 
