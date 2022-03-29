@@ -447,7 +447,7 @@ class ReactExoplayerView extends FrameLayout implements
 
         @Override
         public boolean shouldContinueLoading(long playbackPositionUs, long bufferedDurationUs, float playbackSpeed) {
-            if (this.disableBufferNoConnection && !ConnectivityUtil.isConnected(getContext())) {
+            if (ReactExoplayerView.this.disableBufferNoConnection && !ConnectivityUtil.isConnected(getContext())) {
                 return false;
             }
             if (ReactExoplayerView.this.disableBuffering) {
