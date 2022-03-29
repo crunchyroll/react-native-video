@@ -15,6 +15,8 @@ import android.view.Window;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
@@ -444,6 +446,12 @@ class ReactExoplayerView extends FrameLayout implements
 
         @Override
         public boolean shouldContinueLoading(long playbackPositionUs, long bufferedDurationUs, float playbackSpeed) {
+            ConnectivityManager cm = (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            boolean connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            if (!connected) {
+                return false;
+            }
             if (ReactExoplayerView.this.disableBuffering) {
                 return false;
             }
