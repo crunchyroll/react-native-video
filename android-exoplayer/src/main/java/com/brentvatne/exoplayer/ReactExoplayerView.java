@@ -186,6 +186,7 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean disableBuffering;
     private long contentStartTime;
     private boolean disableDisconnectError;
+    private boolean disableBufferNoConnection;
     private boolean preventsDisplaySleepDuringVideoPlayback = true;
     private float mProgressUpdateInterval = 250.0f;
     private boolean playInBackground = false;
@@ -446,7 +447,7 @@ class ReactExoplayerView extends FrameLayout implements
 
         @Override
         public boolean shouldContinueLoading(long playbackPositionUs, long bufferedDurationUs, float playbackSpeed) {
-            if (!ConnectivityUtil.isConnected(getContext())) {
+            if (this.disableBufferNoConnection && !ConnectivityUtil.isConnected(getContext())) {
                 return false;
             }
             if (ReactExoplayerView.this.disableBuffering) {
@@ -1661,6 +1662,10 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setDisableDisconnectError(boolean disableDisconnectError) {
         this.disableDisconnectError = disableDisconnectError;
+    }
+
+    public void setDisableBufferNoConnection(boolean disableBufferNoConnection) {
+        this.disableBufferNoConnection = disableBufferNoConnection;
     }
 
     public void setFullscreen(boolean fullscreen) {

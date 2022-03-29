@@ -70,6 +70,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     private static final String PROP_DISABLE_FOCUS = "disableFocus";
     private static final String PROP_DISABLE_BUFFERING = "disableBuffering";
     private static final String PROP_DISABLE_DISCONNECT_ERROR = "disableDisconnectError";
+    private static final String PROP_DISABLE_BUFFER_NO_CONNECTION = "disableBufferNoConnection";
     private static final String PROP_FULLSCREEN = "fullscreen";
     private static final String PROP_USE_TEXTURE_VIEW = "useTextureView";
     private static final String PROP_SECURE_VIEW = "useSecureView";
@@ -320,6 +321,11 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     @ReactProp(name = PROP_DISABLE_DISCONNECT_ERROR, defaultBoolean = false)
     public void setDisableDisconnectError(final ReactExoplayerView videoView, final boolean disableDisconnectError) {
         videoView.setDisableDisconnectError(disableDisconnectError);
+    }
+
+    @ReactProp(name = PROP_DISABLE_BUFFER_NO_CONNECTION, defaultBoolean = false)
+    public void setDisableBufferNoConnection(final ReactExoplayerView videoView, final boolean disableBufferNoConnection) {
+        videoView.setDisableBufferNoConnection(disableBufferNoConnection);
     }
 
     @ReactProp(name = PROP_FULLSCREEN, defaultBoolean = false)

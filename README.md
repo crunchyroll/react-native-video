@@ -282,6 +282,7 @@ var styles = StyleSheet.create({
 * [currentPlaybackTime](#currentPlaybackTime)
 * [disableFocus](#disableFocus)
 * [disableDisconnectError](#disableDisconnectError)
+* [disableBufferNoConnection](#disableBufferNoConnection)
 * [filter](#filter)
 * [filterEnabled](#filterEnabled)
 * [fullscreen](#fullscreen)
@@ -433,6 +434,13 @@ Platforms: Android Exoplayer
 Determines if the player needs to throw an error when connection is lost or not
 * **false (default)** - Player will throw an error when connection is lost
 * **true** - Player will keep trying to buffer when network connect is lost
+
+Platforms: Android Exoplayer
+
+#### disableBufferNoConnection
+Determines if the player will attempt to buffer if there is no network connection
+* **false (default)** - Player will try to buffer even without a network connection
+* **true** - Player will not try to buffer even without a network connection
 
 Platforms: Android Exoplayer
 
