@@ -1,3 +1,5 @@
+package com.brentvatne.exoplayer;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
