@@ -1,6 +1,7 @@
 package com.brentvatne.exoplayer;
 
 import java.io.IOException;
+import android.util.Log;
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy;
 import com.google.android.exoplayer2.upstream.HttpDataSource.HttpDataSourceException;
 import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorInfo;
@@ -16,6 +17,9 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
 
   @Override
   public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
+    Log.d("nnn loadErrorInfo", loadErrorInfo.toString());
+    Log.d("nnn loadEventInfo", loadErrorInfo.loadEventInfo.toString());
+    Log.d("nnn exception", loadErrorInfo.exception.toString());
     if (loadErrorInfo.exception instanceof HttpDataSourceException) {
       // Capture the error we get when there is no network connectivity and keep retrying it
       return 1000; // Retry every second
