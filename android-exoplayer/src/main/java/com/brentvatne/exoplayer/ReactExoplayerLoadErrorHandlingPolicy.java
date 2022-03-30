@@ -1,7 +1,6 @@
 package com.brentvatne.exoplayer;
 
 import java.io.IOException;
-import android.util.Log;
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy;
 import com.google.android.exoplayer2.upstream.HttpDataSource.HttpDataSourceException;
 import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorInfo;
@@ -17,9 +16,6 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
 
   @Override
   public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
-    Log.d("nnn loadErrorInfo", loadErrorInfo.toString());
-    Log.d("nnn toString", loadErrorInfo.exception.toString());
-    Log.d("nnn getMessage", loadErrorInfo.exception.getMessage());
     if (
       loadErrorInfo.exception instanceof HttpDataSourceException &&
       (loadErrorInfo.exception.getMessage() == "Unable to connect" || loadErrorInfo.exception.getMessage() == "Software caused connection abort")
