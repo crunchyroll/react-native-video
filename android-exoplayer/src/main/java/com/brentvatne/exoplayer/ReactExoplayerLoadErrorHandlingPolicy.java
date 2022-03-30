@@ -19,8 +19,9 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
   public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
     Log.d("nnn loadErrorInfo", loadErrorInfo.toString());
     Log.d("nnn loadEventInfo", loadErrorInfo.loadEventInfo.toString());
-    Log.d("nnn exception", loadErrorInfo.exception.toString());
-    if (loadErrorInfo.exception instanceof HttpDataSourceException) {
+    Log.d("nnn exception", String.valueOf(loadErrorInfo.exception.hashCode()));
+    Log.d("nnn exception", String.valueOf(Integer.valueOf(loadErrorInfo.exception.hashCode())));
+    if (loadErrorInfo.exception instanceof HttpDataSourceException && String.valueOf(loadErrorInfo.exception.hashCode()) == "Unable to connect") {
       // Capture the error we get when there is no network connectivity and keep retrying it
       return 1000; // Retry every second
     } else if(loadErrorInfo.errorCount < this.minLoadRetryCount) {
