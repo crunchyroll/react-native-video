@@ -511,6 +511,7 @@ class ReactExoplayerView extends FrameLayout implements
     private void initializePlayer() {
         Log.w("Velocity", "DEBUG1");
         ReactExoplayerView self = this;
+        Activity activity = themedReactContext.getCurrentActivity();
         // This ensures all props have been settled, to avoid async racing conditions.
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -541,10 +542,10 @@ class ReactExoplayerView extends FrameLayout implements
                                     // Failed to intialize DRM session manager - cannot continue
                                     return;
                                 }
+
                                 // Initialize handler to run on the main thread
-                                new Handler(Looper.getMainLooper()).post(new Runnable () {
-                                    @Override
-                                    public void run () {
+                                activity.runOnUiThread(new Runnable() {
+                                    public void run() {
                                         Log.w("Velocity", "DEBUG9");
                                         // Source initialization must run on the main thread
                                         initializePlayerSource(self, drmSessionManager);
