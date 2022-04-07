@@ -509,36 +509,27 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void initializePlayer() {
-        Log.w("Velocity", "DEBUG1");
         ReactExoplayerView self = this;
         Activity activity = themedReactContext.getCurrentActivity();
         // This ensures all props have been settled, to avoid async racing conditions.
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.w("Velocity", "DEBUG2");
                 try {
                     if (player == null) {
-                        Log.w("Velocity", "DEBUG3");
                         // Initialize core configuration and listeners
                         initializePlayerCore(self);
                     }
-                    Log.w("Velocity", "DEBUG3");
                     if (playerNeedsSource && srcUri != null) {
-                        Log.w("Velocity", "DEBUG4");
                         exoPlayerView.invalidateAspectRatio();
-                        Log.w("Velocity", "DEBUG5");
                         // DRM session manager creation must be done on a different thread to prevent crashes so we start a new thread
                         ExecutorService es = Executors.newSingleThreadExecutor();
                         es.execute(new Runnable() {
                             @Override
                             public void run() {
-                                Log.w("Velocity", "DEBUG6");
                                 // DRM initialization must run on a different thread
                                 DrmSessionManager drmSessionManager = initializePlayerDrm(self);
-                                Log.w("Velocity", "DEBUG7");
                                 if (drmSessionManager == null && self.drmUUID != null) {
-                                    Log.w("Velocity", "DEBUG8");
                                     // Failed to intialize DRM session manager - cannot continue
                                     Log.e("ExoPlayer Exception", "Failed to initialize DRM Session Manager Framework!");
                                     eventEmitter.error("Failed to initialize DRM Session Manager Framework!", new Exception("DRM Session Manager Framework failure!"), "3003");
@@ -548,7 +539,6 @@ class ReactExoplayerView extends FrameLayout implements
                                 // Initialize handler to run on the main thread
                                 activity.runOnUiThread(new Runnable() {
                                     public void run() {
-                                        Log.w("Velocity", "DEBUG9");
                                         // Source initialization must run on the main thread
                                         initializePlayerSource(self, drmSessionManager);
                                     }
@@ -572,7 +562,6 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void initializePlayerCore(ReactExoplayerView self) {
-        Log.w("Velocity", "CORE1");
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
         trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
         trackSelector.setParameters(trackSelector.buildUponParameters()
@@ -608,26 +597,20 @@ class ReactExoplayerView extends FrameLayout implements
 
         PlaybackParameters params = new PlaybackParameters(rate, 1f);
         player.setPlaybackParameters(params);
-        Log.w("Velocity", "CORE2");
 
     }
 
     private DrmSessionManager initializePlayerDrm(ReactExoplayerView self) {
-        Log.w("Velocity", "DRM1");
         DrmSessionManager drmSessionManager = null;
         if (self.drmUUID != null) {
             try {
-                Log.w("Velocity", "DRM2");
                 drmSessionManager = self.buildDrmSessionManager(self.drmUUID, self.drmLicenseUrl,
                         self.drmLicenseHeader);
-                Log.w("Velocity", "DRM3");
             } catch (UnsupportedDrmException e) {
-                Log.w("Velocity", "DRM-ERR1");
                 int errorStringId = Util.SDK_INT < 18 ? R.string.error_drm_not_supported
                         : (e.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
                         ? R.string.error_drm_unsupported_scheme : R.string.error_drm_unknown);
                 eventEmitter.error(getResources().getString(errorStringId), e, "3003");
-                Log.w("Velocity", "DRM-ERR2");
                 return null;
             }
         }
@@ -635,7 +618,6 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void initializePlayerSource(ReactExoplayerView self, DrmSessionManager drmSessionManager) {
-        Log.w("Velocity", "SOURCE1");
         ArrayList<MediaSource> mediaSourceList = buildTextSources();
         MediaSource videoSource = buildMediaSource(srcUri, extension, drmSessionManager);
         MediaSource mediaSource;
@@ -661,7 +643,6 @@ class ReactExoplayerView extends FrameLayout implements
         loadVideoStarted = true;
 
         finishPlayerInitialization();
-        Log.w("Velocity", "SOURCE2");
     }
 
     private void finishPlayerInitialization() {
