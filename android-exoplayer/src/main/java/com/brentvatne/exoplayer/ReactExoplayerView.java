@@ -537,9 +537,11 @@ class ReactExoplayerView extends FrameLayout implements
                                 // DRM initialization must run on a different thread
                                 DrmSessionManager drmSessionManager = initializePlayerDrm(self);
                                 Log.w("Velocity", "DEBUG7");
-                                if (drmSessionManager == null) {
+                                if (drmSessionManager == null && this.drmUUID != null) {
                                     Log.w("Velocity", "DEBUG8");
                                     // Failed to intialize DRM session manager - cannot continue
+                                    Log.e("ExoPlayer Exception", "Failed to initialize DRM Session Manager Framework!");
+                                    eventEmitter.error("Failed to initialize DRM Session Manager Framework!", ex, "3003");
                                     return;
                                 }
 
