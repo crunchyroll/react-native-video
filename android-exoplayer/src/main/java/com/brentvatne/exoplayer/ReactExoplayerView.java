@@ -449,7 +449,7 @@ class ReactExoplayerView extends FrameLayout implements
             if (ReactExoplayerView.this.disableBuffering) {
                 return false;
             }
-            int loadedBytes = getAllocator().getTotalBytesAllocated();
+            /*int loadedBytes = getAllocator().getTotalBytesAllocated();
             boolean isHeapReached = availableHeapInBytes > 0 && loadedBytes >= availableHeapInBytes;
             if (isHeapReached) {
                 return false;
@@ -461,7 +461,7 @@ class ReactExoplayerView extends FrameLayout implements
             if (reserveMemory > freeMemory && bufferedMs > 2000) {
                 // We don't have enough memory in reserve so we stop buffering to allow other components to use it instead
                 return false;
-            }
+            }*/
             if (runtime.freeMemory() == 0) {
                 Log.w("ExoPlayer Warning", "Free memory reached 0, forcing garbage collection");
                 runtime.gc();
