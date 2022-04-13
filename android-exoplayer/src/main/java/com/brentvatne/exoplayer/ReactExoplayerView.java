@@ -169,6 +169,7 @@ class ReactExoplayerView extends FrameLayout implements
     private double minBufferMemoryReservePercent = ReactExoplayerView.DEFAULT_MIN_BUFFER_MEMORY_RESERVE;
     private Handler mainHandler;
     private Timer bufferCheckTimer;
+    private DefaultAllocator allocator;
 
     // Props from React
     private int backBufferDurationMs = DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS;
@@ -428,7 +429,14 @@ class ReactExoplayerView extends FrameLayout implements
 
     private class RNVLoadControl extends DefaultLoadControl {
         private int availableHeapInBytes = 0;
+        private boolean isBuffering = false;
         private Runtime runtime;
+        private DefaultAllocator allocator;
+
+        private static final int ABOVE_HIGH_WATERMARK = 0;
+        private static final int BETWEEN_WATERMARKS = 1;
+        private static final int BELOW_LOW_WATERMARK = 2;
+
         public RNVLoadControl(DefaultAllocator allocator, int minBufferMs, int maxBufferMs, int bufferForPlaybackMs, int bufferForPlaybackAfterRebufferMs, int targetBufferBytes, boolean prioritizeTimeOverSizeThresholds, int backBufferDurationMs, boolean retainBackBufferFromKeyframe) {
             super(allocator,
                     minBufferMs,
@@ -440,13 +448,20 @@ class ReactExoplayerView extends FrameLayout implements
                     backBufferDurationMs,
                     retainBackBufferFromKeyframe);
             runtime = Runtime.getRuntime();
+            this.allocator = allocator;
             ActivityManager activityManager = (ActivityManager) themedReactContext.getSystemService(themedReactContext.ACTIVITY_SERVICE);
             availableHeapInBytes = (int) Math.floor(activityManager.getMemoryClass() * maxHeapAllocationPercent * 1024 * 1024);
+        }
+
+        private int getBufferTimeState(long bufferedDurationUs) {
+            return bufferedDurationUs > maxBufferUs ? ABOVE_HIGH_WATERMARK
+                : (bufferedDurationUs < minBufferUs ? BELOW_LOW_WATERMARK : BETWEEN_WATERMARKS);
         }
 
         @Override
         public boolean shouldContinueLoading(long playbackPositionUs, long bufferedDurationUs, float playbackSpeed) {
             if (ReactExoplayerView.this.disableBuffering) {
+                isBuffering = false;
                 return false;
             }
             /*int loadedBytes = getAllocator().getTotalBytesAllocated();
@@ -461,13 +476,30 @@ class ReactExoplayerView extends FrameLayout implements
             if (reserveMemory > freeMemory && bufferedMs > 2000) {
                 // We don't have enough memory in reserve so we stop buffering to allow other components to use it instead
                 return false;
-            }*/
+            }
             if (runtime.freeMemory() == 0) {
                 Log.w("ExoPlayer Warning", "Free memory reached 0, forcing garbage collection");
                 runtime.gc();
                 return false;
             }
-            return super.shouldContinueLoading(playbackPositionUs, bufferedDurationUs, playbackSpeed);
+            return super.shouldContinueLoading(playbackPositionUs, bufferedDurationUs, playbackSpeed);*/
+            int bufferTimeState = getBufferTimeState(bufferedDurationUs);
+            boolean wasBuffering = isBuffering;
+            isBuffering = bufferTimeState == BELOW_LOW_WATERMARK || (bufferTimeState == BETWEEN_WATERMARKS
+                    /*
+                    * commented below line to achieve drip-feeding method for better caching. once you are below maxBufferUs, do fetch immediately.
+                    * Added by Sri
+                    */
+                    /* && isBuffering */
+                    /* && !targetBufferSizeReached*/);
+            /*if (priorityTaskManager != null && isBuffering != wasBuffering) {
+                if (isBuffering) {
+                    priorityTaskManager.add(LOADING_PRIORITY);
+                } else {
+                    priorityTaskManager.remove(LOADING_PRIORITY);
+                }
+            }*/
+            return isBuffering;
         }
     }
 
@@ -567,9 +599,9 @@ class ReactExoplayerView extends FrameLayout implements
         trackSelector.setParameters(trackSelector.buildUponParameters()
                 .setMaxVideoBitrate(maxBitRate == 0 ? Integer.MAX_VALUE : maxBitRate));
 
-        DefaultAllocator allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
+        self.allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
         RNVLoadControl loadControl = new RNVLoadControl(
-                allocator,
+                self.allocator,
                 minBufferMs,
                 maxBufferMs,
                 bufferForPlaybackMs,
