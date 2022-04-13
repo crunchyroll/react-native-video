@@ -432,8 +432,8 @@ class ReactExoplayerView extends FrameLayout implements
         private boolean isBuffering = false;
         private Runtime runtime;
         private DefaultAllocator allocator;
-        private minBufferUs = 0;
-        private maxBufferUs = 0;
+        private int minBufferUs = 0;
+        private int maxBufferUs = 0;
 
         private static final int ABOVE_HIGH_WATERMARK = 0;
         private static final int BETWEEN_WATERMARKS = 1;
