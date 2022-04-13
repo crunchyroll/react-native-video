@@ -432,6 +432,8 @@ class ReactExoplayerView extends FrameLayout implements
         private boolean isBuffering = false;
         private Runtime runtime;
         private DefaultAllocator allocator;
+        private minBufferUs = 0;
+        private maxBufferUs = 0;
 
         private static final int ABOVE_HIGH_WATERMARK = 0;
         private static final int BETWEEN_WATERMARKS = 1;
@@ -448,6 +450,8 @@ class ReactExoplayerView extends FrameLayout implements
                     backBufferDurationMs,
                     retainBackBufferFromKeyframe);
             runtime = Runtime.getRuntime();
+            minBufferUs = minBufferMs * 1000;
+            maxBufferUs = maxBufferMs * 1000;
             this.allocator = allocator;
             ActivityManager activityManager = (ActivityManager) themedReactContext.getSystemService(themedReactContext.ACTIVITY_SERVICE);
             availableHeapInBytes = (int) Math.floor(activityManager.getMemoryClass() * maxHeapAllocationPercent * 1024 * 1024);
