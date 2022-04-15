@@ -1209,7 +1209,8 @@ class ReactExoplayerView extends FrameLayout implements
 
     }
 
-    @Override onPlaybackStateChanged(int playbackState) {
+    @Override
+    void onPlaybackStateChanged(int playbackState) {
         if (state == Player.STATE_READY && seekTime != C.TIME_UNSET) {
             eventEmitter.seek(player.getCurrentPosition(), seekTime);
             seekTime = C.TIME_UNSET;
