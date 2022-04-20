@@ -1374,7 +1374,8 @@ class ReactExoplayerView extends FrameLayout implements
     public void setSrc(final Uri uri, final String extension, Map<String, String> headers) {
         if (uri != null) {
             boolean isSourceEqual = uri.equals(srcUri);
-
+            
+            hasDrmFailed = false;
             this.srcUri = uri;
             this.extension = extension;
             this.requestHeaders = headers;
