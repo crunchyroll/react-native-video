@@ -1301,7 +1301,7 @@ class ReactExoplayerView extends FrameLayout implements
                     playerNeedsSource = true;
                     updateResumePosition();
                     initializePlayer();
-                    setPlayWhenReady(true)
+                    setPlayWhenReady(true);
                     return;
                 }
             } else {
@@ -1319,7 +1319,7 @@ class ReactExoplayerView extends FrameLayout implements
                         playerNeedsSource = true;
                         updateResumePosition();
                         initializePlayer();
-                        setPlayWhenReady(true)
+                        setPlayWhenReady(true);
                         return;
                     }
                 }
