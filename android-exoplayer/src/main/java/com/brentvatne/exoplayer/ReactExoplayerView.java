@@ -803,15 +803,9 @@ class ReactExoplayerView extends FrameLayout implements
     private void startPlayback() {
         if (player != null) {
             switch (player.getPlaybackState()) {
+                case Player.STATE_IDLE:
                 case Player.STATE_ENDED:
                     initializePlayer();
-                    break;
-                case Player.STATE_IDLE:
-                    initializePlayer();
-                    if (!player.getPlayWhenReady()) {
-                        setPlayWhenReady(true);
-                    }
-                    break;
                 case Player.STATE_BUFFERING:
                 case Player.STATE_READY:
                     if (!player.getPlayWhenReady()) {
@@ -821,7 +815,6 @@ class ReactExoplayerView extends FrameLayout implements
                 default:
                     break;
             }
-
         } else {
             initializePlayer();
         }
@@ -1307,6 +1300,12 @@ class ReactExoplayerView extends FrameLayout implements
                     initializePlayer();
                     return;
                 }
+            } else if (cause instanceof HttpDataSource.HttpDataSourceException) {
+                // this exception happens when connectivity is lost
+                updateResumePosition();
+                initializePlayer();
+                setPlayWhenReady(true);
+                return;
             } else {
                 errorCode = "2021";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
