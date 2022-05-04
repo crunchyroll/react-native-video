@@ -708,9 +708,9 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private MediaSource buildMediaSource(Uri uri, String overrideExtension, DrmSessionManager drmSessionManager) {
-        if (uri == null) {
+        // if (uri == null) {
             throw new IllegalStateException("Invalid video uri");
-        }
+        // }
         int type = Util.inferContentType(!TextUtils.isEmpty(overrideExtension) ? "." + overrideExtension
                 : uri.getLastPathSegment());
         config.setDisableDisconnectError(this.disableDisconnectError);
