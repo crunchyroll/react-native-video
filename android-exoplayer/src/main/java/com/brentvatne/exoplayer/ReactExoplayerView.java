@@ -540,8 +540,15 @@ class ReactExoplayerView extends FrameLayout implements
                                 // Initialize handler to run on the main thread
                                 activity.runOnUiThread(new Runnable() {
                                     public void run() {
-                                        // Source initialization must run on the main thread
-                                        initializePlayerSource(self, drmSessionManager);
+                                        try {
+                                            // Source initialization must run on the main thread
+                                            initializePlayerSource(self, drmSessionManager);
+                                        } catch (Exception ex) {
+                                            self.playerNeedsSource = true;
+                                            Log.e("ExoPlayer Exception", "Failed to initialize Player source!");
+                                            Log.e("ExoPlayer Exception", ex.toString());
+                                            eventEmitter.error(ex.toString(), ex, "1002");
+                                        }
                                     }
                                 });
                             }
