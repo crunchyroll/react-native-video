@@ -711,7 +711,7 @@ class ReactExoplayerView extends FrameLayout implements
         // if (uri == null) {
             throw new IllegalStateException("Invalid video uri");
         // }
-        int type = Util.inferContentType(!TextUtils.isEmpty(overrideExtension) ? "." + overrideExtension
+       /* int type = Util.inferContentType(!TextUtils.isEmpty(overrideExtension) ? "." + overrideExtension
                 : uri.getLastPathSegment());
         config.setDisableDisconnectError(this.disableDisconnectError);
         switch (type) {
@@ -748,7 +748,7 @@ class ReactExoplayerView extends FrameLayout implements
             default: {
                 throw new IllegalStateException("Unsupported type: " + type);
             }
-        }
+        }*/
     }
 
     private ArrayList<MediaSource> buildTextSources() {
