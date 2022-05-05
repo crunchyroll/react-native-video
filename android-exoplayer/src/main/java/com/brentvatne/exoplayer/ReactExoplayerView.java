@@ -541,13 +541,16 @@ class ReactExoplayerView extends FrameLayout implements
                                 activity.runOnUiThread(new Runnable() {
                                     public void run() {
                                         try {
+                                            Log.w("Velocity", "DEBUG1");
                                             // Source initialization must run on the main thread
                                             initializePlayerSource(self, drmSessionManager);
+                                            Log.w("Velocity", "DEBUG2");
                                         } catch (Exception ex) {
+                                            Log.w("Velocity", "DEBUG3");
                                             self.playerNeedsSource = true;
                                             Log.e("ExoPlayer Exception", "Failed to initialize Player source!");
                                             Log.e("ExoPlayer Exception", ex.toString());
-                                            eventEmitter.error(ex.toString(), ex, "1002");
+                                            self.eventEmitter.error(ex.toString(), ex, "1001");
                                         }
                                     }
                                 });
@@ -627,7 +630,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     private void initializePlayerSource(ReactExoplayerView self, DrmSessionManager drmSessionManager) {
         ArrayList<MediaSource> mediaSourceList = buildTextSources();
-        MediaSource videoSource = buildMediaSource(srcUri, extension, drmSessionManager);
+        MediaSource videoSource = buildMediaSource(self.srcUri, self.extension, drmSessionManager);
         MediaSource mediaSource;
         if (mediaSourceList.size() == 0) {
             mediaSource = videoSource;
