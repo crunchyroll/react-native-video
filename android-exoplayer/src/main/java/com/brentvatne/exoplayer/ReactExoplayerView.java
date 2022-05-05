@@ -590,6 +590,7 @@ class ReactExoplayerView extends FrameLayout implements
                     .build();
         player.addListener(self);
         player.addMetadataOutput(self);
+        player.setHandleAudioBecomingNoisy(true);
         exoPlayerView.setPlayer(player);
         audioBecomingNoisyReceiver.setListener(self);
         bandwidthMeter.addEventListener(new Handler(), self);
