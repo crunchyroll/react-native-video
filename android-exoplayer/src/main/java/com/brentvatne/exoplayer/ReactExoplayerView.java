@@ -1042,7 +1042,7 @@ class ReactExoplayerView extends FrameLayout implements
     private WritableArray getAudioTrackInfo() {
         WritableArray audioTracks = Arguments.createArray();
 
-        if (trackSelector = null) {
+        if (trackSelector == null) {
             // Likely player is unmounting so no audio tracks are available anymore
             return audioTracks;
         }
