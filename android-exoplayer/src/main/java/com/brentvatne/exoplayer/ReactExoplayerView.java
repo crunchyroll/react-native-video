@@ -1325,6 +1325,7 @@ class ReactExoplayerView extends FrameLayout implements
                 errorCode = "3004";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
             } else if(cause instanceof MediaDrmCallbackException || cause instanceof DrmSessionException) {
+                Log.e("Velocity", "3005 - 1");
                 errorCode = "3005";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
                 if (!hasDrmFailed) {
@@ -1349,6 +1350,7 @@ class ReactExoplayerView extends FrameLayout implements
             if (cause != null) {
                 Throwable rootCause = cause.getCause();
                 if (rootCause instanceof MediaDrmCallbackException) {
+                    Log.e("Velocity", "3005 - 2");
                     errorCode = "3005";
                     errorString = getResources().getString(R.string.unrecognized_media_format);
                     if (!hasDrmFailed) {
