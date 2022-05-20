@@ -676,33 +676,45 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private DrmSessionManager buildDrmSessionManager(UUID uuid, String licenseUrl, String[] keyRequestPropertiesArray, int retryCount) throws UnsupportedDrmException {
+        Log.e("Velocity", "DEBUG1");
         if (Util.SDK_INT < 18) {
             return null;
         }
+        Log.e("Velocity", "DEBUG2");
         try {
+            Log.e("Velocity", "DEBUG3");
             HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl,
                     buildHttpDataSourceFactory(false));
+            Log.e("Velocity", "DEBUG4");
             if (keyRequestPropertiesArray != null) {
                 for (int i = 0; i < keyRequestPropertiesArray.length - 1; i += 2) {
                     drmCallback.setKeyRequestProperty(keyRequestPropertiesArray[i], keyRequestPropertiesArray[i + 1]);
                 }
             }
+            Log.e("Velocity", "DEBUG5");
             FrameworkMediaDrm mediaDrm = FrameworkMediaDrm.newInstance(uuid);
             if (hasDrmFailed) {
+                Log.e("Velocity", "DEBUG6");
                 // When DRM fails using L1 we want to switch to L3
                 mediaDrm.setPropertyString("securityLevel", "L3");
             }
+            Log.e("Velocity", "DEBUG7");
             return new DefaultDrmSessionManager(uuid, mediaDrm, drmCallback, null, false, 3);
         } catch(UnsupportedDrmException ex) {
+            Log.e("Velocity", "DEBUG8");
             // Unsupported DRM exceptions are handled by the calling method
             throw ex;
         } catch (Exception ex) {
+            Log.e("Velocity", "DEBUG9");
             if (retryCount < 3) {
+                Log.e("Velocity", "DEBUG10");
                 // Attempt retry 3 times in case where the OS Media DRM Framework fails for whatever reason
                 return buildDrmSessionManager(uuid, licenseUrl, keyRequestPropertiesArray, ++retryCount);
             }
+            Log.e("Velocity", "DEBUG11");
             // Handle the unknow exception and emit to JS
             eventEmitter.error(ex.toString(), ex, "3006");
+            Log.e("Velocity", "DEBUG12");
             return null;
         }
     }
