@@ -1328,7 +1328,7 @@ class ReactExoplayerView extends FrameLayout implements
                 Log.e("Velocity", "3005 - 1");
                 errorCode = "3005";
                 errorString = getResources().getString(R.string.unrecognized_media_format);
-                if (!hasDrmFailed) {
+                if (!hasDrmFailed || cause instanceof DrmSessionException) {
                     // When DRM fails to reach the app level certificate server it will fail with a source error so we assume that it is DRM related and try one more time
                     hasDrmFailed = true;
                     playerNeedsSource = true;
