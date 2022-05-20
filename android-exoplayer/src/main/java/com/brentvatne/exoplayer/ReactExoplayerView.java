@@ -1414,7 +1414,7 @@ class ReactExoplayerView extends FrameLayout implements
     public void setSrc(final Uri uri, final String extension, Map<String, String> headers) {
         if (uri != null) {
             boolean isSourceEqual = uri.equals(srcUri);
-            
+            Log.e("Velocity", "setSrc");
             hasDrmFailed = false;
             this.srcUri = uri;
             this.extension = extension;
@@ -1430,6 +1430,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     public void clearSrc() {
+        Log.e("Velocity", "clearSrc");
         if (srcUri != null) {
             player.stop(true);
             this.srcUri = null;
@@ -1451,7 +1452,7 @@ class ReactExoplayerView extends FrameLayout implements
     public void setRawSrc(final Uri uri, final String extension) {
         if (uri != null) {
             boolean isSourceEqual = uri.equals(srcUri);
-
+            Log.e("Velocity", "setRawSrc");
             this.srcUri = uri;
             this.extension = extension;
             this.mediaDataSourceFactory = buildDataSourceFactory(true);
