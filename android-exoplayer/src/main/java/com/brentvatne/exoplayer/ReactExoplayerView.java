@@ -6,16 +6,19 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.util.DisplayMetrics;
 
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
@@ -104,6 +107,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.lang.Integer;
+import java.lang.reflect.Method;
 
 @SuppressLint("ViewConstructor")
 class ReactExoplayerView extends FrameLayout implements
@@ -1092,7 +1096,7 @@ class ReactExoplayerView extends FrameLayout implements
                 Format format = group.getFormat(trackIndex);
                 WritableMap videoTrack = Arguments.createMap();
 
-                int shortestFormatSide = format.height < hormat.width ? format.height : format.width;
+                int shortestFormatSide = format.height < format.width ? format.height : format.width;
                 int shortestScreenSize = this.getScreenShortestSide();
                 Log.w("Velocity", "shortestScreenSize: " + String.valueOf(shortestScreenSize) + "| shortestFormatSide " + String.valueOf(shortestFormatSide));
                 if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
@@ -1115,7 +1119,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private int getScreenShortestSide() {
-        Display display = context.getWindowManager().getDefaultDisplay();
+        Display display = this.themedReactContext.getWindowManager().getDefaultDisplay();
         int realWidth;
         int realHeight;
 
@@ -1167,6 +1171,9 @@ class ReactExoplayerView extends FrameLayout implements
 
             public WritableArray call() throws Exception {
                 WritableArray videoTracks = Arguments.createArray();
+                int shortestScreenSize = this.getScreenShortestSide();
+                boolean limitMaxResolution = this.limitMaxResolution;
+
                 try  {
                     DashManifest manifest = DashUtil.loadManifest(this.ds, this.uri);
                     int periodCount = manifest.getPeriodCount();
@@ -1187,10 +1194,10 @@ class ReactExoplayerView extends FrameLayout implements
                                 hasFoundContentPeriod = true;
                                 WritableMap videoTrack = Arguments.createMap();
 
-                                int shortestFormatSide = format.height < hormat.width ? format.height : format.width;
-                                int shortestScreenSize = this.getScreenShortestSide();
+                                int shortestFormatSide = format.height < format.width ? format.height : format.width;
+                                
                                 Log.w("Velocity", "shortestScreenSize: " + String.valueOf(shortestScreenSize) + "| shortestFormatSide " + String.valueOf(shortestFormatSide));
-                                if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
+                                if (limitMaxResolution && shortestFormatSide > shortestScreenSize) {
                                     // This video track is larger than screen resolution so we do not include it in the list of video tracks
                                     continue;
                                 }
