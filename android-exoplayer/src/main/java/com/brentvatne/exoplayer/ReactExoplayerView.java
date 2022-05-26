@@ -160,6 +160,7 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean hasDrmFailed = false;
     private boolean isUsingContentResolution = false;
     private boolean selectTrackWhenReady = false;
+    private boolean limitMaxResolution = false;
 
     private int minBufferMs = DefaultLoadControl.DEFAULT_MIN_BUFFER_MS;
     private int maxBufferMs = DefaultLoadControl.DEFAULT_MAX_BUFFER_MS;
@@ -1090,6 +1091,15 @@ class ReactExoplayerView extends FrameLayout implements
             for (int trackIndex = 0; trackIndex < group.length; trackIndex++) {
                 Format format = group.getFormat(trackIndex);
                 WritableMap videoTrack = Arguments.createMap();
+
+                int shortestFormatSide = format.height < hormat.width ? format.height : format.width;
+                int shortestScreenSize = this.getScreenShortestSide();
+                Log.w("Velocity", "shortestScreenSize: " + String.valueOf(shortestScreenSize) + "| shortestFormatSide " + String.valueOf(shortestFormatSide));
+                if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
+                    // This video track is larger than screen resolution so we do not include it in the list of video tracks
+                    continue;
+                }
+
                 videoTrack.putInt("width", format.width == Format.NO_VALUE ? 0 : format.width);
                 videoTrack.putInt("height",format.height == Format.NO_VALUE ? 0 : format.height);
                 videoTrack.putInt("bitrate", format.bitrate == Format.NO_VALUE ? 0 : format.bitrate);
@@ -1102,6 +1112,41 @@ class ReactExoplayerView extends FrameLayout implements
         }
 
         return videoTracks;
+    }
+
+    private int getScreenShortestSide() {
+        Display display = context.getWindowManager().getDefaultDisplay();
+        int realWidth;
+        int realHeight;
+
+        if (Build.VERSION.SDK_INT >= 17){
+            //new pleasant way to get real metrics
+            DisplayMetrics realMetrics = new DisplayMetrics();
+            display.getRealMetrics(realMetrics);
+            realWidth = realMetrics.widthPixels;
+            realHeight = realMetrics.heightPixels;
+
+        } else if (Build.VERSION.SDK_INT >= 14) {
+            //Reflection for this weird in-between time
+            try {
+                Method mGetRawH = Display.class.getMethod("getRawHeight");
+                Method mGetRawW = Display.class.getMethod("getRawWidth");
+                realWidth = (Integer) mGetRawW.invoke(display);
+                realHeight = (Integer) mGetRawH.invoke(display);
+
+            } catch (Exception e) {
+                //This may not be 100% accurate, but it's all we've got
+                realWidth = display.getWidth();
+                realHeight = display.getHeight();
+                Log.e("Display Info", "Couldn't use reflection to get the real display metrics.");
+            }
+
+        } else {
+            //This should be close, as lower API devices should not have window navigation bars
+            realWidth = display.getWidth();
+            realHeight = display.getHeight();
+        }
+        return realHeight < realWidth ? realHeight : realWidth;
     }
 
     private WritableArray getVideoTrackInfoFromManifest(Timeline timeline) {
@@ -1141,6 +1186,15 @@ class ReactExoplayerView extends FrameLayout implements
                                 }
                                 hasFoundContentPeriod = true;
                                 WritableMap videoTrack = Arguments.createMap();
+
+                                int shortestFormatSide = format.height < hormat.width ? format.height : format.width;
+                                int shortestScreenSize = this.getScreenShortestSide();
+                                Log.w("Velocity", "shortestScreenSize: " + String.valueOf(shortestScreenSize) + "| shortestFormatSide " + String.valueOf(shortestFormatSide));
+                                if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
+                                    // This video track is larger than screen resolution so we do not include it in the list of video tracks
+                                    continue;
+                                }
+
                                 videoTrack.putInt("width", format.width == Format.NO_VALUE ? 0 : format.width);
                                 videoTrack.putInt("height",format.height == Format.NO_VALUE ? 0 : format.height);
                                 videoTrack.putInt("bitrate", format.bitrate == Format.NO_VALUE ? 0 : format.bitrate);
@@ -1461,6 +1515,10 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setResizeModeModifier(@ResizeMode.Mode int resizeMode) {
         exoPlayerView.setResizeMode(resizeMode);
+    }
+
+    public void setLimitMaxResolution(boolean limitMaxResolution) {
+        this.limitMaxResolution = limitMaxResolution;
     }
 
     private void applyModifiers() {
