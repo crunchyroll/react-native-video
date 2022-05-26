@@ -1162,14 +1162,16 @@ class ReactExoplayerView extends FrameLayout implements
         final DataSource dataSource = this.mediaDataSourceFactory.createDataSource();
         final Uri sourceUri = this.srcUri;
         final long startTime = this.contentStartTime * 1000 - 100; // s -> ms with 100ms offset
+        int shortestScreenSide = this.getScreenShortestSide(this.themedReactContext);
+        boolean limitMaxRes = this.limitMaxResolution;
 
         Future<WritableArray> result = es.submit(new Callable<WritableArray>() {
             DataSource ds = dataSource;
             Uri uri = sourceUri;
             Timeline timeline = timelineRef;
             long startTimeUs = startTime * 1000; // ms -> us
-            int shortestScreenSize = this.getScreenShortestSide(this.themedReactContext);
-            boolean limitMaxResolution = this.limitMaxResolution;
+            int shortestScreenSize = shortestScreenSide;
+            boolean limitMaxResolution = limitMaxRes;
 
             public WritableArray call() throws Exception {
                 WritableArray videoTracks = Arguments.createArray();
