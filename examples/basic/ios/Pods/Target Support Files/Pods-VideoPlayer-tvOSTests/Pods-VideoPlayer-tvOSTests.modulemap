@@ -1,0 +1,6 @@
+framework module Pods_VideoPlayer_tvOSTests {
+  umbrella header "Pods-VideoPlayer-tvOSTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
