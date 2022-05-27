@@ -462,6 +462,7 @@ class ReactExoplayerView extends FrameLayout implements
             }
             long usedMemory = runtime.totalMemory() - runtime.freeMemory();
             long freeMemory = runtime.maxMemory() - usedMemory;
+            Log.w("Velocity", "freeMemory: " + String.valueOf(freeMemory));
             long reserveMemory = (long)minBufferMemoryReservePercent * runtime.maxMemory();
             long bufferedMs = bufferedDurationUs / (long)1000;
             if (reserveMemory > freeMemory && bufferedMs > 2000) {
