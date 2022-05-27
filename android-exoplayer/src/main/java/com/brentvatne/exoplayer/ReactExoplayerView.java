@@ -165,7 +165,6 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean isUsingContentResolution = false;
     private boolean selectTrackWhenReady = false;
     private boolean limitMaxResolution = false;
-    private float enableBackBufferAvailableMemory = -1f;
 
     private int minBufferMs = DefaultLoadControl.DEFAULT_MIN_BUFFER_MS;
     private int maxBufferMs = DefaultLoadControl.DEFAULT_MAX_BUFFER_MS;
@@ -174,6 +173,7 @@ class ReactExoplayerView extends FrameLayout implements
     private double maxHeapAllocationPercent = ReactExoplayerView.DEFAULT_MAX_HEAP_ALLOCATION_PERCENT;
     private double minBackBufferMemoryReservePercent = ReactExoplayerView.DEFAULT_MIN_BACK_BUFFER_MEMORY_RESERVE;
     private double minBufferMemoryReservePercent = ReactExoplayerView.DEFAULT_MIN_BUFFER_MEMORY_RESERVE;
+    private double enableBackBufferAvailableMemory = -1f;
     private Handler mainHandler;
     private Timer bufferCheckTimer;
 
@@ -1543,10 +1543,6 @@ class ReactExoplayerView extends FrameLayout implements
         this.limitMaxResolution = limitMaxResolution;
     }
 
-    public void setEnableBackBufferMemoryLimit(float memoryLimit) {
-        this.enableBackBufferAvailableMemory = memoryLimit;
-    }
-
     private void applyModifiers() {
         setRepeatModifier(repeat);
         setMutedModifier(muted);
@@ -1913,7 +1909,7 @@ class ReactExoplayerView extends FrameLayout implements
         exoPlayerView.setHideShutterView(hideShutterView);
     }
 
-    public void setBufferConfig(int newMinBufferMs, int newMaxBufferMs, int newBufferForPlaybackMs, int newBufferForPlaybackAfterRebufferMs, double newMaxHeapAllocationPercent, double newMinBackBufferMemoryReservePercent, double newMinBufferMemoryReservePercent) {
+    public void setBufferConfig(int newMinBufferMs, int newMaxBufferMs, int newBufferForPlaybackMs, int newBufferForPlaybackAfterRebufferMs, double newMaxHeapAllocationPercent, double newMinBackBufferMemoryReservePercent, double newMinBufferMemoryReservePercent, double minAvailableMemoryToEnableBackBuffer) {
         minBufferMs = newMinBufferMs;
         maxBufferMs = newMaxBufferMs;
         bufferForPlaybackMs = newBufferForPlaybackMs;
@@ -1921,6 +1917,7 @@ class ReactExoplayerView extends FrameLayout implements
         maxHeapAllocationPercent = newMaxHeapAllocationPercent;
         minBackBufferMemoryReservePercent = newMinBackBufferMemoryReservePercent;
         minBufferMemoryReservePercent = newMinBufferMemoryReservePercent;
+        enableBackBufferAvailableMemory = minAvailableMemoryToEnableBackBuffer;
         releasePlayer();
         initializePlayer();
     }
