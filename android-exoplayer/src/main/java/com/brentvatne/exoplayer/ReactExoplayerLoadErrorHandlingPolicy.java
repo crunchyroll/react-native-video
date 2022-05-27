@@ -18,6 +18,7 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
   @Override
   public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
     Log.d("nicktest", loadErrorInfo.exception.getMessage());
+    Log.d("nicktest", loadErrorInfo.errorCount);
     if (
       loadErrorInfo.exception instanceof HttpDataSourceException &&
       (loadErrorInfo.exception.getMessage() == "Unable to connect" || loadErrorInfo.exception.getMessage() == "Software caused connection abort")
