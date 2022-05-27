@@ -22,11 +22,14 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
       loadErrorInfo.exception instanceof HttpDataSourceException &&
       (loadErrorInfo.exception.getMessage() == "Unable to connect" || loadErrorInfo.exception.getMessage() == "Software caused connection abort")
     ) {
+      Log.d("nicktest", "if statement");
       // Capture the error we get when there is no network connectivity and keep retrying it
       return 1000; // Retry every second
     } else if(loadErrorInfo.errorCount < this.minLoadRetryCount) {
+      Log.d("nicktest", "loadErrorInfo.errorCount < this.minLoadRetryCount");
       return Math.min((loadErrorInfo.errorCount - 1) * 1000, 5000); // Default timeout handling
     } else {
+      Log.d("nicktest", "else");
       return C.TIME_UNSET; // Done retrying and will return the error immediately
     }
   }
