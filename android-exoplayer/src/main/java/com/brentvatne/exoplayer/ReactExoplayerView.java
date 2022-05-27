@@ -165,6 +165,7 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean isUsingContentResolution = false;
     private boolean selectTrackWhenReady = false;
     private boolean limitMaxResolution = false;
+    private float enableBackBufferAvailableMemory = -1f;
 
     private int minBufferMs = DefaultLoadControl.DEFAULT_MIN_BUFFER_MS;
     private int maxBufferMs = DefaultLoadControl.DEFAULT_MAX_BUFFER_MS;
@@ -581,6 +582,15 @@ class ReactExoplayerView extends FrameLayout implements
         self.trackSelector.setParameters(trackSelector.buildUponParameters()
                 .setMaxVideoBitrate(maxBitRate == 0 ? Integer.MAX_VALUE : maxBitRate));
 
+        Runtime runtime = Runtime.getRuntime();
+        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+        long freeMemory = runtime.maxMemory() - usedMemory;
+        int backBufferMs = backBufferDurationMs;
+        if (freeMemory < (self.enableBackBufferAvailableMemory * 1000 * 1000)) {
+            Log.w("LoadControl", "Available memory is less than required to enable back buffer, setting to 0ms!");
+            backBufferMs = 0;
+        }
+
         DefaultAllocator allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
         RNVLoadControl loadControl = new RNVLoadControl(
                 allocator,
@@ -590,7 +600,7 @@ class ReactExoplayerView extends FrameLayout implements
                 bufferForPlaybackAfterRebufferMs,
                 -1,
                 true,
-                backBufferDurationMs,
+                backBufferMs,
                 DefaultLoadControl.DEFAULT_RETAIN_BACK_BUFFER_FROM_KEYFRAME
         );
         DefaultRenderersFactory renderersFactory =
@@ -1099,7 +1109,6 @@ class ReactExoplayerView extends FrameLayout implements
 
                 int shortestFormatSide = format.height < format.width ? format.height : format.width;
                 int shortestScreenSize = this.getScreenShortestSide(this.themedReactContext);
-                Log.w("Velocity", "shortestScreenSize: " + String.valueOf(shortestScreenSize) + "| shortestFormatSide " + String.valueOf(shortestFormatSide));
                 if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
                     // This video track is larger than screen resolution so we do not include it in the list of video tracks
                     continue;
@@ -1203,7 +1212,6 @@ class ReactExoplayerView extends FrameLayout implements
 
                                 int shortestFormatSide = format.height < format.width ? format.height : format.width;
                                 
-                                Log.w("Velocity", "shortestScreenSize: " + String.valueOf(shortestScreenSize) + "| shortestFormatSide " + String.valueOf(shortestFormatSide));
                                 if (limitMaxResolution && shortestFormatSide > shortestScreenSize) {
                                     // This video track is larger than screen resolution so we do not include it in the list of video tracks
                                     continue;
@@ -1533,6 +1541,10 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setLimitMaxResolution(boolean limitMaxResolution) {
         this.limitMaxResolution = limitMaxResolution;
+    }
+
+    public void setEnableBackBufferMemoryLimit(float memoryLimit) {
+        this.enableBackBufferAvailableMemory = memoryLimit;
     }
 
     private void applyModifiers() {
