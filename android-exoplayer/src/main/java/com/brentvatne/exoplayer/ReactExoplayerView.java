@@ -870,7 +870,6 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void stopPlayback() {
-        Log.w("Velocity", "Cleaning up!!!!!!");
         onStopPlayback();
         releasePlayer();
     }
