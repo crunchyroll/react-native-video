@@ -463,7 +463,6 @@ class ReactExoplayerView extends FrameLayout implements
             }
             long usedMemory = runtime.totalMemory() - runtime.freeMemory();
             long freeMemory = runtime.maxMemory() - usedMemory;
-            Log.w("Velocity", "freeMemory: " + String.valueOf(freeMemory));
             long reserveMemory = (long)minBufferMemoryReservePercent * runtime.maxMemory();
             long bufferedMs = bufferedDurationUs / (long)1000;
             if (reserveMemory > freeMemory && bufferedMs > 2000) {
@@ -586,7 +585,6 @@ class ReactExoplayerView extends FrameLayout implements
         long usedMemory = runtime.totalMemory() - runtime.freeMemory();
         long freeMemory = runtime.maxMemory() - usedMemory;
         int backBufferMs = backBufferDurationMs;
-        Log.w("LoadControl", "backBUfferLimit " + String.valueOf(self.enableBackBufferAvailableMemory));
         if (freeMemory < (self.enableBackBufferAvailableMemory * 1000 * 1000)) {
             Log.w("LoadControl", "Available memory is less than required to enable back buffer, setting to 0ms!");
             backBufferMs = 0;
@@ -804,6 +802,10 @@ class ReactExoplayerView extends FrameLayout implements
             trackSelector = null;
             player = null;
         }
+        Runtime runtime = Runtime.getRuntime();
+        if (runtime != null) {
+            runtime.gc();
+        }
         progressHandler.removeMessages(SHOW_PROGRESS);
         themedReactContext.removeLifecycleEventListener(this);
         audioBecomingNoisyReceiver.removeListener();
@@ -868,6 +870,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void stopPlayback() {
+        Log.w("Velocity", "Cleaning up!!!!!!");
         onStopPlayback();
         releasePlayer();
     }
@@ -877,6 +880,7 @@ class ReactExoplayerView extends FrameLayout implements
             setFullscreen(false);
         }
         audioManager.abandonAudioFocus(this);
+        
     }
 
     private void updateResumePosition() {
