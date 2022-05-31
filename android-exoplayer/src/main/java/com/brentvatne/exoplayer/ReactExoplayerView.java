@@ -798,6 +798,7 @@ class ReactExoplayerView extends FrameLayout implements
             stopBufferCheckTimer();
             updateResumePosition();
             player.release();
+            player.clearMediaItems();
             player.removeMetadataOutput(this);
             trackSelector = null;
             player = null;
