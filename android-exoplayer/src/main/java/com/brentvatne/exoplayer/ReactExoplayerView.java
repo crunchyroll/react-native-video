@@ -532,6 +532,7 @@ class ReactExoplayerView extends FrameLayout implements
                         // DRM session manager creation must be done on a different thread to prevent crashes so we start a new thread
                         ExecutorService es = Executors.newSingleThreadExecutor();
                         es.execute(new Runnable() {
+                            ExecutorService esRunnable = es;
                             @Override
                             public void run() {
                                 // DRM initialization must run on a different thread
@@ -545,6 +546,7 @@ class ReactExoplayerView extends FrameLayout implements
 
                                 // Initialize handler to run on the main thread
                                 activity.runOnUiThread(new Runnable() {
+                                    ExecutorService esUiThread = esRunnable;
                                     public void run() {
                                         try {
                                             // Source initialization must run on the main thread
@@ -556,7 +558,7 @@ class ReactExoplayerView extends FrameLayout implements
                                             self.eventEmitter.error(ex.toString(), ex, "1001");
                                         }
                                     }
-                                    es.shutdown();
+                                    esUiThread.shutdown();
                                 });
                             }
                         });
