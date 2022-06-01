@@ -556,6 +556,7 @@ class ReactExoplayerView extends FrameLayout implements
                                             self.eventEmitter.error(ex.toString(), ex, "1001");
                                         }
                                     }
+                                    es.shutdown();
                                 });
                             }
                         });
@@ -1054,6 +1055,7 @@ class ReactExoplayerView extends FrameLayout implements
                     // To prevent ANRs caused by getVideoTrackInfo we run this on a different thread and notify the player only when we're done
                     eventEmitter.load(duration, currentPosition, width, height,
                         audioTrackInfo, textTrackInfo, getVideoTrackInfo(timelineRef, trackRendererIndex), trackId);
+                    es.shutdown();
                 }
             });
         }
