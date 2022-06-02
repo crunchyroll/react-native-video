@@ -800,6 +800,10 @@ class ReactExoplayerView extends FrameLayout implements
             player.release();
             player.removeMetadataOutput(this);
             trackSelector = null;
+            srcUri = null;
+            extension = null;
+            requestHeaders = null;
+            mediaDataSourceFactory = null;
             player = null;
         }
         Runtime runtime = Runtime.getRuntime();
