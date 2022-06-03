@@ -1709,7 +1709,7 @@ class ReactExoplayerView extends FrameLayout implements
                         if (format.height < minHeight) {
                             minHeight = format.height;
                             groupIndex = i;
-                            tracks[0] = j;
+                            tracks.set(0, j);
                         }
                     }
                 }
@@ -1717,7 +1717,7 @@ class ReactExoplayerView extends FrameLayout implements
                 if (closestFormat != null && closestTrackIndex != -1) {
                     // We found the closest match instead of an exact one
                     groupIndex = i;
-                    tracks[0] = closestTrackIndex;
+                    tracks.set(0, closestTrackIndex);
                 }
             }
         } else if (rendererIndex == C.TRACK_TYPE_TEXT && Util.SDK_INT > 18) { // Text default
@@ -1734,7 +1734,7 @@ class ReactExoplayerView extends FrameLayout implements
         if (groupIndex == C.INDEX_UNSET && trackType == C.TRACK_TYPE_VIDEO && groups.length != 0) { // Video auto
             // Add all tracks as valid options for ABR to choose from
             TrackGroup group = groups.get(0);
-            List<Integer> alltracks = new ArrayList<>(group.length);
+            List<Integer> allTracks = new ArrayList<>(group.length);
             groupIndex = 0;
             
             for (int j = 0; j < group.length; j++) {
@@ -1750,12 +1750,12 @@ class ReactExoplayerView extends FrameLayout implements
                     supportedFormatLength++;
                 }
             }
-            tracks = new int[supportedFormatLength + 1];
+            List<Integer> tracks = new ArrayList<>(supportedFormatLength + 1);
             int o = 0;
             for (int k = 0; k < allTracks.size(); k++) {
                 Format format = group.getFormat(k);
                 if (isFormatSupported(format)) {
-                    tracks[o] = allTracks.get(k);
+                    tracks.set(o, allTracks.get(k));
                     supportedTrackList.add(allTracks.get(k));
                     o++;
                 }
