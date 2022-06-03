@@ -1514,6 +1514,7 @@ class ReactExoplayerView extends FrameLayout implements
             this.mediaDataSourceFactory = null;
             clearResumePosition();
         }
+        releasePlayer();
     }
 
     public void setProgressUpdateInterval(final float progressUpdateInterval) {
