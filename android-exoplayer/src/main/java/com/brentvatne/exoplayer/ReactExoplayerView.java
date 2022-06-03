@@ -34,12 +34,12 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.util.RNLog;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.drm.DrmSession.DrmSessionException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -51,7 +51,6 @@ import com.google.android.exoplayer2.drm.ExoMediaDrm;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionEventListener;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
-import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
@@ -1095,7 +1094,7 @@ class ReactExoplayerView extends FrameLayout implements
 
             ExecutorService es = Executors.newSingleThreadExecutor();
             es.execute(new Runnable() {
-                ExecutorService es = parentEs;
+                ExecutorService parentEs = es;
                 @Override
                 public void run() {
                     // To prevent ANRs caused by getVideoTrackInfo we run this on a different thread and notify the player only when we're done
@@ -1634,7 +1633,8 @@ class ReactExoplayerView extends FrameLayout implements
 
         TrackGroupArray groups = info.getTrackGroups(rendererIndex);
         int groupIndex = C.INDEX_UNSET;
-        int[] tracks = {0} ;
+        List<Integer> tracks = new ArrayList<>();
+        tracks.add(0);
 
         if (TextUtils.isEmpty(type)) {
             type = "default";
@@ -1681,7 +1681,7 @@ class ReactExoplayerView extends FrameLayout implements
                     Format format = group.getFormat(j);
                     if (format.height == height) {
                         groupIndex = i;
-                        tracks[0] = j;
+                        tracks.set(0, j);
                         closestFormat = null;
                         closestTrackIndex = -1;
                         usingExactMatch = true;
@@ -1734,17 +1734,17 @@ class ReactExoplayerView extends FrameLayout implements
         if (groupIndex == C.INDEX_UNSET && trackType == C.TRACK_TYPE_VIDEO && groups.length != 0) { // Video auto
             // Add all tracks as valid options for ABR to choose from
             TrackGroup group = groups.get(0);
-            int[] allTracks = new int[group.length];
+            List<Integer> alltracks = new ArrayList<>(group.length);
             groupIndex = 0;
             
             for (int j = 0; j < group.length; j++) {
-                allTracks[j] = j;
+                allTracks.add(j, j);
             }
             
             // Valiate list of all tracks and add only supported formats
             int supportedFormatLength = 0;
             ArrayList<Integer> supportedTrackList = new ArrayList<Integer>();
-            for (int g = 0; g < allTracks.length; g++) {
+            for (int g = 0; g < allTracks.size(); g++) {
                 Format format = group.getFormat(g);
                 if (isFormatSupported(format)) {
                     supportedFormatLength++;
@@ -1752,11 +1752,11 @@ class ReactExoplayerView extends FrameLayout implements
             }
             tracks = new int[supportedFormatLength + 1];
             int o = 0;
-            for (int k = 0; k < allTracks.length; k++) {
+            for (int k = 0; k < allTracks.size(); k++) {
                 Format format = group.getFormat(k);
                 if (isFormatSupported(format)) {
-                    tracks[o] = allTracks[k];
-                    supportedTrackList.add(allTracks[k]);
+                    tracks[o] = allTracks.get(k);
+                    supportedTrackList.add(allTracks.get(k));
                     o++;
                 }
             }
