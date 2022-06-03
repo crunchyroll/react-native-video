@@ -532,6 +532,7 @@ class ReactExoplayerView extends FrameLayout implements
                         // DRM session manager creation must be done on a different thread to prevent crashes so we start a new thread
                         ExecutorService es = Executors.newSingleThreadExecutor();
                         es.execute(new Runnable() {
+                            ExecutorService es = es;
                             @Override
                             public void run() {
                                 // DRM initialization must run on a different thread
@@ -545,6 +546,7 @@ class ReactExoplayerView extends FrameLayout implements
 
                                 // Initialize handler to run on the main thread
                                 activity.runOnUiThread(new Runnable() {
+                                    ExecutorService es = es;
                                     public void run() {
                                         try {
                                             // Source initialization must run on the main thread
@@ -555,6 +557,7 @@ class ReactExoplayerView extends FrameLayout implements
                                             Log.e("ExoPlayer Exception", ex.toString());
                                             self.eventEmitter.error(ex.toString(), ex, "1001");
                                         }
+                                        es.shutdown();
                                     }
                                 });
                             }
@@ -1057,11 +1060,13 @@ class ReactExoplayerView extends FrameLayout implements
 
             ExecutorService es = Executors.newSingleThreadExecutor();
             es.execute(new Runnable() {
+                ExecutorService es = es;
                 @Override
                 public void run() {
                     // To prevent ANRs caused by getVideoTrackInfo we run this on a different thread and notify the player only when we're done
                     eventEmitter.load(duration, currentPosition, width, height,
                         audioTrackInfo, textTrackInfo, getVideoTrackInfo(timelineRef, trackRendererIndex), trackId);
+                    es.shutdown();
                 }
             });
         }
@@ -1855,6 +1860,7 @@ class ReactExoplayerView extends FrameLayout implements
         long usedMemory = runtime.totalMemory() - runtime.freeMemory();
         long freeMemory = runtime.maxMemory() - usedMemory;
         long reserveMemory = (long)minBackBufferMemoryReservePercent * runtime.maxMemory();
+
         if (reserveMemory > freeMemory) {
             // We don't have enough memory in reserve so we will 
             Log.w("ExoPlayer Warning", "Not enough reserve memory, setting back buffer to 0ms to reduce memory pressure!");
