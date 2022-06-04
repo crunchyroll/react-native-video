@@ -1060,7 +1060,7 @@ class ReactExoplayerView extends FrameLayout implements
 
             ExecutorService es = Executors.newSingleThreadExecutor();
             es.execute(new Runnable() {
-                ExecutorService es = parentEs;
+                ExecutorService parentEs = es;
                 @Override
                 public void run() {
                     // To prevent ANRs caused by getVideoTrackInfo we run this on a different thread and notify the player only when we're done
