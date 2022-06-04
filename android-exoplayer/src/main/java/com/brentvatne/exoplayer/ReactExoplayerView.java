@@ -139,6 +139,7 @@ class ReactExoplayerView extends FrameLayout implements
     private PlayerControlView playerControlView;
     private View playPauseControlContainer;
     private Player.EventListener eventListener;
+    private DrmSessionManager mDrmSessionManager;
 
     private ExoPlayerView exoPlayerView;
 
@@ -549,6 +550,7 @@ class ReactExoplayerView extends FrameLayout implements
                                     ExecutorService es = parentEs;
                                     public void run() {
                                         try {
+                                            self.mDrmSessionManager = drmSessionManager;
                                             // Source initialization must run on the main thread
                                             initializePlayerSource(self, drmSessionManager);
                                         } catch (Exception ex) {
@@ -805,6 +807,9 @@ class ReactExoplayerView extends FrameLayout implements
             player.stop(true);
             player.release();
             player.removeMetadataOutput(this);
+            if (mDrmSessionManager != null) {
+                mDrmSessionManager.release();
+            }
             trackSelector = null;
             srcUri = null;
             extension = null;
