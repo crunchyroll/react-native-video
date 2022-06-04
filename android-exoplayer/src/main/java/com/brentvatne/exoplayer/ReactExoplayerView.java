@@ -569,7 +569,6 @@ class ReactExoplayerView extends FrameLayout implements
                                             Log.e("ExoPlayer Exception", ex.toString());
                                             self.eventEmitter.error(ex.toString(), ex, "1001");
                                         }
-                                        self = null;
                                         es.shutdown();
                                     }
                                 });
