@@ -1749,13 +1749,11 @@ class ReactExoplayerView extends FrameLayout implements
                 }
             }
             tracks = new ArrayList<>(supportedFormatLength + 1);
-            int o = 0;
             for (int k = 0; k < allTracks.size(); k++) {
                 Format format = group.getFormat(k);
                 if (isFormatSupported(format)) {
-                    tracks.set(o, allTracks.get(k));
+                    tracks.add(allTracks.get(k));
                     supportedTrackList.add(allTracks.get(k));
-                    o++;
                 }
             }
         }
