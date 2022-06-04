@@ -809,6 +809,7 @@ class ReactExoplayerView extends FrameLayout implements
             player.seekTo(0);
             player.release();
             player.removeMetadataOutput(this);
+            player.removeListener(this);
             if (mDrmSessionManager != null) {
                 mDrmSessionManager.release();
                 mDrmSessionManager = null;
