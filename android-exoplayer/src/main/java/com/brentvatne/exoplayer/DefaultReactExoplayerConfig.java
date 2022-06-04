@@ -15,6 +15,10 @@ public class DefaultReactExoplayerConfig implements ReactExoplayerConfig {
         this.bandwidthMeter = new DefaultBandwidthMeter.Builder(context).build();
     }
 
+    public void clearResources() {
+        this.bandwidthMeter = null;
+    }
+
     public LoadErrorHandlingPolicy buildLoadErrorHandlingPolicy(int minLoadRetryCount) {
         if (this.disableDisconnectError) {
             // Use custom error handling policy to prevent throwing an error when losing network connection

@@ -685,8 +685,8 @@ class ReactExoplayerView extends FrameLayout implements
 
     private void finishPlayerInitialization() {
         // Initializing the playerControlView
-        initializePlayerControl();
-        setControls(controls);
+        // initializePlayerControl();
+        // setControls(controls);
         applyModifiers();
         startBufferCheckTimer();
     }
@@ -809,6 +809,7 @@ class ReactExoplayerView extends FrameLayout implements
             player.removeMetadataOutput(this);
             if (mDrmSessionManager != null) {
                 mDrmSessionManager.release();
+                mDrmSessionManager = null;
             }
             trackSelector = null;
             srcUri = null;
@@ -818,7 +819,7 @@ class ReactExoplayerView extends FrameLayout implements
             player = null;
             DataSourceUtil.clearDataSource();
             exoPlayerView.setPlayer(null);
-            playerControlView.setPlayer(null);
+            // playerControlView.setPlayer(null);
         }
         Runtime runtime = Runtime.getRuntime();
         if (runtime != null) {
