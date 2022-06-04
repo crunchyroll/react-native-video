@@ -31,9 +31,6 @@ public class DataSourceUtil {
 
     public static void clearDataSource() {
         rawDataSourceFactory = null;
-        if (defaultDataSourceFactory != null) {
-            defaultDataSourceFactory.close();
-        }
         defaultDataSourceFactory = null;
         defaultHttpDataSourceFactory = null;
         userAgent = null;
