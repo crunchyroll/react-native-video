@@ -811,6 +811,7 @@ class ReactExoplayerView extends FrameLayout implements
             requestHeaders = null;
             mediaDataSourceFactory = null;
             player = null;
+            DataSourceUtil.clearDataSource();
             exoPlayerView.setPlayer(null);
             playerControlView.setPlayer(null);
         }
