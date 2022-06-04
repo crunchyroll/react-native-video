@@ -799,6 +799,7 @@ class ReactExoplayerView extends FrameLayout implements
     private void releasePlayer() {
         Log.w("Velocity", "RELEASE PLAYER!");
         if (player != null) {
+            Log.w("Velocity", "ACTUALLY RELEASINBG!");
             stopBufferCheckTimer();
             updateResumePosition();
             player.stop(true);
