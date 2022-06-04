@@ -309,6 +309,10 @@ class ReactExoplayerView extends FrameLayout implements
             return;
         }
         setPlayWhenReady(false);
+        if (Build.VERSION.SDK_INT < 24) {
+            // On Android 7 there is no split screen so we need to stop playback on Activity pause
+            stopPlayback();
+        }
     }
 
     @Override
