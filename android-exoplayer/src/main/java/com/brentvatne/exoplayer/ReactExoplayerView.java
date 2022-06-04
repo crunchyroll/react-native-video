@@ -206,9 +206,9 @@ class ReactExoplayerView extends FrameLayout implements
     // \ End props
 
     // React
-    private final ThemedReactContext themedReactContext;
-    private final AudioManager audioManager;
-    private final AudioBecomingNoisyReceiver audioBecomingNoisyReceiver;
+    private ThemedReactContext themedReactContext;
+    private AudioManager audioManager;
+    private AudioBecomingNoisyReceiver audioBecomingNoisyReceiver;
 
     private final Handler progressHandler = new Handler() {
         @Override
@@ -311,6 +311,8 @@ class ReactExoplayerView extends FrameLayout implements
         setPlayWhenReady(false);
         if (Build.VERSION.SDK_INT < 24) {
             this.themedReactContext = null;
+            this.audioManager = null;
+            this.audioBecomingNoisyReceiver = null;
             // On Android 7 there is no split screen so we need to stop playback on Activity pause
             stopPlayback();
         }
@@ -319,6 +321,8 @@ class ReactExoplayerView extends FrameLayout implements
     @Override
     public void onHostDestroy() {
         this.themedReactContext = null;
+        this.audioManager = null;
+        this.audioBecomingNoisyReceiver = null;
         stopPlayback();
     }
 
