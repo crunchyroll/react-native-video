@@ -310,6 +310,7 @@ class ReactExoplayerView extends FrameLayout implements
         }
         setPlayWhenReady(false);
         if (Build.VERSION.SDK_INT < 24) {
+            this.themedReactContext = null;
             // On Android 7 there is no split screen so we need to stop playback on Activity pause
             stopPlayback();
         }
@@ -317,6 +318,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onHostDestroy() {
+        this.themedReactContext = null;
         stopPlayback();
     }
 
@@ -563,6 +565,7 @@ class ReactExoplayerView extends FrameLayout implements
                                             Log.e("ExoPlayer Exception", ex.toString());
                                             self.eventEmitter.error(ex.toString(), ex, "1001");
                                         }
+                                        self = null;
                                         es.shutdown();
                                     }
                                 });
@@ -818,6 +821,9 @@ class ReactExoplayerView extends FrameLayout implements
                 mDrmSessionManager.release();
                 mDrmSessionManager = null;
             }
+            drmUUID = null;
+            drmLicenseUrl = null;
+            drmLicenseHeader = null;
             trackSelector = null;
             srcUri = null;
             extension = null;
@@ -828,14 +834,14 @@ class ReactExoplayerView extends FrameLayout implements
             exoPlayerView.setPlayer(null);
             // playerControlView.setPlayer(null);
         }
-        Runtime runtime = Runtime.getRuntime();
-        if (runtime != null) {
-            runtime.gc();
-        }
         progressHandler.removeMessages(SHOW_PROGRESS);
         themedReactContext.removeLifecycleEventListener(this);
         audioBecomingNoisyReceiver.removeListener();
         bandwidthMeter.removeEventListener(this);
+        Runtime runtime = Runtime.getRuntime();
+        if (runtime != null) {
+            runtime.gc();
+        }
     }
 
     private boolean requestAudioFocus() {
