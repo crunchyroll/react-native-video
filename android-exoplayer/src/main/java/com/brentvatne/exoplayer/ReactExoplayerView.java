@@ -1640,8 +1640,6 @@ class ReactExoplayerView extends FrameLayout implements
             type = "default";
         }
 
-        TrackSelectionOverride selectionOverride = new TrackSelectionOverride(groups.get(groupIndex), tracks);
-
         DefaultTrackSelector.Parameters disableParameters = trackSelector.getParameters()
                 .buildUpon()
                 .setRendererDisabled(rendererIndex, true)
@@ -1766,6 +1764,8 @@ class ReactExoplayerView extends FrameLayout implements
             trackSelector.setParameters(disableParameters);
             return;
         }
+
+        TrackSelectionOverride selectionOverride = new TrackSelectionOverride(groups.get(groupIndex), tracks);
 
         DefaultTrackSelector.Parameters selectionParameters = trackSelector.getParameters()
                 .buildUpon()
