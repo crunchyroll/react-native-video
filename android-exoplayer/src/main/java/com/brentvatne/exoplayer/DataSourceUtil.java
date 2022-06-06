@@ -29,13 +29,6 @@ public class DataSourceUtil {
         DataSourceUtil.userAgent = userAgent;
     }
 
-    public static void clearDataSource() {
-        rawDataSourceFactory = null;
-        defaultDataSourceFactory = null;
-        defaultHttpDataSourceFactory = null;
-        userAgent = null;
-    }
-
     public static String getUserAgent(ReactContext context) {
         if (userAgent == null) {
             userAgent = Util.getUserAgent(context, "ReactNativeVideo");

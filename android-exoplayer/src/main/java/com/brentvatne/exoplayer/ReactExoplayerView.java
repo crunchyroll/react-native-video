@@ -139,7 +139,6 @@ class ReactExoplayerView extends FrameLayout implements
     private PlayerControlView playerControlView;
     private View playPauseControlContainer;
     private Player.EventListener eventListener;
-    //private DrmSessionManager mDrmSessionManager;
 
     private ExoPlayerView exoPlayerView;
 
@@ -310,9 +309,6 @@ class ReactExoplayerView extends FrameLayout implements
         }
         setPlayWhenReady(false);
         if (Build.VERSION.SDK_INT < 24) {
-            // this.themedReactContext = null;
-            // this.audioManager = null;
-            // this.audioBecomingNoisyReceiver = null;
             // On Android 7 there is no split screen so we need to stop playback on Activity pause
             stopPlayback();
         }
@@ -320,9 +316,6 @@ class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onHostDestroy() {
-        /*this.themedReactContext = null;
-        this.audioManager = null;
-        this.audioBecomingNoisyReceiver = null;*/
         stopPlayback();
     }
 
@@ -560,7 +553,6 @@ class ReactExoplayerView extends FrameLayout implements
                                     ExecutorService es = parentEs;
                                     public void run() {
                                         try {
-                                            DrmSessionManager DrmSessionManager = drmSessionManager;
                                             // Source initialization must run on the main thread
                                             initializePlayerSource(self, drmSessionManager);
                                         } catch (Exception ex) {
@@ -695,8 +687,8 @@ class ReactExoplayerView extends FrameLayout implements
 
     private void finishPlayerInitialization() {
         // Initializing the playerControlView
-        // initializePlayerControl();
-        // setControls(controls);
+        initializePlayerControl();
+        setControls(controls);
         applyModifiers();
         startBufferCheckTimer();
     }
