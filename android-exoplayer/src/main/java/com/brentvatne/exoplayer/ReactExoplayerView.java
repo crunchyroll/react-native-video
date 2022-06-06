@@ -822,8 +822,10 @@ class ReactExoplayerView extends FrameLayout implements
         progressHandler.removeMessages(SHOW_PROGRESS);
         themedReactContext.removeLifecycleEventListener(this);
         audioBecomingNoisyReceiver.removeListener();
-        bandwidthMeter.removeEventListener(this);
-        bandwidthMeter = null;
+        if (bandwidthMeter != null) {
+            bandwidthMeter.removeEventListener(this);
+            bandwidthMeter = null;
+        }
         Runtime runtime = Runtime.getRuntime();
         if (runtime != null) {
             runtime.gc();
@@ -1510,7 +1512,9 @@ class ReactExoplayerView extends FrameLayout implements
             this.mediaDataSourceFactory =
                     DataSourceUtil.getDefaultDataSourceFactory(this.themedReactContext, bandwidthMeter,
                             this.requestHeaders);
-
+            if (this.bandwidthMeter != null) {
+                this.bandwidthMeter = config.getBandwidthMeter();
+            }
             if (!isSourceEqual) {
                 reloadSource();
             }
