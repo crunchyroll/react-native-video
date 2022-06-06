@@ -1509,8 +1509,8 @@ class ReactExoplayerView extends FrameLayout implements
             this.extension = extension;
             this.requestHeaders = headers;
             if (this.bandwidthMeter == null) {
-                tihs.bandwidthMeter.addEventListener(new Handler(), this);
                 this.bandwidthMeter = config.getBandwidthMeter();
+                tihs.bandwidthMeter.addEventListener(new Handler(), this);
             }
             this.mediaDataSourceFactory =
                     DataSourceUtil.getDefaultDataSourceFactory(this.themedReactContext, bandwidthMeter,
