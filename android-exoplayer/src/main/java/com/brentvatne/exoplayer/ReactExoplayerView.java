@@ -919,7 +919,7 @@ class ReactExoplayerView extends FrameLayout implements
      * @return A new DataSource factory.
      */
     private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter) {
-        DataSourceUtil.getDefaultDataSourceFactory(this.themedReactContext,
+        return DataSourceUtil.getDefaultDataSourceFactory(this.themedReactContext,
                 useBandwidthMeter ? bandwidthMeter : null, requestHeaders);
     }
 
