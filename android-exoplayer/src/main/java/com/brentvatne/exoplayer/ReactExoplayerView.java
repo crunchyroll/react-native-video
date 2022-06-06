@@ -309,7 +309,7 @@ class ReactExoplayerView extends FrameLayout implements
         }
         setPlayWhenReady(false);
         if (Build.VERSION.SDK_INT < 24) {
-            // On Android 7 there is no split screen so we need to stop playback on Activity pause
+            // On Android 6 there is no split screen so we need to stop playback on Activity pause
             stopPlayback();
         }
     }
@@ -345,7 +345,7 @@ class ReactExoplayerView extends FrameLayout implements
      * Toggling the visibility of the player control view
      */
     private void togglePlayerControlVisibility() {
-        if(player == null) return;
+        if(player == null || playerControlView == null) return;
         reLayout(playerControlView);
         if (playerControlView.isVisible()) {
             playerControlView.hide();
@@ -358,6 +358,9 @@ class ReactExoplayerView extends FrameLayout implements
      * Initializing Player control
      */
     private void initializePlayerControl() {
+        if (!controls) {
+            return;
+        }
         if (playerControlView == null) {
             playerControlView = new PlayerControlView(getContext());
         }
@@ -412,7 +415,7 @@ class ReactExoplayerView extends FrameLayout implements
      * Adding Player control to the frame layout
      */
     private void addPlayerControl() {
-        if(player == null) return;
+        if(player == null || playerControlView == null) return;
         LayoutParams layoutParams = new LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT);
@@ -801,9 +804,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private void releasePlayer() {
-        Log.w("Velocity", "RELEASE PLAYER!");
         if (player != null) {
-            Log.w("Velocity", "ACTUALLY RELEASINBG!");
             stopBufferCheckTimer();
             updateResumePosition();
             player.setPlayWhenReady(false);
@@ -811,23 +812,13 @@ class ReactExoplayerView extends FrameLayout implements
             player.seekTo(0);
             player.release();
             player.removeMetadataOutput(this);
-            player.removeListener(this);
-            /*if (mDrmSessionManager != null) {
-                mDrmSessionManager.release();
-                mDrmSessionManager = null;
-            }*/
-            drmUUID = null;
-            drmLicenseUrl = null;
-            drmLicenseHeader = null;
+            // player.removeListener(this);
             trackSelector = null;
-            srcUri = null;
-            extension = null;
-            requestHeaders = null;
-            mediaDataSourceFactory = null;
             player = null;
-            // DataSourceUtil.clearDataSource();
             exoPlayerView.setPlayer(null);
-            // playerControlView.setPlayer(null);
+            if (playerControlView != null) {
+                playerControlView.setPlayer(null);
+            }
         }
         progressHandler.removeMessages(SHOW_PROGRESS);
         themedReactContext.removeLifecycleEventListener(this);
