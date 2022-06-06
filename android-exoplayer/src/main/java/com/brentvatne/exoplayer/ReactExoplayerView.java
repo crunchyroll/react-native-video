@@ -624,7 +624,6 @@ class ReactExoplayerView extends FrameLayout implements
         player.addMetadataOutput(self);
         exoPlayerView.setPlayer(player);
         audioBecomingNoisyReceiver.setListener(self);
-        bandwidthMeter.addEventListener(new Handler(), self);
         setPlayWhenReady(!isPaused);
         playerNeedsSource = true;
 
@@ -1509,12 +1508,13 @@ class ReactExoplayerView extends FrameLayout implements
             this.srcUri = uri;
             this.extension = extension;
             this.requestHeaders = headers;
+            if (this.bandwidthMeter == null) {
+                tihs.bandwidthMeter.addEventListener(new Handler(), this.);
+                this.bandwidthMeter = config.getBandwidthMeter();
+            }
             this.mediaDataSourceFactory =
                     DataSourceUtil.getDefaultDataSourceFactory(this.themedReactContext, bandwidthMeter,
                             this.requestHeaders);
-            if (this.bandwidthMeter != null) {
-                this.bandwidthMeter = config.getBandwidthMeter();
-            }
             if (!isSourceEqual) {
                 reloadSource();
             }
