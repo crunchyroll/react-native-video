@@ -22,7 +22,12 @@ export default class Video extends Component {
 
     this.state = {
       showPoster: !!props.poster,
+      isDestroying: false,
     };
+  }
+
+  componentWillUnmount() {
+    this.setState({ isDestroying: true });
   }
 
   setNativeProps(nativeProps) {
@@ -307,7 +312,7 @@ export default class Video extends Component {
       style: [styles.base, nativeProps.style],
       resizeMode: nativeResizeMode,
       src: {
-        uri,
+        uri: this.state.isDestroying ? '' : uri,
         isNetwork,
         isAsset,
         shouldCache,
