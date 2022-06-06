@@ -320,9 +320,9 @@ class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onHostDestroy() {
-        this.themedReactContext = null;
+        /*this.themedReactContext = null;
         this.audioManager = null;
-        this.audioBecomingNoisyReceiver = null;
+        this.audioBecomingNoisyReceiver = null;*/
         stopPlayback();
     }
 
