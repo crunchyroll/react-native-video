@@ -814,6 +814,7 @@ class ReactExoplayerView extends FrameLayout implements
             player.removeMetadataOutput(this);
             // player.removeListener(this);
             trackSelector = null;
+            bandwidthMeter = null;
             player = null;
             exoPlayerView.setPlayer(null);
             if (playerControlView != null) {
