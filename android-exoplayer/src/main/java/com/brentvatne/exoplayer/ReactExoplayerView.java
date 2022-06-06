@@ -139,7 +139,7 @@ class ReactExoplayerView extends FrameLayout implements
     private PlayerControlView playerControlView;
     private View playPauseControlContainer;
     private Player.EventListener eventListener;
-    private DrmSessionManager mDrmSessionManager;
+    //private DrmSessionManager mDrmSessionManager;
 
     private ExoPlayerView exoPlayerView;
 
@@ -206,9 +206,9 @@ class ReactExoplayerView extends FrameLayout implements
     // \ End props
 
     // React
-    private ThemedReactContext themedReactContext;
-    private AudioManager audioManager;
-    private AudioBecomingNoisyReceiver audioBecomingNoisyReceiver;
+    private final ThemedReactContext themedReactContext;
+    private final AudioManager audioManager;
+    private final AudioBecomingNoisyReceiver audioBecomingNoisyReceiver;
 
     private final Handler progressHandler = new Handler() {
         @Override
@@ -310,9 +310,9 @@ class ReactExoplayerView extends FrameLayout implements
         }
         setPlayWhenReady(false);
         if (Build.VERSION.SDK_INT < 24) {
-            this.themedReactContext = null;
-            this.audioManager = null;
-            this.audioBecomingNoisyReceiver = null;
+            // this.themedReactContext = null;
+            // this.audioManager = null;
+            // this.audioBecomingNoisyReceiver = null;
             // On Android 7 there is no split screen so we need to stop playback on Activity pause
             stopPlayback();
         }
@@ -560,7 +560,7 @@ class ReactExoplayerView extends FrameLayout implements
                                     ExecutorService es = parentEs;
                                     public void run() {
                                         try {
-                                            self.mDrmSessionManager = drmSessionManager;
+                                            DrmSessionManager DrmSessionManager = drmSessionManager;
                                             // Source initialization must run on the main thread
                                             initializePlayerSource(self, drmSessionManager);
                                         } catch (Exception ex) {
@@ -820,10 +820,10 @@ class ReactExoplayerView extends FrameLayout implements
             player.release();
             player.removeMetadataOutput(this);
             player.removeListener(this);
-            if (mDrmSessionManager != null) {
+            /*if (mDrmSessionManager != null) {
                 mDrmSessionManager.release();
                 mDrmSessionManager = null;
-            }
+            }*/
             drmUUID = null;
             drmLicenseUrl = null;
             drmLicenseHeader = null;
@@ -833,7 +833,7 @@ class ReactExoplayerView extends FrameLayout implements
             requestHeaders = null;
             mediaDataSourceFactory = null;
             player = null;
-            DataSourceUtil.clearDataSource();
+            // DataSourceUtil.clearDataSource();
             exoPlayerView.setPlayer(null);
             // playerControlView.setPlayer(null);
         }
