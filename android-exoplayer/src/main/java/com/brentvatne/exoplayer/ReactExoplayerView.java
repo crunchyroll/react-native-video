@@ -812,9 +812,7 @@ class ReactExoplayerView extends FrameLayout implements
             player.seekTo(0);
             player.release();
             player.removeMetadataOutput(this);
-            // player.removeListener(this);
             trackSelector = null;
-            bandwidthMeter = null;
             player = null;
             exoPlayerView.setPlayer(null);
             if (playerControlView != null) {
@@ -825,6 +823,7 @@ class ReactExoplayerView extends FrameLayout implements
         themedReactContext.removeLifecycleEventListener(this);
         audioBecomingNoisyReceiver.removeListener();
         bandwidthMeter.removeEventListener(this);
+        bandwidthMeter = null;
         Runtime runtime = Runtime.getRuntime();
         if (runtime != null) {
             runtime.gc();
