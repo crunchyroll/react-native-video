@@ -1198,6 +1198,10 @@ class ReactExoplayerView extends FrameLayout implements
 
     private WritableArray getVideoTrackInfoFromManifest(Timeline timelineRef, int retryCount) {
         ExecutorService es = Executors.newSingleThreadExecutor();
+        if (this.mediaDataSourceFactory == null) {
+            // Data source factory was not yet initialised - we can't proceed without it!
+            return null;
+        }
         final DataSource dataSource = this.mediaDataSourceFactory.createDataSource();
         final Uri sourceUri = this.srcUri;
         final long startTime = this.contentStartTime * 1000 - 100; // s -> ms with 100ms offset
