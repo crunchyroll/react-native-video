@@ -35,10 +35,12 @@ import com.facebook.react.util.RNLog;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.drm.DrmSession.DrmSessionException;
 import com.google.android.exoplayer2.SimpleExoPlayer.Builder;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.MediaItem.Subtitle;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -112,7 +114,7 @@ import java.lang.reflect.Method;
 @SuppressLint("ViewConstructor")
 class ReactExoplayerView extends FrameLayout implements
         LifecycleEventListener,
-        Player.EventListener,
+        Player.Listener,
         BandwidthMeter.EventListener,
         BecomingNoisyListener,
         AudioManager.OnAudioFocusChangeListener,
@@ -138,7 +140,7 @@ class ReactExoplayerView extends FrameLayout implements
     private DefaultBandwidthMeter bandwidthMeter;
     private PlayerControlView playerControlView;
     private View playPauseControlContainer;
-    private Player.EventListener eventListener;
+    private Player.Listener eventListener;
 
     private ExoPlayerView exoPlayerView;
 
@@ -401,7 +403,7 @@ class ReactExoplayerView extends FrameLayout implements
         });
 
         // Invoking onPlayerStateChanged event for Player
-        eventListener = new Player.EventListener() {
+        eventListener = new Player.Listener() {
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 reLayout(playPauseControlContainer);
@@ -798,9 +800,9 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private MediaSource buildTextSource(String title, Uri uri, String mimeType, String language) {
-        Format textFormat = Format.createTextSampleFormat(title, mimeType, Format.NO_VALUE, language);
+        MediaItem.Subtitle mediaSubtitle = new MediaItem.Subtitle(uri, mimeType, language);
         return new SingleSampleMediaSource.Factory(mediaDataSourceFactory)
-                .createMediaSource(uri, textFormat, C.TIME_UNSET);
+                .createMediaSource(mediaSubtitle, C.TIME_UNSET);
     }
 
     private void releasePlayer() {
@@ -981,7 +983,7 @@ class ReactExoplayerView extends FrameLayout implements
         eventEmitter.audioBecomingNoisy();
     }
 
-    // Player.EventListener implementation
+    // Player.Listener implementation
 
     @Override
     public void onLoadingChanged(boolean isLoading) {
@@ -1361,11 +1363,6 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
-        // Do nothing.
-    }
-
-    @Override
     public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
         // Do nothing.
     }
@@ -1391,50 +1388,20 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     @Override
-    public void onPlayerError(ExoPlaybackException e) {
-        String errorString = "ExoPlaybackException type : " + e.type;
-        String errorCode = "2001"; // Playback error code 2xxx (2001 - unknown playback exception)
-        boolean needsReInitialization = false;
-        Exception ex = e;
-        if (e.type == ExoPlaybackException.TYPE_RENDERER) {
-            Exception cause = e.getRendererException();
-            if (cause instanceof MediaCodecRenderer.DecoderInitializationException) {
-                // Special case for decoder initialization failures.
-                MediaCodecRenderer.DecoderInitializationException decoderInitializationException =
-                        (MediaCodecRenderer.DecoderInitializationException) cause;
-                if (decoderInitializationException.codecInfo.name == null) {
-                    if (decoderInitializationException.getCause() instanceof MediaCodecUtil.DecoderQueryException) {
-                        errorCode = "2011"; 
-                        errorString = getResources().getString(R.string.error_querying_decoders);
-                    } else if (decoderInitializationException.secureDecoderRequired) {
-                        errorCode = "2012";
-                        errorString = getResources().getString(R.string.error_no_secure_decoder,
-                                decoderInitializationException.mimeType);
-                    } else {
-                        errorCode = "2013";
-                        errorString = getResources().getString(R.string.error_no_decoder,
-                                decoderInitializationException.mimeType);
-                    }
-                } else {
-                    errorCode = "2014";
-                    errorString = getResources().getString(R.string.error_instantiating_decoder,
-                            decoderInitializationException.codecInfo.name);
-                }
-            }
+    public void onPlayerErrorChanged(PlaybackException e) {
+        if (e == null) {
+            return;
         }
-        else if (e.type == ExoPlaybackException.TYPE_SOURCE) {
-            // Re-initialization improves recovery speed and properly resumes
-            needsReInitialization = true;
-            errorString = getResources().getString(R.string.unrecognized_media_format);
-            Exception cause = e.getSourceException();
-            if (cause instanceof DefaultDrmSessionManager.MissingSchemeDataException) {
-                errorCode = "3004";
-                errorString = getResources().getString(R.string.unrecognized_media_format);
-            } else if(cause instanceof MediaDrmCallbackException || cause instanceof DrmSessionException) {
-                errorCode = "3005";
-                errorString = getResources().getString(R.string.unrecognized_media_format);
-                // DrmSessionExceptions can be caused by a lot internal reasons for failure, in most cases they can be safely retried and playback will recover
-                if (!hasDrmFailed || cause instanceof DrmSessionException) {
+        String errorString = "PlaybackException: " + PlaybackException.getErrorCodeName(e.errorCode);
+        String errorCode = "2" + String.valueOf(e.errorCode);
+        boolean needsReInitialization = false;
+        switch(e.errorCode) {
+            case PlaybackException.ERROR_CODE_DRM_DEVICE_REVOKED:
+            case PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED:
+            case PlaybackException.ERROR_CODE_DRM_PROVISIONING_FAILED:
+            case PlaybackException.ERROR_CODE_DRM_SYSTEM_ERROR:
+            case PlaybackException.ERROR_CODE_DRM_UNSPECIFIED:
+                if (!hasDrmFailed) {
                     // When DRM fails to reach the app level certificate server it will fail with a source error so we assume that it is DRM related and try one more time
                     hasDrmFailed = true;
                     playerNeedsSource = true;
@@ -1443,34 +1410,11 @@ class ReactExoplayerView extends FrameLayout implements
                     setPlayWhenReady(true);
                     return;
                 }
-            } else if (cause instanceof HttpDataSource.HttpDataSourceException) {
-                // this exception happens when connectivity is lost
-                updateResumePosition();
-                initializePlayer();
-                setPlayWhenReady(true);
-                return;
-            } else {
-                errorCode = "2021";
-                errorString = getResources().getString(R.string.unrecognized_media_format);
-            }
-            if (cause != null) {
-                Throwable rootCause = cause.getCause();
-                if (rootCause instanceof MediaDrmCallbackException) {
-                    errorCode = "3005";
-                    errorString = getResources().getString(R.string.unrecognized_media_format);
-                    if (!hasDrmFailed) {
-                        // When DRM fails to reach the app level certificate server it will fail with a source error so we assume that it is DRM related and try one more time
-                        hasDrmFailed = true;
-                        playerNeedsSource = true;
-                        updateResumePosition();
-                        initializePlayer();
-                        setPlayWhenReady(true);
-                        return;
-                    }
-                }
-            }
+                break;
+            default:
+                break;
         }
-        eventEmitter.error(errorString, ex, errorCode);
+        eventEmitter.error(errorString, e, errorCode);
         playerNeedsSource = true;
         if (isBehindLiveWindow(e)) {
             clearResumePosition();
@@ -1483,20 +1427,8 @@ class ReactExoplayerView extends FrameLayout implements
         }
     }
 
-    private static boolean isBehindLiveWindow(ExoPlaybackException e) {
-        Log.e("ExoPlayer Exception", e.toString());
-        if (e.type != ExoPlaybackException.TYPE_SOURCE) {
-            return false;
-        }
-        Throwable cause = e.getSourceException();
-        while (cause != null) {
-            if (cause instanceof BehindLiveWindowException ||
-                    cause instanceof HttpDataSource.HttpDataSourceException) {
-                return true;
-            }
-            cause = cause.getCause();
-        }
-        return false;
+    private static boolean isBehindLiveWindow(PlaybackException e) {
+        return e.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW;
     }
 
     public int getTrackRendererIndex(int trackType) {

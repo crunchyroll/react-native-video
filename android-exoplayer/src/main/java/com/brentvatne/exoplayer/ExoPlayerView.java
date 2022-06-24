@@ -13,7 +13,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackException;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -231,7 +232,7 @@ public final class ExoPlayerView extends FrameLayout {
     }
 
     private final class ComponentListener implements VideoListener,
-            TextOutput, ExoPlayer.EventListener {
+            TextOutput, Player.EventListener {
 
         // TextRenderer.Output implementation
 
@@ -258,7 +259,7 @@ public final class ExoPlayerView extends FrameLayout {
             shutterView.setVisibility(INVISIBLE);
         }
 
-        // ExoPlayer.EventListener implementation
+        // ExoPlayer.Listener implementation
 
         @Override
         public void onLoadingChanged(boolean isLoading) {
@@ -271,7 +272,7 @@ public final class ExoPlayerView extends FrameLayout {
         }
 
         @Override
-        public void onPlayerError(ExoPlaybackException e) {
+        public void onPlayerError(PlaybackException e) {
             // Do nothing.
         }
 
@@ -280,10 +281,10 @@ public final class ExoPlayerView extends FrameLayout {
             // Do nothing.
         }
 
-        @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
-            // Do nothing.
-        }
+        // @Override
+        // public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+        //     // Do nothing.
+        // }
 
         @Override
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
