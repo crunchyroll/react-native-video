@@ -38,7 +38,7 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.drm.DrmSession.DrmSessionException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer.Builder;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -239,6 +239,7 @@ class ReactExoplayerView extends FrameLayout implements
 
     public ReactExoplayerView(ThemedReactContext context, ReactExoplayerConfig config) {
         super(context);
+        Log.i("=>=>", "starting new exoplayer");
         this.themedReactContext = context;
         this.eventEmitter = new VideoEventEmitter(context);
         this.config = config;
@@ -1118,8 +1119,15 @@ class ReactExoplayerView extends FrameLayout implements
 
         WritableArray videoTracks = Arguments.createArray();
 
+        if (trackSelector == null) {
+            // The player is probably unmounting, the only entry point to this method
+            // is trough onPlayerStateChanged when Player.STATE_READY which means
+            // if trackSelector is null, the player is most likely cleaning up
+            return videoTracks;
+        }
+
         MappingTrackSelector.MappedTrackInfo info = trackSelector.getCurrentMappedTrackInfo();
-        
+
         if (info == null || trackRendererIndex == C.INDEX_UNSET) {
             return videoTracks;
         }
@@ -1281,6 +1289,11 @@ class ReactExoplayerView extends FrameLayout implements
     private WritableArray getTextTrackInfo() {
         WritableArray textTracks = Arguments.createArray();
 
+        if (trackSelector == null) {
+            // Likely player is unmounting so no text tracks are available anymore
+            return textTracks;
+        }
+
         MappingTrackSelector.MappedTrackInfo info = trackSelector.getCurrentMappedTrackInfo();
         int index = getTrackRendererIndex(C.TRACK_TYPE_TEXT);
         if (info == null || index == C.INDEX_UNSET) {
@@ -1328,7 +1341,7 @@ class ReactExoplayerView extends FrameLayout implements
         }
         // When repeat is turned on, reaching the end of the video will not cause a state change
         // so we need to explicitly detect it.
-        if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION
+        if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION
                 && player.getRepeatMode() == Player.REPEAT_MODE_ONE) {
             eventEmitter.end();
         }
