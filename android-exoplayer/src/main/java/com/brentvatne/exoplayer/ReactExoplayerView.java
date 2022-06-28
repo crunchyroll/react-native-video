@@ -1118,8 +1118,15 @@ class ReactExoplayerView extends FrameLayout implements
 
         WritableArray videoTracks = Arguments.createArray();
 
+        if (trackSelector == null) {
+            // The player is probably unmounting, the only entry point to this method
+            // is trough onPlayerStateChanged when Player.STATE_READY which means
+            // if trackSelector is null, the player is most likely cleaning up
+            return videoTracks;
+        }
+
         MappingTrackSelector.MappedTrackInfo info = trackSelector.getCurrentMappedTrackInfo();
-        
+
         if (info == null || trackRendererIndex == C.INDEX_UNSET) {
             return videoTracks;
         }
@@ -1280,6 +1287,11 @@ class ReactExoplayerView extends FrameLayout implements
 
     private WritableArray getTextTrackInfo() {
         WritableArray textTracks = Arguments.createArray();
+
+        if (trackSelector == null) {
+            // Likely player is unmounting so no text tracks are available anymore
+            return textTracks;
+        }
 
         MappingTrackSelector.MappedTrackInfo info = trackSelector.getCurrentMappedTrackInfo();
         int index = getTrackRendererIndex(C.TRACK_TYPE_TEXT);
