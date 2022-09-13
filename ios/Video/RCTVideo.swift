@@ -21,7 +21,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     private var _localSourceEncryptionKeyScheme:String?
     
     /* Required to publish events */
-    private var _eventDispatcher:RCTEventDispatcher?
+    private var _eventDispatcher:RCTEventDispatcherProtocol?
     private var _videoLoadStarted:Bool = false
     
     private var _pendingSeek:Bool = false
@@ -95,7 +95,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     @objc var onRestoreUserInterfaceForPictureInPictureStop: RCTDirectEventBlock?
     @objc var onGetLicense: RCTDirectEventBlock?
     
-    init(eventDispatcher:RCTEventDispatcher!) {
+    init(eventDispatcher:RCTEventDispatcherProtocol!) {
         super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         
         _eventDispatcher = eventDispatcher
@@ -227,10 +227,20 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         RCTVideoUtils.delay()
             .then{ [weak self] in
                 guard let self = self else {throw NSError(domain: "", code: 0, userInfo: nil)}
-                guard let source = self._source,
-                let assetResult = RCTVideoUtils.prepareAsset(source: source),
-                let asset = assetResult.asset,
-                let assetOptions = assetResult.assetOptions else {
+                guard let source = self._source else {
+                    DebugLog("The source not exist")
+                    throw NSError(domain: "", code: 0, userInfo: nil)
+                }
+                if let uri = source.uri, uri.starts(with: "ph://") {
+                    return Promise {
+                        RCTVideoUtils.preparePHAsset(uri: uri).then { asset in
+                            return self.playerItemPrepareText(asset:asset, assetOptions:nil)
+                        }
+                    }
+                }
+                guard let assetResult = RCTVideoUtils.prepareAsset(source: source),
+                      let asset = assetResult.asset,
+                      let assetOptions = assetResult.assetOptions else {
                       DebugLog("Could not find video URL in source '\(self._source)'")
                       throw NSError(domain: "", code: 0, userInfo: nil)
                   }
@@ -264,9 +274,12 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                     self._playerItem?.preferredPeakBitRate = Double(maxBitRate)
                 }
                 
-                self._player = AVPlayer(playerItem: self._playerItem)
+                self._player = AVPlayer()
+                DispatchQueue.global(qos: .default).async {
+                    self._player?.replaceCurrentItem(with: playerItem)
+                }
                 self._playerObserver.player = self._player
-                
+                self.applyModifiers()
                 self._player?.actionAtItemEnd = .none
                 
                 if #available(iOS 10.0, *) {
@@ -368,13 +381,14 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     @objc
     func setIgnoreSilentSwitch(_ ignoreSilentSwitch:String?) {
         _ignoreSilentSwitch = ignoreSilentSwitch
-        self.applyModifiers()
+        RCTPlayerOperations.configureAudio(ignoreSilentSwitch:_ignoreSilentSwitch, mixWithOthers:_mixWithOthers)
+        applyModifiers()
     }
     
     @objc
     func setMixWithOthers(_ mixWithOthers:String?) {
         _mixWithOthers = mixWithOthers
-        self.applyModifiers()
+        applyModifiers()
     }
     
     @objc
@@ -383,38 +397,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             _player?.pause()
             _player?.rate = 0.0
         } else {
-            let session:AVAudioSession! = AVAudioSession.sharedInstance()
-            var category:AVAudioSession.Category? = nil
-            var options:AVAudioSession.CategoryOptions? = nil
-            
-            if (_ignoreSilentSwitch == "ignore") {
-                category = AVAudioSession.Category.playback
-            } else if (_ignoreSilentSwitch == "obey") {
-                category = AVAudioSession.Category.ambient
-            }
-            
-            if (_mixWithOthers == "mix") {
-                options = .mixWithOthers
-            } else if (_mixWithOthers == "duck") {
-                options = .duckOthers
-            }
-            
-            if let category = category, let options = options {
-                do {
-                    try session.setCategory(category, options: options)
-                } catch {
-                }
-            } else if let category = category, options == nil {
-                do {
-                    try session.setCategory(category)
-                } catch {
-                }
-            } else if category == nil, let options = options {
-                do {
-                    try session.setCategory(session.category, options: options)
-                } catch {
-                }
-            }
+            RCTPlayerOperations.configureAudio(ignoreSilentSwitch:_ignoreSilentSwitch, mixWithOthers:_mixWithOthers)
             
             if #available(iOS 10.0, *), !_automaticallyWaitsToMinimizeStalling {
                 _player?.playImmediately(atRate: _rate)
@@ -540,8 +523,8 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         setSelectedTextTrack(_selectedTextTrackCriteria)
         setResizeMode(_resizeMode)
         setRepeat(_repeat)
-        setPaused(_paused)
         setControls(_controls)
+        setPaused(_paused)
         setAllowsExternalPlayback(_allowsExternalPlayback)
     }
     
@@ -1073,6 +1056,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             item.seek(to: CMTime.zero)
             self.applyModifiers()
         } else {
+            self.setPaused(true);
             _playerObserver.removePlayerTimeObserver()
         }
     }

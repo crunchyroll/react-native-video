@@ -12,11 +12,13 @@ enum RCTPlayerOperations {
     static func setSideloadedText(player:AVPlayer?, textTracks:[TextTrack]?, criteria:SelectedTrackCriteria?) {
         let type = criteria?.type
         let textTracks:[TextTrack]! = textTracks ?? RCTVideoUtils.getTextTrackInfo(player)
-        
+        let trackCount:Int! = player?.currentItem?.tracks.count ?? 0
+
         // The first few tracks will be audio & video track
-        let firstTextIndex:Int = 0
-        for firstTextIndex in 0..<(player?.currentItem?.tracks.count ?? 0) {
-            if player?.currentItem?.tracks[firstTextIndex].assetTrack?.hasMediaCharacteristic(.legible) ?? false {
+        var firstTextIndex:Int = 0
+        for i in 0..<(trackCount) {
+            if player?.currentItem?.tracks[i].assetTrack?.hasMediaCharacteristic(.legible) ?? false {
+                firstTextIndex = i
                 break
             }
         }
@@ -24,7 +26,8 @@ enum RCTPlayerOperations {
         var selectedTrackIndex:Int = RCTVideoUnset
         
         if (type == "disabled") {
-            // Do nothing. We want to ensure option is nil
+            // Select the last text index which is the disabled text track
+            selectedTrackIndex = trackCount - firstTextIndex
         } else if (type == "language") {
             let selectedValue = criteria?.value as? String
             for i in 0..<textTracks.count {
@@ -53,7 +56,7 @@ enum RCTPlayerOperations {
         
         // in the situation that a selected text track is not available (eg. specifies a textTrack not available)
         if (type != "disabled") && selectedTrackIndex == RCTVideoUnset {
-            let captioningMediaCharacteristics = MACaptionAppearanceCopyPreferredCaptioningMediaCharacteristics(.user) as! CFArray
+            let captioningMediaCharacteristics = MACaptionAppearanceCopyPreferredCaptioningMediaCharacteristics(.user)
             let captionSettings = captioningMediaCharacteristics as? [AnyHashable]
             if ((captionSettings?.contains(AVMediaCharacteristic.transcribesSpokenDialogForAccessibility)) != nil) {
                 selectedTrackIndex = 0 // If we can't find a match, use the first available track
@@ -67,8 +70,8 @@ enum RCTPlayerOperations {
                 }
             }
         }
-        
-        for i in firstTextIndex..<(player?.currentItem?.tracks.count ?? 0) {
+                
+        for i in firstTextIndex..<(trackCount) {
             var isEnabled = false
             if selectedTrackIndex != RCTVideoUnset {
                 isEnabled = i == selectedTrackIndex + firstTextIndex
@@ -109,12 +112,20 @@ enum RCTPlayerOperations {
                 }
             }
         } else { // default. invalid type or "system"
-            player?.currentItem?.selectMediaOptionAutomatically(in: group)
-            return
+            #if TARGET_OS_TV
+                // Do noting. Fix for tvOS native audio menu language selector
+            #else
+                player?.currentItem?.selectMediaOptionAutomatically(in: group)
+                return
+            #endif
         }
         
-        // If a match isn't found, option will be nil and text tracks will be disabled
-        player?.currentItem?.select(mediaOption, in:group)
+        #if TARGET_OS_TV
+            // Do noting. Fix for tvOS native audio menu language selector
+        #else
+            // If a match isn't found, option will be nil and text tracks will be disabled
+            player?.currentItem?.select(mediaOption, in:group)
+        #endif
     }
     
     static func setMediaSelectionTrackForCharacteristic(player:AVPlayer?, characteristic:AVMediaCharacteristic, criteria:SelectedTrackCriteria?) {
@@ -167,7 +178,7 @@ enum RCTPlayerOperations {
         
         return Promise<Bool>(on: .global()) { fulfill, reject in
             guard CMTimeCompare(current, cmSeekTime) != 0 else {
-                reject(NSError())
+                reject(NSError(domain: "", code: 0, userInfo: nil))
                 return
             }
             if !paused { player.pause() }
@@ -175,6 +186,41 @@ enum RCTPlayerOperations {
             player.seek(to: cmSeekTime, toleranceBefore:tolerance, toleranceAfter:tolerance, completionHandler:{ (finished:Bool) in
                 fulfill(finished)
             })
+        }
+    }
+    
+    static func configureAudio(ignoreSilentSwitch:String, mixWithOthers:String) {
+        let session:AVAudioSession! = AVAudioSession.sharedInstance()
+        var category:AVAudioSession.Category? = nil
+        var options:AVAudioSession.CategoryOptions? = nil
+        
+        if (ignoreSilentSwitch == "ignore") {
+            category = AVAudioSession.Category.playback
+        } else if (ignoreSilentSwitch == "obey") {
+            category = AVAudioSession.Category.ambient
+        }
+        
+        if (mixWithOthers == "mix") {
+            options = .mixWithOthers
+        } else if (mixWithOthers == "duck") {
+            options = .duckOthers
+        }
+        
+        if let category = category, let options = options {
+            do {
+                try session.setCategory(category, options: options)
+            } catch {
+            }
+        } else if let category = category, options == nil {
+            do {
+                try session.setCategory(category)
+            } catch {
+            }
+        } else if category == nil, let options = options {
+            do {
+                try session.setCategory(session.category, options: options)
+            } catch {
+            }
         }
     }
 }
