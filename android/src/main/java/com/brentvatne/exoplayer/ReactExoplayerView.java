@@ -1112,12 +1112,7 @@ class ReactExoplayerView extends FrameLayout implements
                 public void run() {
                     // To prevent ANRs caused by getVideoTrackInfo we run this on a different thread and notify the player only when we're done
                     eventEmitter.load(duration, currentPosition, width, height,
-<<<<<<< HEAD:android-exoplayer/src/main/java/com/brentvatne/exoplayer/ReactExoplayerView.java
-                        audioTrackInfo, textTrackInfo, getVideoTrackInfo(timelineRef, trackRendererIndex), trackId);
-                    parentEs.shutdown();
-=======
                         audioTrackInfo, textTrackInfo, getVideoTrackInfo(trackRendererIndex), trackId);
->>>>>>> release/6.0.0-alpha.2:android/src/main/java/com/brentvatne/exoplayer/ReactExoplayerView.java
                 }
             });
         }
@@ -1182,23 +1177,6 @@ class ReactExoplayerView extends FrameLayout implements
 
             for (int trackIndex = 0; trackIndex < group.length; trackIndex++) {
                 Format format = group.getFormat(trackIndex);
-<<<<<<< HEAD:android-exoplayer/src/main/java/com/brentvatne/exoplayer/ReactExoplayerView.java
-                WritableMap videoTrack = Arguments.createMap();
-
-                int shortestFormatSide = format.height < format.width ? format.height : format.width;
-                int shortestScreenSize = this.getScreenShortestSide(this.themedReactContext);
-                if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
-                    // This video track is larger than screen resolution so we do not include it in the list of video tracks
-                    continue;
-                }
-
-                videoTrack.putInt("width", format.width == Format.NO_VALUE ? 0 : format.width);
-                videoTrack.putInt("height",format.height == Format.NO_VALUE ? 0 : format.height);
-                videoTrack.putInt("bitrate", format.bitrate == Format.NO_VALUE ? 0 : format.bitrate);
-                videoTrack.putString("codecs", format.codecs != null ? format.codecs : "");
-                videoTrack.putString("trackId", format.id == null ? String.valueOf(trackIndex) : format.id);
-=======
->>>>>>> release/6.0.0-alpha.2:android/src/main/java/com/brentvatne/exoplayer/ReactExoplayerView.java
                 if (isFormatSupported(format)) {
                     WritableMap videoTrack = Arguments.createMap();
                     videoTrack.putInt("width", format.width == Format.NO_VALUE ? 0 : format.width);
@@ -1214,52 +1192,8 @@ class ReactExoplayerView extends FrameLayout implements
         return videoTracks;
     }
 
-<<<<<<< HEAD:android-exoplayer/src/main/java/com/brentvatne/exoplayer/ReactExoplayerView.java
-    private int getScreenShortestSide(ThemedReactContext context) {
-        if (context == null) {
-            // No context so we fallback to max int
-            return 2147483647;
-        }
-        Display display = context.getCurrentActivity().getWindowManager().getDefaultDisplay();
-        int realWidth;
-        int realHeight;
-
-        if (Build.VERSION.SDK_INT >= 17){
-            //new pleasant way to get real metrics
-            DisplayMetrics realMetrics = new DisplayMetrics();
-            display.getRealMetrics(realMetrics);
-            realWidth = realMetrics.widthPixels;
-            realHeight = realMetrics.heightPixels;
-
-        } else if (Build.VERSION.SDK_INT >= 14) {
-            //Reflection for this weird in-between time
-            try {
-                Method mGetRawH = Display.class.getMethod("getRawHeight");
-                Method mGetRawW = Display.class.getMethod("getRawWidth");
-                realWidth = (Integer) mGetRawW.invoke(display);
-                realHeight = (Integer) mGetRawH.invoke(display);
-
-            } catch (Exception e) {
-                //This may not be 100% accurate, but it's all we've got
-                realWidth = display.getWidth();
-                realHeight = display.getHeight();
-                Log.e("Display Info", "Couldn't use reflection to get the real display metrics.");
-            }
-
-        } else {
-            //This should be close, as lower API devices should not have window navigation bars
-            realWidth = display.getWidth();
-            realHeight = display.getHeight();
-        }
-        return realHeight < realWidth ? realHeight : realWidth;
-    }
-
-    private WritableArray getVideoTrackInfoFromManifest(Timeline timeline) {
-        return this.getVideoTrackInfoFromManifest(timeline, 0);
-=======
     private WritableArray getVideoTrackInfoFromManifest() {
         return this.getVideoTrackInfoFromManifest(0);
->>>>>>> release/6.0.0-alpha.2:android/src/main/java/com/brentvatne/exoplayer/ReactExoplayerView.java
     }
 
     // We need retry count to in case where minefest request fails from poor network conditions
@@ -1453,21 +1387,6 @@ class ReactExoplayerView extends FrameLayout implements
         if (e == null) {
             return;
         }
-<<<<<<< HEAD:android-exoplayer/src/main/java/com/brentvatne/exoplayer/ReactExoplayerView.java
-        else if (e.type == ExoPlaybackException.TYPE_SOURCE) {
-            // Re-initialization improves recovery speed and properly resumes
-            needsReInitialization = true;
-            errorString = getResources().getString(R.string.unrecognized_media_format);
-            Exception cause = e.getSourceException();
-            if (cause instanceof DefaultDrmSessionManager.MissingSchemeDataException) {
-                errorCode = "3004";
-                errorString = getResources().getString(R.string.unrecognized_media_format);
-            } else if(cause instanceof MediaDrmCallbackException || cause instanceof DrmSessionException) {
-                errorCode = "3005";
-                errorString = getResources().getString(R.string.unrecognized_media_format);
-                // DrmSessionExceptions can be caused by a lot internal reasons for failure, in most cases they can be safely retried and playback will recover
-                if (!hasDrmFailed || cause instanceof DrmSessionException) {
-=======
         String errorString = "ExoPlaybackException: " + PlaybackException.getErrorCodeName(e.errorCode);
         String errorCode = "2" + String.valueOf(e.errorCode);
         boolean needsReInitialization = false;
@@ -1478,7 +1397,6 @@ class ReactExoplayerView extends FrameLayout implements
             case PlaybackException.ERROR_CODE_DRM_SYSTEM_ERROR:
             case PlaybackException.ERROR_CODE_DRM_UNSPECIFIED:
                 if (!hasDrmFailed) {
->>>>>>> release/6.0.0-alpha.2:android/src/main/java/com/brentvatne/exoplayer/ReactExoplayerView.java
                     // When DRM fails to reach the app level certificate server it will fail with a source error so we assume that it is DRM related and try one more time
                     hasDrmFailed = true;
                     playerNeedsSource = true;
