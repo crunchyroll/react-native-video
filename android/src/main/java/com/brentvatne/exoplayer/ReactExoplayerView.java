@@ -228,7 +228,7 @@ class ReactExoplayerView extends FrameLayout implements
                             && player.getPlaybackState() == Player.STATE_READY
                             && player.getPlayWhenReady()
                             ) {
-                        if (player.getCurrentMediaItem().requestMetadata.mediaUri !== null) {
+                        if (player.getCurrentMediaItem().requestMetadata.mediaUri != null) {
                             String currentUri = player.getCurrentMediaItem().requestMetadata.mediaUri.toString();
                             Log.w("ExoPlayer", "currentUri: " + currentUri);
                         }
