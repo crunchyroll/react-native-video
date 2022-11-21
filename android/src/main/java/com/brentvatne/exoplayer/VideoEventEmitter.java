@@ -28,6 +28,7 @@ class VideoEventEmitter {
         this.eventEmitter = reactContext.getJSModule(RCTEventEmitter.class);
     }
 
+    private static final String EVENT_CDN_UPDATE = "onCdnUpdate";
     private static final String EVENT_LOAD_START = "onVideoLoadStart";
     private static final String EVENT_LOAD = "onVideoLoad";
     private static final String EVENT_ERROR = "onVideoError";
@@ -52,6 +53,7 @@ class VideoEventEmitter {
     private static final String EVENT_PLAYBACK_RATE_CHANGE = "onPlaybackRateChange";
 
     static final String[] Events = {
+            EVENT_CDN_UPDATE,
             EVENT_LOAD_START,
             EVENT_LOAD,
             EVENT_ERROR,
@@ -77,6 +79,7 @@ class VideoEventEmitter {
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({
+            EVENT_CDN_UPDATE,
             EVENT_LOAD_START,
             EVENT_LOAD,
             EVENT_ERROR,
@@ -198,7 +201,11 @@ class VideoEventEmitter {
         event.putInt(EVENT_PROP_HEIGHT, height);
         event.putString(EVENT_PROP_TRACK_ID, id);
         receiveEvent(EVENT_BANDWIDTH, event);
-    }    
+    }  
+
+    void updateCdn(String url) {
+        receiveEvent(EVENT_CDN_UPDATE);
+    }  
 
     void seek(long currentPosition, long seekTime) {
         WritableMap event = Arguments.createMap();
