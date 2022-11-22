@@ -229,8 +229,8 @@ class ReactExoplayerView extends FrameLayout implements
                             && player.getPlaybackState() == Player.STATE_READY
                             && player.getPlayWhenReady()
                             ) {
-                        if (this.cdnUrl != null) {
-                            eventEmitter.updateCdn(this.cdnUrl);
+                        if (cdnUrl != null) {
+                            eventEmitter.updateCdn(cdnUrl);
                         }
                         long pos = player.getCurrentPosition();
                         long bufferedDuration = player.getBufferedPercentage() * player.getDuration() / 100;
@@ -525,7 +525,7 @@ class ReactExoplayerView extends FrameLayout implements
         public void onLoadCompleted​(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
             segments.add(new Segment(mediaLoadData.mediaEndTimeMs, mediaLoadData.mediaStartTimeMs, loadEventInfo.uri));
             if (loadEventInfo.uri != null) {
-                this.cdnUrl = loadEventInfo.uri;
+                cdnUrl = loadEventInfo.uri;
             }
             removePassedSegments();
         }

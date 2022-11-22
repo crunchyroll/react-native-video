@@ -204,7 +204,7 @@ class VideoEventEmitter {
     }  
 
     void updateCdn(String url) {
-        receiveEvent(EVENT_CDN_UPDATE);
+        receiveEvent(EVENT_CDN_UPDATE, url);
     }  
 
     void seek(long currentPosition, long seekTime) {
