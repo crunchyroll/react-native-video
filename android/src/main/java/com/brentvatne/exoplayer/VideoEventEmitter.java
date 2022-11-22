@@ -114,6 +114,7 @@ class VideoEventEmitter {
 
     private static final String EVENT_PROP_BUFFER_START = "bufferStart";
     private static final String EVENT_PROP_BUFFER_END = "bufferEnd";
+    private static final String EVENT_PROP_CDN_URL = "cdnUrl";
     private static final String EVENT_PROP_DURATION = "duration";
     private static final String EVENT_PROP_PLAYABLE_DURATION = "playableDuration";
     private static final String EVENT_PROP_SEEKABLE_DURATION = "seekableDuration";
@@ -204,7 +205,9 @@ class VideoEventEmitter {
     }  
 
     void updateCdn(String url) {
-        receiveEvent(EVENT_CDN_UPDATE, url);
+        WritableMap event = Arguments.createMap();
+        event.putString(EVENT_PROP_CDN_URL, url);
+        receiveEvent(EVENT_CDN_UPDATE, event);
     }  
 
     void seek(long currentPosition, long seekTime) {

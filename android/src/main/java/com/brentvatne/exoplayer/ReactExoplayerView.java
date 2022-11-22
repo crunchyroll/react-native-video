@@ -525,7 +525,7 @@ class ReactExoplayerView extends FrameLayout implements
         public void onLoadCompleted​(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
             segments.add(new Segment(mediaLoadData.mediaEndTimeMs, mediaLoadData.mediaStartTimeMs, loadEventInfo.uri));
             if (loadEventInfo.uri != null) {
-                cdnUrl = loadEventInfo.uri;
+                cdnUrl = loadEventInfo.uri.toString();
             }
             removePassedSegments();
         }
