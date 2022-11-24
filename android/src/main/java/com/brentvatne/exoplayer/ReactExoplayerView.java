@@ -208,9 +208,10 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean playInBackground = false;
     private Map<String, String> requestHeaders;
     private boolean mReportBandwidth = false;
+    private String cdnUrl = null;
     private UUID drmUUID = null;
     private String drmLicenseUrl = null;
-    private String[] drmLicenseHeader = null;
+    private String[] drmLicenseHeader = null; 
     private boolean controls;
     // \ End props
 
@@ -228,6 +229,9 @@ class ReactExoplayerView extends FrameLayout implements
                             && player.getPlaybackState() == Player.STATE_READY
                             && player.getPlayWhenReady()
                             ) {
+                        if (cdnUrl != null) {
+                            eventEmitter.updateCdn(cdnUrl);
+                        }
                         long pos = player.getCurrentPosition();
                         long bufferedDuration = player.getBufferedPercentage() * player.getDuration() / 100;
                         eventEmitter.progressChanged(pos, bufferedDuration, player.getDuration(), getPositionInFirstPeriodMsForCurrentWindow(pos));
@@ -520,6 +524,9 @@ class ReactExoplayerView extends FrameLayout implements
         @Override
         public void onLoadCompleted​(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
             segments.add(new Segment(mediaLoadData.mediaEndTimeMs, mediaLoadData.mediaStartTimeMs, loadEventInfo.uri));
+            if (loadEventInfo.uri != null) {
+                cdnUrl = loadEventInfo.uri.toString();
+            }
             removePassedSegments();
         }
 

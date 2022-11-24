@@ -128,6 +128,12 @@ export default class Video extends Component {
     }
   };
 
+  _onCdnUpdate = (event) => {
+    if (this.props.onCdnUpdate) {
+      this.props.onCdnUpdate(event.nativeEvent);
+    }
+  }
+
   _onBandwidthUpdate = (event) => {
     if (this.props.onBandwidthUpdate) {
       this.props.onBandwidthUpdate(event.nativeEvent);
@@ -313,6 +319,7 @@ export default class Video extends Component {
         patchVer: source.patchVer || 0,
         requestHeaders: source.headers ? this.stringsOnlyObject(source.headers) : {},
       },
+      onCdnUpdate: this._onCdnUpdate,
       onVideoLoadStart: this._onLoadStart,
       onVideoPlaybackStateChanged: this._onPlaybackStateChanged,
       onVideoLoad: this._onLoad,
@@ -386,6 +393,7 @@ Video.propTypes = {
     PropTypes.number,
     PropTypes.object,
   ]),
+  onCdnUpdate: PropTypes.func,
   fullscreen: PropTypes.bool,
   onVideoLoadStart: PropTypes.func,
   onVideoLoad: PropTypes.func,
