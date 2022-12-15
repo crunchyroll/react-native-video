@@ -1207,7 +1207,7 @@ class ReactExoplayerView extends FrameLayout implements
 
             for (int trackIndex = 0; trackIndex < group.length; trackIndex++) {
                 Format format = group.getFormat(trackIndex);
-
+                Log.w("ExoPlayer", "Checking format: " + String.valueOf(format.height));
                 int shortestFormatSide = format.height < format.width ? format.height : format.width;
                 int shortestScreenSize = this.getScreenShortestSide(this.themedReactContext);
                 if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
@@ -1321,7 +1321,7 @@ class ReactExoplayerView extends FrameLayout implements
                                 }
                                 hasFoundContentPeriod = true;
                                 WritableMap videoTrack = Arguments.createMap();
-
+                                Log.w("ExoPlayer", "Manfest resolution detected: " + String.valueOf(format.height));
                                 int shortestFormatSide = format.height < format.width ? format.height : format.width;
                                 if (limitMaxResolution && shortestFormatSide > shortestScreenSize) {
                                     // This video track is larger than screen resolution so we do not include it in the list of video tracks
