@@ -1215,7 +1215,7 @@ class ReactExoplayerView extends FrameLayout implements
                     continue;
                 }
                 if (isFormatSupported(format)) {
-                    Log.w("ExoPlayer", "Format is supported " + format.height);
+                    Log.w("ExoPlayer", "Format is supported " + String.valueOf(format.height));
                     WritableMap videoTrack = Arguments.createMap();
                     videoTrack.putInt("width", format.width == Format.NO_VALUE ? 0 : format.width);
                     videoTrack.putInt("height",format.height == Format.NO_VALUE ? 0 : format.height);
@@ -1224,7 +1224,7 @@ class ReactExoplayerView extends FrameLayout implements
                     videoTrack.putString("trackId", format.id == null ? String.valueOf(trackIndex) : format.id);
                     videoTracks.pushMap(videoTrack);
                 } else {
-                    Log.w("ExoPlayer", "Format NOT supported " + format.height);
+                    Log.w("ExoPlayer", "Format NOT supported " + String.valueOf(format.height));
                 }
             }
         }
