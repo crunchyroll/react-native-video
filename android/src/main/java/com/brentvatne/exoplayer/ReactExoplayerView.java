@@ -1211,6 +1211,7 @@ class ReactExoplayerView extends FrameLayout implements
                 int shortestFormatSide = format.height < format.width ? format.height : format.width;
                 int shortestScreenSize = this.getScreenShortestSide(this.themedReactContext);
                 if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
+                    Log.w("ExoPlayer", "Ignoring Format with height: " + String.valueOf(shortestFormatSide));
                     // This video track is larger than screen resolution so we do not include it in the list of video tracks
                     continue;
                 }
