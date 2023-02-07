@@ -1232,14 +1232,17 @@ class ReactExoplayerView extends FrameLayout implements
         return videoTracks;
     }
 
-    private WritableMap getScreenDimensions() {
+    private WritableMap getScreenDimensions(ThemedReactContext context) {
         if (
           context == null ||
           context.getCurrentActivity() == null ||
           context.getCurrentActivity().getWindowManager() == null
         ) {
             // No context, activity or window manager, we'll return the max int
-            return 2147483647;
+            WritableMap unknownDimensions = Arguments.createMap();
+            unknownDimensions.putInt("width", 2147483647);
+            unknownDimensions.putInt("height", 2147483647);
+            return unknownDimensions;
         }
         Display display = context.getCurrentActivity().getWindowManager().getDefaultDisplay();
         int realWidth;
@@ -1279,7 +1282,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private int getScreenShortestSide(ThemedReactContext context) {
-        WritableMap dimensions = getScreenDimensions();
+        WritableMap dimensions = getScreenDimensions(context);
 
         int realWidth = dimensions.getInt("width");
         int realHeight = dimensions.getInt("height");
@@ -1288,7 +1291,7 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private int getScreenLongestSide(ThemedReactContext context) {
-        WritableMap dimensions = getScreenDimensions();
+        WritableMap dimensions = getScreenDimensions(context);
 
         int realWidth = dimensions.getInt("width");
         int realHeight = dimensions.getInt("height");
