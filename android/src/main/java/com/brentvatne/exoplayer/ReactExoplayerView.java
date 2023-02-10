@@ -1210,7 +1210,10 @@ class ReactExoplayerView extends FrameLayout implements
 
                 int shortestFormatSide = format.height < format.width ? format.height : format.width;
                 int shortestScreenSize = this.getScreenShortestSide(this.themedReactContext);
-                if (this.limitMaxResolution && shortestFormatSide > shortestScreenSize) {
+                int longestFormatSide = format.height > format.width ? format.height : format.width;
+                int longestScreenSize = this.getScreenLongestSide(this.themedReactContext);
+                
+                if (this.limitMaxResolution && (shortestFormatSide > shortestScreenSize && longestFormatSide > longestScreenSize)) {
                     // This video track is larger than screen resolution so we do not include it in the list of video tracks
                     continue;
                 }
@@ -1229,14 +1232,17 @@ class ReactExoplayerView extends FrameLayout implements
         return videoTracks;
     }
 
-    private int getScreenShortestSide(ThemedReactContext context) {
+    private WritableMap getScreenDimensions(ThemedReactContext context) {
         if (
           context == null ||
           context.getCurrentActivity() == null ||
           context.getCurrentActivity().getWindowManager() == null
         ) {
             // No context, activity or window manager, we'll return the max int
-            return 2147483647;
+            WritableMap unknownDimensions = Arguments.createMap();
+            unknownDimensions.putInt("width", 2147483647);
+            unknownDimensions.putInt("height", 2147483647);
+            return unknownDimensions;
         }
         Display display = context.getCurrentActivity().getWindowManager().getDefaultDisplay();
         int realWidth;
@@ -1269,7 +1275,28 @@ class ReactExoplayerView extends FrameLayout implements
             realWidth = display.getWidth();
             realHeight = display.getHeight();
         }
+        WritableMap dimensions = Arguments.createMap();
+        dimensions.putInt("width", realWidth);
+        dimensions.putInt("height", realHeight);
+        return dimensions;
+    }
+
+    private int getScreenShortestSide(ThemedReactContext context) {
+        WritableMap dimensions = getScreenDimensions(context);
+
+        int realWidth = dimensions.getInt("width");
+        int realHeight = dimensions.getInt("height");
+
         return realHeight < realWidth ? realHeight : realWidth;
+    }
+
+    private int getScreenLongestSide(ThemedReactContext context) {
+        WritableMap dimensions = getScreenDimensions(context);
+
+        int realWidth = dimensions.getInt("width");
+        int realHeight = dimensions.getInt("height");
+
+        return realHeight > realWidth ? realHeight : realWidth;
     }
 
     private WritableArray getVideoTrackInfoFromManifest() {
@@ -1287,6 +1314,8 @@ class ReactExoplayerView extends FrameLayout implements
         final Uri sourceUri = this.srcUri;
         final long startTime = this.contentStartTime * 1000 - 100; // s -> ms with 100ms offset
         int shortestScreenSide = this.getScreenShortestSide(this.themedReactContext);
+        int longestScreenSide = this.getScreenLongestSide(this.themedReactContext);
+
         boolean limitMaxRes = this.limitMaxResolution;
 
         Future<WritableArray> result = es.submit(new Callable<WritableArray>() {
@@ -1294,6 +1323,7 @@ class ReactExoplayerView extends FrameLayout implements
             Uri uri = sourceUri;
             long startTimeUs = startTime * 1000; // ms -> us
             int shortestScreenSize = shortestScreenSide;
+            int longestScreenSize = longestScreenSide;
             boolean limitMaxResolution = limitMaxRes;
 
             public WritableArray call() throws Exception {
@@ -1319,7 +1349,8 @@ class ReactExoplayerView extends FrameLayout implements
                                 WritableMap videoTrack = Arguments.createMap();
 
                                 int shortestFormatSide = format.height < format.width ? format.height : format.width;
-                                if (limitMaxResolution && shortestFormatSide > shortestScreenSize) {
+                                int longestFormatSide = format.height > format.width ? format.height : format.width;
+                                if (limitMaxResolution && (shortestFormatSide > shortestScreenSize && longestFormatSide > longestScreenSize)) {
                                     // This video track is larger than screen resolution so we do not include it in the list of video tracks
                                     continue;
                                 }
