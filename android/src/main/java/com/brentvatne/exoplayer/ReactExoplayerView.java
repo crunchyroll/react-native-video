@@ -1273,7 +1273,8 @@ class ReactExoplayerView extends FrameLayout implements
     }
 
     private WritableArray getVideoTrackInfoFromManifest() {
-        return this.getVideoTrackInfoFromManifest(0);
+        return null;
+        // return this.getVideoTrackInfoFromManifest(0);
     }
 
     // We need retry count to in case where minefest request fails from poor network conditions
