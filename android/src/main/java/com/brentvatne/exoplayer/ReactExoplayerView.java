@@ -83,6 +83,7 @@ import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
 import com.google.android.exoplayer2.ui.PlayerControlView;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
@@ -120,7 +121,7 @@ import java.lang.Integer;
 import java.lang.reflect.Method;
 
 @SuppressLint("ViewConstructor")
-class ReactExoplayerView extends FrameLayout implements
+public class ReactExoplayerView extends FrameLayout implements
         LifecycleEventListener,
         Player.Listener,
         BandwidthMeter.EventListener,
@@ -131,6 +132,8 @@ class ReactExoplayerView extends FrameLayout implements
     public static final double DEFAULT_MAX_HEAP_ALLOCATION_PERCENT = 1;
     public static final double DEFAULT_MIN_BACK_BUFFER_MEMORY_RESERVE = 0;
     public static final double DEFAULT_MIN_BUFFER_MEMORY_RESERVE = 0;
+
+    public static final String NATIVE_SOURCE_URI = "native://mediaSource";
 
     private static final String TAG = "ReactExoplayerView";
 
@@ -215,6 +218,10 @@ class ReactExoplayerView extends FrameLayout implements
     private boolean controls;
     // \ End props
 
+    // DASH Offline Source
+    public static MediaSource offlineMediaSource;
+    public static CacheDataSource.Factory offlineCacheDataSourceFactory;
+
     // React
     private final ThemedReactContext themedReactContext;
     private final AudioManager audioManager;
@@ -271,6 +278,13 @@ class ReactExoplayerView extends FrameLayout implements
     public void setId(int id) {
         super.setId(id);
         eventEmitter.setViewId(id);
+    }
+
+    private boolean isUriNativeSource(Uri src) {
+        if (src == null) {
+            return false;
+        }
+        return src.toString().equals(ReactExoplayerView.NATIVE_SOURCE_URI);
     }
 
     private void createViews() {
@@ -786,6 +800,12 @@ class ReactExoplayerView extends FrameLayout implements
         if (uri == null) {
             throw new IllegalStateException("Invalid video uri");
         }
+        if (isUriNativeSource(uri)) {
+            if (ReactExoplayerView.offlineMediaSource == null) {
+                throw new IllegalStateException("Invalid native source");
+            }
+            return ReactExoplayerView.offlineMediaSource;
+        }
         int type = Util.inferContentType(!TextUtils.isEmpty(overrideExtension) ? "." + overrideExtension
                 : uri.getLastPathSegment());
         config.setDisableDisconnectError(this.disableDisconnectError);
@@ -1279,8 +1299,9 @@ class ReactExoplayerView extends FrameLayout implements
     // We need retry count to in case where minefest request fails from poor network conditions
     private WritableArray getVideoTrackInfoFromManifest(int retryCount) {
         ExecutorService es = Executors.newSingleThreadExecutor();
-        if (this.mediaDataSourceFactory == null) {
+        if (this.mediaDataSourceFactory == null || isUriNativeSource(this.srcUri)) {
             // Data source factory was not yet initialised - we can't proceed without it!
+            // Native source URI is intended for offline playback - so there is no manifest info
             return null;
         }
         final DataSource dataSource = this.mediaDataSourceFactory.createDataSource();
@@ -1524,18 +1545,23 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setSrc(final Uri uri, final String extension, Map<String, String> headers) {
         if (uri != null) {
-            boolean isSourceEqual = uri.equals(srcUri);
+            boolean hasNativeSource = isUriNativeSource(uri);
+            boolean isSourceEqual = uri.equals(srcUri) && !hasNativeSource;
             hasDrmFailed = false;
             this.srcUri = uri;
             this.extension = extension;
             this.requestHeaders = headers;
-            if (this.bandwidthMeter == null) {
+            if (this.bandwidthMeter == null && !hasNativeSource) {
                 this.bandwidthMeter = config.getBandwidthMeter();
                 this.bandwidthMeter.addEventListener(new Handler(), this);
             }
-            this.mediaDataSourceFactory =
+            if (hasNativeSource) {
+                this.mediaDataSourceFactory = ReactExoplayerView.offlineCacheDataSourceFactory;
+            } else {
+                this.mediaDataSourceFactory =
                     DataSourceUtil.getDefaultDataSourceFactory(this.themedReactContext, bandwidthMeter,
                             this.requestHeaders);
+            }
 
             if (!isSourceEqual) {
                 reloadSource();
@@ -1566,10 +1592,11 @@ class ReactExoplayerView extends FrameLayout implements
 
     public void setRawSrc(final Uri uri, final String extension) {
         if (uri != null) {
-            boolean isSourceEqual = uri.equals(srcUri);
+            boolean hasNativeSource = isUriNativeSource(uri);
+            boolean isSourceEqual = uri.equals(srcUri) && !hasNativeSource;
             this.srcUri = uri;
             this.extension = extension;
-            this.mediaDataSourceFactory = buildDataSourceFactory(true);
+            this.mediaDataSourceFactory = buildDataSourceFactory(!hasNativeSource);
 
             if (!isSourceEqual) {
                 reloadSource();
