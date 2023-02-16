@@ -658,6 +658,8 @@ public class ReactExoplayerView extends FrameLayout implements
         Runtime runtime = Runtime.getRuntime();
         long usedMemory = runtime.totalMemory() - runtime.freeMemory();
         long freeMemory = runtime.maxMemory() - usedMemory;
+        boolean hasNativeSource = isUriNativeSource(self.srcUri);
+
         int backBufferMs = backBufferDurationMs;
         if (freeMemory < (self.enableBackBufferAvailableMemory * 1000 * 1000)) {
             Log.w("LoadControl", "Available memory is less than required to enable back buffer, setting to 0ms!");
@@ -679,11 +681,19 @@ public class ReactExoplayerView extends FrameLayout implements
         DefaultRenderersFactory renderersFactory =
                 new DefaultRenderersFactory(getContext())
                         .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
-        player = new ExoPlayer.Builder(getContext(), renderersFactory)
+        if (hasNativeSource) {
+            player = new ExoPlayer.Builder(getContext(), renderersFactory)
+                    .setTrackSelector​(self.trackSelector)
+                    .setLoadControl(loadControl)
+                    .build();
+        } else {
+            player = new ExoPlayer.Builder(getContext(), renderersFactory)
                     .setTrackSelector​(self.trackSelector)
                     .setBandwidthMeter(bandwidthMeter)
                     .setLoadControl(loadControl)
                     .build();
+        }
+        
         player.addListener(self);
         exoPlayerView.setPlayer(player);
         audioBecomingNoisyReceiver.setListener(self);
