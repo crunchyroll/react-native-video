@@ -1587,6 +1587,8 @@ public class ReactExoplayerView extends FrameLayout implements
             this.extension = null;
             this.requestHeaders = null;
             this.mediaDataSourceFactory = null;
+            ReactExoplayerView.offlineMediaSource = null;
+            ReactExoplayerView.offlineCacheDataSourceFactory = null;
             clearResumePosition();
         }
         releasePlayer();
