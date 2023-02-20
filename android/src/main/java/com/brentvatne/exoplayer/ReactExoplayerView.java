@@ -1158,7 +1158,13 @@ public class ReactExoplayerView extends FrameLayout implements
             Format videoFormat = player.getVideoFormat();
             int width = videoFormat != null ? videoFormat.width : 0;
             int height = videoFormat != null ? videoFormat.height : 0;
+            long bitrate = (videoFormat != null || videoFormat.bitrate == Format.NO_VALUE) ? 0 : videoFormat.bitrate;
             String trackId = videoFormat != null ? videoFormat.id : "-1";
+
+            if (isUriNativeSource(this.srcUri) && mReportBandwidth) {
+                // Offline playback has only one video track so we report bandwidth only once without initializing bandwidth meter
+                eventEmitter.bandwidthReport(bitrate, height, width, trackId);
+            }
 
             // Properties that must be accessed on the main thread
             long duration = player.getDuration();
