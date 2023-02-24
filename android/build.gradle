@@ -37,6 +37,13 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
+    // IMA SDK
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.18.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.1'
+    implementation 'com.google.android.exoplayer:extension-ima:2.18.1'
+
     // All support libs must use the same version
     implementation "androidx.annotation:annotation:1.1.0"
     implementation "androidx.core:core:1.1.0"

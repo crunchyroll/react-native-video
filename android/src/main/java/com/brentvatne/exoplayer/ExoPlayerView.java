@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.google.common.collect.ImmutableList;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -21,19 +22,24 @@ import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.ui.SubtitleView;
+import com.google.android.exoplayer2.ui.AdOverlayInfo;
+import com.google.android.exoplayer2.ui.AdViewProvider;
 import com.google.android.exoplayer2.video.VideoSize;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @TargetApi(16)
-public final class ExoPlayerView extends FrameLayout {
+public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
 
     private View surfaceView;
     private final View shutterView;
     private final SubtitleView subtitleLayout;
     private final AspectRatioFrameLayout layout;
     private final ComponentListener componentListener;
+    private FrameLayout adOverlayFrameLayout;
     private ExoPlayer player;
     private Context context;
     private ViewGroup.LayoutParams layoutParams;
@@ -83,6 +89,10 @@ public final class ExoPlayerView extends FrameLayout {
         layout.addView(subtitleLayout, 2, layoutParams);
 
         addViewInLayout(layout, 0, aspectRatioParams);
+    }
+
+    public void setAdOverlay(FrameLayout adOverlay) {
+        adOverlayFrameLayout = adOverlay;
     }
 
     private void clearVideoView() {
@@ -222,6 +232,18 @@ public final class ExoPlayerView extends FrameLayout {
     public void invalidateAspectRatio() {
         // Resetting aspect ratio will force layout refresh on next video size changed
         layout.invalidateAspectRatio();
+    }
+
+    @Override
+    public ViewGroup getAdViewGroup() {
+        return Assertions.checkStateNotNull(
+            adOverlayFrameLayout, "exo_ad_overlay must be present for ad playback");
+    }
+
+    @Override
+    public List<AdOverlayInfo> getAdOverlayInfos() {
+        List<AdOverlayInfo> overlayViews = new ArrayList<>();
+        return ImmutableList.copyOf(overlayViews);
     }
 
     private final class ComponentListener implements Player.Listener {

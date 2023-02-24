@@ -28,6 +28,7 @@ class VideoEventEmitter {
         this.eventEmitter = reactContext.getJSModule(RCTEventEmitter.class);
     }
 
+    private static final String EVENT_AD_EVENT = "onAdEvent";
     private static final String EVENT_CDN_UPDATE = "onCdnUpdate";
     private static final String EVENT_LOAD_START = "onVideoLoadStart";
     private static final String EVENT_LOAD = "onVideoLoad";
@@ -53,6 +54,7 @@ class VideoEventEmitter {
     private static final String EVENT_PLAYBACK_RATE_CHANGE = "onPlaybackRateChange";
 
     static final String[] Events = {
+            EVENT_AD_EVENT,
             EVENT_CDN_UPDATE,
             EVENT_LOAD_START,
             EVENT_LOAD,
@@ -79,6 +81,7 @@ class VideoEventEmitter {
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({
+            EVENT_AD_EVENT,
             EVENT_CDN_UPDATE,
             EVENT_LOAD_START,
             EVENT_LOAD,
@@ -111,7 +114,8 @@ class VideoEventEmitter {
     private static final String EVENT_PROP_REVERSE = "canPlayReverse";
     private static final String EVENT_PROP_STEP_FORWARD = "canStepForward";
     private static final String EVENT_PROP_STEP_BACKWARD = "canStepBackward";
-
+    private static final String EVENT_PROP_AD_EVENT_TYPE = "adEventType";
+    private static final String EVENT_PROP_AD_EVENT_PAYLOAD = "adEventPayload";
     private static final String EVENT_PROP_BUFFER_START = "bufferStart";
     private static final String EVENT_PROP_BUFFER_END = "bufferEnd";
     private static final String EVENT_PROP_CDN_URL = "cdnUrl";
@@ -186,12 +190,20 @@ class VideoEventEmitter {
         receiveEvent(EVENT_LOAD, event);
     }
 
-    void progressChanged(double currentPosition, double bufferedDuration, double seekableDuration, double currentPlaybackTime) {
+    void adEvent(String eventType, WritableMap payload) {
+        WritableMap event = Arguments.createMap();
+        event.putString(EVENT_PROP_AD_EVENT_TYPE, eventType);
+        event.putMap(EVENT_PROP_AD_EVENT_PAYLOAD, payload);
+        receiveEvent(EVENT_AD_EVENT, event);
+    }
+
+    void progressChanged(double currentPosition, double bufferedDuration, double seekableDuration, double currentPlaybackTime, double duration) {
         WritableMap event = Arguments.createMap();
         event.putDouble(EVENT_PROP_CURRENT_TIME, currentPosition / 1000D);
         event.putDouble(EVENT_PROP_PLAYABLE_DURATION, bufferedDuration / 1000D);
         event.putDouble(EVENT_PROP_SEEKABLE_DURATION, seekableDuration / 1000D);
         event.putDouble(EVENT_PROP_CURRENT_PLAYBACK_TIME, currentPlaybackTime);
+        event.putDouble(EVENT_PROP_DURATION, duration);
         receiveEvent(EVENT_PROGRESS, event);
     }
 

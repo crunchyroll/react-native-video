@@ -32,12 +32,19 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.util.RNLog;
+import com.google.ads.interactivemedia.v3.api.Ad;
+import com.google.ads.interactivemedia.v3.api.AdPodInfo;
+import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
+import com.google.ads.interactivemedia.v3.api.AdEvent;
+import com.google.ads.interactivemedia.v3.api.AdEvent.AdEventListener;
+import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayerCallback;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.drm.DrmSession.DrmSessionException;
+import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
@@ -61,6 +68,7 @@ import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.LoadEventInfo;
 import com.google.android.exoplayer2.source.MediaLoadData;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -122,6 +130,7 @@ import java.lang.reflect.Method;
 
 @SuppressLint("ViewConstructor")
 public class ReactExoplayerView extends FrameLayout implements
+        AdEventListener,
         LifecycleEventListener,
         Player.Listener,
         BandwidthMeter.EventListener,
@@ -154,6 +163,8 @@ public class ReactExoplayerView extends FrameLayout implements
     private MediaSourceEventListener mediaSourceEventListener;
 
     private ExoPlayerView exoPlayerView;
+    private FrameLayout adOverlay;
+    private ImaAdsLoader adsLoader;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -194,6 +205,8 @@ public class ReactExoplayerView extends FrameLayout implements
     private int backBufferDurationMs = DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS;
     private Uri srcUri;
     private String extension;
+    private boolean isCSAIEnabled = false;
+    private String adTagUrl;
     private boolean repeat;
     private String audioTrackType;
     private Dynamic audioTrackValue;
@@ -241,7 +254,8 @@ public class ReactExoplayerView extends FrameLayout implements
                         }
                         long pos = player.getCurrentPosition();
                         long bufferedDuration = player.getBufferedPercentage() * player.getDuration() / 100;
-                        eventEmitter.progressChanged(pos, bufferedDuration, player.getDuration(), getPositionInFirstPeriodMsForCurrentWindow(pos));
+                        long duration = player.getDuration();
+                        eventEmitter.progressChanged(pos, bufferedDuration, player.getDuration(), getPositionInFirstPeriodMsForCurrentWindow(pos), duration);
                         msg = obtainMessage(SHOW_PROGRESS);
                         sendMessageDelayed(msg, Math.round(mProgressUpdateInterval));
                     }
@@ -294,15 +308,53 @@ public class ReactExoplayerView extends FrameLayout implements
             CookieHandler.setDefault(DEFAULT_COOKIE_MANAGER);
         }
 
+        // ExoPlayer view init
         LayoutParams layoutParams = new LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT);
         exoPlayerView = new ExoPlayerView(getContext());
         exoPlayerView.setLayoutParams(layoutParams);
 
+        // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
+         // Ads overlay - it will be invisible - ads UI should be handled by JS
+        LayoutParams adOverlayLayoutParams = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT);
+        adOverlay = new FrameLayout(getContext());
+        adOverlay.setLayoutParams(adOverlayLayoutParams);
+
+        addView(adOverlay, 1, adOverlayLayoutParams);
+
+        // Let ExoPlayerView know which FrameLayout can be used for ads rendering
+        exoPlayerView.setAdOverlay(adOverlay);
+
+
+        adsLoader = new ImaAdsLoader.Builder(getContext())
+            .setAdEventListener(this)
+            .setVideoAdPlayerCallback(this)
+            .build();
+
         mainHandler = new Handler();
+    }
+
+    @Override
+    public void onAdEvent(AdEvent event) {
+        if (event == null) {
+            return;
+        }
+        WritableMap payload = Arguments.createMap();
+
+        AdEvent.AdEventType eventType = event.getType();
+        switch(eventType) {
+            case STARTED:
+                eventEmitter.adEvent("STARTED", payload);
+                break;
+            case CONTENT_RESUME_REQUESTED:
+                eventEmitter.adEvent("CONTENT_RESUME_REQUESTED", payload);
+                break;
+        } 
     }
 
     @Override
@@ -683,19 +735,25 @@ public class ReactExoplayerView extends FrameLayout implements
                         .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
         if (hasNativeSource) {
             player = new ExoPlayer.Builder(getContext(), renderersFactory)
-                    .setTrackSelector​(self.trackSelector)
+                    .setTrackSelector(self.trackSelector)
                     .setLoadControl(loadControl)
                     .build();
         } else {
+            if (self.bandwidthMeter == null) {
+                self.bandwidthMeter = self.config.getBandwidthMeter();
+            }
             player = new ExoPlayer.Builder(getContext(), renderersFactory)
-                    .setTrackSelector​(self.trackSelector)
-                    .setBandwidthMeter(bandwidthMeter)
+                    .setBandwidthMeter(self.bandwidthMeter)
+                    .setTrackSelector(self.trackSelector)
                     .setLoadControl(loadControl)
                     .build();
         }
-        
+
         player.addListener(self);
         exoPlayerView.setPlayer(player);
+        if (self.isCSAIEnabled) {
+            adsLoader.setPlayer(player);
+        }
         audioBecomingNoisyReceiver.setListener(self);
         setPlayWhenReady(!isPaused);
         playerNeedsSource = true;
@@ -725,7 +783,7 @@ public class ReactExoplayerView extends FrameLayout implements
         ArrayList<MediaSource> mediaSourceList = buildTextSources();
         MediaSource videoSource = buildMediaSource(self.srcUri, self.extension, drmSessionManager);
 
-        videoSource.addEventListener​(this.mainHandler, this.mediaSourceEventListener);
+        videoSource.addEventListener(this.mainHandler, this.mediaSourceEventListener);
 
         MediaSource mediaSource;
         if (mediaSourceList.size() == 0) {
@@ -819,7 +877,18 @@ public class ReactExoplayerView extends FrameLayout implements
         int type = Util.inferContentType(!TextUtils.isEmpty(overrideExtension) ? "." + overrideExtension
                 : uri.getLastPathSegment());
         config.setDisableDisconnectError(this.disableDisconnectError);
-        MediaItem mediaItem = new MediaItem.Builder().setUri(uri).build();
+
+        MediaItem mediaItem;
+        if (isCSAIEnabled) {
+            // CSAI ad tag uri
+            Uri adTagUri = Uri.parse(adTagUrl);
+            mediaItem = new MediaItem.Builder()
+                .setUri(uri)
+                .setAdsConfiguration(new MediaItem.AdsConfiguration.Builder(adTagUri).build())
+                .build();
+        } else {
+            mediaItem = new MediaItem.Builder().setUri(uri).build();
+        }
         DrmSessionManagerProvider drmProvider = null;
         if (drmSessionManager != null) {
             drmProvider = new DrmSessionManagerProvider() {
@@ -841,6 +910,18 @@ public class ReactExoplayerView extends FrameLayout implements
                         config.buildLoadErrorHandlingPolicy(minLoadRetryCount)
                 ).createMediaSource(mediaItem);
             case C.TYPE_DASH:
+                if(isCSAIEnabled) {
+                    return new DefaultMediaSourceFactory(mediaDataSourceFactory)
+                        .setDataSourceFactory(buildDataSourceFactory(false))
+                        .setDrmSessionManagerProvider(drmProvider)
+                        .setLoadErrorHandlingPolicy(
+                            config.buildLoadErrorHandlingPolicy(minLoadRetryCount)
+                        )
+                        .setAdsLoaderProvider(unusedAdTagUri -> adsLoader)
+                        .setAdViewProvider(exoPlayerView)
+                        .createMediaSource(mediaItem);
+                }
+            
                 return new DashMediaSource.Factory(
                         new DefaultDashChunkSource.Factory(mediaDataSourceFactory),
                         buildDataSourceFactory(false)
@@ -911,6 +992,7 @@ public class ReactExoplayerView extends FrameLayout implements
             player.removeListener(this);
             trackSelector = null;
             player = null;
+            adsLoader.setPlayer(null);
             exoPlayerView.setPlayer(null);
             if (playerControlView != null) {
                 playerControlView.setPlayer(null);
@@ -1992,6 +2074,14 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void setDisableDisconnectError(boolean disableDisconnectError) {
         this.disableDisconnectError = disableDisconnectError;
+    }
+
+    public void setEnableCSAI(boolean isEnabled) {
+        this.isCSAIEnabled = isEnabled;
+    }
+
+    public void setAdTagUrl(String url) {
+        this.adTagUrl = url;
     }
 
     public void setFullscreen(boolean fullscreen) {
