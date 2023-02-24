@@ -19,6 +19,7 @@ import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
@@ -322,10 +323,11 @@ public class ReactExoplayerView extends FrameLayout implements
         LayoutParams adOverlayLayoutParams = new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT);
+        adOverlayLayoutParams.gravity = Gravity.CENTER;
         adOverlay = new FrameLayout(getContext());
         adOverlay.setLayoutParams(adOverlayLayoutParams);
 
-        addView(adOverlay, -1, adOverlayLayoutParams);
+        addView(adOverlay, 2, adOverlayLayoutParams);
 
         // Let ExoPlayerView know which FrameLayout can be used for ads rendering
         exoPlayerView.setAdOverlay(adOverlay);
