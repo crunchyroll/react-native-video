@@ -325,7 +325,7 @@ public class ReactExoplayerView extends FrameLayout implements
         adOverlay = new FrameLayout(getContext());
         adOverlay.setLayoutParams(adOverlayLayoutParams);
 
-        addView(adOverlay, 1, adOverlayLayoutParams);
+        addView(adOverlay, -1, adOverlayLayoutParams);
 
         // Let ExoPlayerView know which FrameLayout can be used for ads rendering
         exoPlayerView.setAdOverlay(adOverlay);
