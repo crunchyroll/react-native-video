@@ -32,6 +32,8 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     private static final String PROP_SRC = "src";
     private static final String PROP_SRC_URI = "uri";
     private static final String PROP_SRC_TYPE = "type";
+    private static final String PROP_AD_TAG_URL = "adTagUrl";
+    private static final String PROP_ENABLE_CSAI = "enableCSAI";
     private static final String PROP_DRM = "drm";
     private static final String PROP_DRM_TYPE = "type";
     private static final String PROP_DRM_LICENSESERVER = "licenseServer";
@@ -144,6 +146,16 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
                 videoView.setUseTextureView(false);
             }
         }
+    }
+
+    @ReactProp(name = PROP_ENABLE_CSAI)
+    public void setEnableCSAI(final ReactExoplayerView videoView, final boolean isEnabled) {
+        videoView.setEnableCSAI(isEnabled);
+    }
+
+    @ReactProp(name = PROP_AD_TAG_URL)
+    public void setAdTagUrl(final ReactExoplayerView videoView, final String url) {
+        videoView.setAdTagUrl(url);
     }
 
     @ReactProp(name = PROP_LIMIT_MAX_RESOLUTION)
