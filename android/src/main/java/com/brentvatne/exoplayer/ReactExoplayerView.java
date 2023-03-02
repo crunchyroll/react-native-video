@@ -268,6 +268,11 @@ public class ReactExoplayerView extends FrameLayout implements
                         eventEmitter.progressChanged(pos, bufferedDuration, player.getDuration(), getPositionInFirstPeriodMsForCurrentWindow(pos), duration);
                         msg = obtainMessage(SHOW_PROGRESS);
                         sendMessageDelayed(msg, Math.round(mProgressUpdateInterval));
+
+                        WritableMap payload = Arguments.createMap();
+                        WritableMap adInfo = getAdInfo();
+                        payload.putMap("adInfo", adInfo);
+                        eventEmitter.adEvent("AD_INFO_UPDATE", payload);  
                     }
                     break;
             }
@@ -345,7 +350,7 @@ public class ReactExoplayerView extends FrameLayout implements
             .build();
         // Get the underlying Google ads loader
         googleAdsLoader = adsLoader.getAdsLoader();
-        googleAdsLoader.addAdsLoadedListener(this)
+        googleAdsLoader.addAdsLoadedListener(this);
         mainHandler = new Handler();
     }
 
@@ -388,7 +393,7 @@ public class ReactExoplayerView extends FrameLayout implements
         return data;
     }
 
-    public clickAd() {
+    public void clickAd() {
         adOverlay.performClick();
     }
 
@@ -407,7 +412,6 @@ public class ReactExoplayerView extends FrameLayout implements
         }
 
         // Get ad data
-        activeAd = event.getAd();
         WritableMap adInfo = getAdInfo();
         
         WritableMap payload = Arguments.createMap();
