@@ -394,7 +394,10 @@ public class ReactExoplayerView extends FrameLayout implements
     private WritableMap getAdInfo() {
         WritableMap data = Arguments.createMap();
         
-        if (activeAd == null || googleAdsManager == null) {
+        if (activeAd == null) {
+            if (activeAd == null) {
+                data.putString("error", "No activeAd!");
+            }
             return data;
         }
 
@@ -418,6 +421,10 @@ public class ReactExoplayerView extends FrameLayout implements
         data.putInt("adPodPosition", adPodPosition);
         data.putDouble("adPodMaxDuration", adPodMaxDuration);
 
+        if (googleAdsManager == null) {
+            data.putString("error", "No googleAdsManager!");
+            return data;
+        }
         // Get ads manager based data
         List<Float> cuePoints = googleAdsManager.getAdCuePoints();
 
