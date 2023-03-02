@@ -35,13 +35,11 @@ import com.facebook.react.util.RNLog;
 import com.google.ads.interactivemedia.v3.api.Ad;
 import com.google.ads.interactivemedia.v3.api.AdPodInfo;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
-import com.google.ads.interactivemedia.v3.api.AdErrorEvent.AdErrorListener;
 import com.google.ads.interactivemedia.v3.api.AdsLoader;
-import com.google.ads.interactivemedia.v3.api.AdsLoader.AdsManagerLoadedEvent;
+import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
 import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdEvent.AdEventListener;
-import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayerCallback;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -136,7 +134,6 @@ import java.lang.reflect.Method;
 @SuppressLint("ViewConstructor")
 public class ReactExoplayerView extends FrameLayout implements
         AdEventListener,
-        AdErrorListener,
         AdsLoader.AdsLoadedListener,
         LifecycleEventListener,
         Player.Listener,
@@ -346,7 +343,6 @@ public class ReactExoplayerView extends FrameLayout implements
 
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
-            .setVideoAdPlayerCallback(this)
             .build();
         // Get the underlying Google ads loader
         googleAdsLoader = adsLoader.getAdsLoader();
@@ -366,8 +362,8 @@ public class ReactExoplayerView extends FrameLayout implements
         int adPodIndex = 0;
         int adPodTotalAds = 0;
         double adPodMaxDuration = 0;
-        if (ad != null) {
-            AdPodInfo podInfo = ad.getAdPodInfo();
+        if (activeAd != null) {
+            AdPodInfo podInfo = activeAd.getAdPodInfo();
             if (podInfo != null) {
                 adPodIndex = podInfo.getPodIndex();
                 adPodTotalAds = podInfo.getTotalAds();
@@ -386,7 +382,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         WritableArray adMarkers = Arguments.createArray();
         for (Float cue : cuePoints) {
-            adMarkers.putFloat(cue.floatValue());
+            adMarkers.pushDouble(cue.doubleValue());
         }
         data.putArray("adMarkers", adMarkers);
 
