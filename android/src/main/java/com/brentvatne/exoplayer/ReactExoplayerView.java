@@ -347,7 +347,7 @@ public class ReactExoplayerView extends FrameLayout implements
             .build();
         // Get the underlying Google ads loader
         googleAdsLoader = adsLoader.getAdsLoader();
-        googleAdsLoader.addAdsLoadedListener(this)
+        googleAdsLoader.addAdsLoadedListener(this);
         mainHandler = new Handler();
         
     }
@@ -441,7 +441,7 @@ public class ReactExoplayerView extends FrameLayout implements
         return data;
     }
 
-    public clickAd() {
+    public void clickAd() {
         adOverlay.performClick();
     }
 
@@ -460,7 +460,6 @@ public class ReactExoplayerView extends FrameLayout implements
         }
 
         // Get ad data
-        activeAd = event.getAd();
         WritableMap adInfo = getAdInfo();
         
         WritableMap payload = Arguments.createMap();
