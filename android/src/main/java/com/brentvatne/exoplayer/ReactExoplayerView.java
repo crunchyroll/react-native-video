@@ -345,9 +345,6 @@ public class ReactExoplayerView extends FrameLayout implements
             .setImaSdkSettings(imaSettings)
             .setVideoAdPlayerCallback(this)
             .build();
-        // Get the underlying Google ads loader
-        googleAdsLoader = adsLoader.getAdsLoader();
-        googleAdsLoader.addAdsLoadedListener(this);
         mainHandler = new Handler();
         
     }
@@ -457,6 +454,15 @@ public class ReactExoplayerView extends FrameLayout implements
     public void onAdEvent(AdEvent event) {
         if (event == null) {
             return;
+        }
+        if (googleAdsLoader == null) {
+        // Get the underlying Google ads loader
+        googleAdsLoader = adsLoader.getAdsLoader();
+        }
+        if (googleAdsLoader != null) {
+            googleAdsLoader.addAdsLoadedListener(this);
+        } else {
+            Log.w("RNV_CSAI", "Could not get google AdsLoader!");
         }
 
         // Get ad data
