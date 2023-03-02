@@ -151,7 +151,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     }
 
     @ReactMethod
-    public void clickAd() {
+    public void clickAd(final ReactExoplayerView videoView) {
         videoView.clickAd();
     }
 
