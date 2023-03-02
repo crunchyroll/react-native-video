@@ -410,8 +410,8 @@ public class ReactExoplayerView extends FrameLayout implements
         int adPodIndex = 0;
         int adPodTotalAds = 0;
         double adPodMaxDuration = 0;
-        if (ad != null) {
-            AdPodInfo podInfo = ad.getAdPodInfo();
+        if (activeAd != null) {
+            AdPodInfo podInfo = activeAd.getAdPodInfo();
             if (podInfo != null) {
                 adPodIndex = podInfo.getPodIndex();
                 adPodTotalAds = podInfo.getTotalAds();
@@ -430,7 +430,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         WritableArray adMarkers = Arguments.createArray();
         for (Float cue : cuePoints) {
-            adMarkers.putFloat(cue.floatValue());
+            adMarkers.pushDouble(cue.doubleValue());
         }
         data.putArray("adMarkers", adMarkers);
 
