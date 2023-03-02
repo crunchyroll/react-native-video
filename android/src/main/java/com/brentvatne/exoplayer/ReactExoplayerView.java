@@ -19,7 +19,6 @@ import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
@@ -36,6 +35,10 @@ import com.facebook.react.util.RNLog;
 import com.google.ads.interactivemedia.v3.api.Ad;
 import com.google.ads.interactivemedia.v3.api.AdPodInfo;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
+import com.google.ads.interactivemedia.v3.api.AdErrorEvent.AdErrorListener;
+import com.google.ads.interactivemedia.v3.api.AdsLoader;
+import com.google.ads.interactivemedia.v3.api.AdsLoader.AdsManagerLoadedEvent;
+import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdEvent.AdEventListener;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer.VideoAdPlayerCallback;
@@ -127,11 +130,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.lang.Integer;
+import java.lang.Float;
 import java.lang.reflect.Method;
 
 @SuppressLint("ViewConstructor")
 public class ReactExoplayerView extends FrameLayout implements
         AdEventListener,
+        AdErrorListener,
+        AdsLoader.AdsLoadedListener,
         LifecycleEventListener,
         Player.Listener,
         BandwidthMeter.EventListener,
@@ -166,6 +172,9 @@ public class ReactExoplayerView extends FrameLayout implements
     private ExoPlayerView exoPlayerView;
     private FrameLayout adOverlay;
     private ImaAdsLoader adsLoader;
+    private AdsLoader googleAdsLoader;
+    private AdsManager googleAdsManager;
+    private Ad activeAd;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -332,9 +341,63 @@ public class ReactExoplayerView extends FrameLayout implements
 
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
+            .setVideoAdPlayerCallback(this)
             .build();
-
+        // Get the underlying Google ads loader
+        googleAdsLoader = adsLoader.getAdsLoader();
+        googleAdsLoader.addAdsLoadedListener(this)
         mainHandler = new Handler();
+    }
+
+    private WritableMap getAdInfo() {
+        WritableMap data = Arguments.createMap();
+        
+        if (activeAd == null || googleAdsManager == null) {
+            return data;
+        }
+
+        // Get ad based data
+        int adPodPosition = 0;
+        int adPodIndex = 0;
+        int adPodTotalAds = 0;
+        double adPodMaxDuration = 0;
+        if (ad != null) {
+            AdPodInfo podInfo = ad.getAdPodInfo();
+            if (podInfo != null) {
+                adPodIndex = podInfo.getPodIndex();
+                adPodTotalAds = podInfo.getTotalAds();
+                adPodPosition = podInfo.getAdPosition();
+                adPodMaxDuration = podInfo.getMaxDuration();
+            }
+        }
+
+        data.putInt("adPodIndex", adPodIndex);
+        data.putInt("adPodTotalAds", adPodTotalAds);
+        data.putInt("adPodPosition", adPodPosition);
+        data.putDouble("adPodMaxDuration", adPodMaxDuration);
+
+        // Get ads manager based data
+        List<Float> cuePoints = googleAdsManager.getAdCuePoints();
+
+        WritableArray adMarkers = Arguments.createArray();
+        for (Float cue : cuePoints) {
+            adMarkers.putFloat(cue.floatValue());
+        }
+        data.putArray("adMarkers", adMarkers);
+
+        return data;
+    }
+
+    public clickAd() {
+        adOverlay.performClick();
+    }
+
+    @Override
+    public void onAdsManagerLoaded(AdsManagerLoadedEvent event){
+        if (event == null) {
+            return;
+        }
+        googleAdsManager = event.getAdsManager();
     }
 
     @Override
@@ -342,7 +405,13 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null) {
             return;
         }
+
+        // Get ad data
+        activeAd = event.getAd();
+        WritableMap adInfo = getAdInfo();
+        
         WritableMap payload = Arguments.createMap();
+        payload.putMap("adInfo", adInfo);
 
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
@@ -350,6 +419,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 eventEmitter.adEvent("STARTED", payload);
                 break;
             case CONTENT_RESUME_REQUESTED:
+                activeAd = null;
                 eventEmitter.adEvent("CONTENT_RESUME_REQUESTED", payload);
                 break;
         } 
