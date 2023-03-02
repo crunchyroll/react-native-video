@@ -391,6 +391,57 @@ public class ReactExoplayerView extends FrameLayout implements
         googleAdsManager = event.getAdsManager();
     }
 
+    private WritableMap getAdInfo() {
+        WritableMap data = Arguments.createMap();
+        
+        if (activeAd == null || googleAdsManager == null) {
+            return data;
+        }
+
+        // Get ad based data
+        int adPodPosition = 0;
+        int adPodIndex = 0;
+        int adPodTotalAds = 0;
+        double adPodMaxDuration = 0;
+        if (ad != null) {
+            AdPodInfo podInfo = ad.getAdPodInfo();
+            if (podInfo != null) {
+                adPodIndex = podInfo.getPodIndex();
+                adPodTotalAds = podInfo.getTotalAds();
+                adPodPosition = podInfo.getAdPosition();
+                adPodMaxDuration = podInfo.getMaxDuration();
+            }
+        }
+
+        data.putInt("adPodIndex", adPodIndex);
+        data.putInt("adPodTotalAds", adPodTotalAds);
+        data.putInt("adPodPosition", adPodPosition);
+        data.putDouble("adPodMaxDuration", adPodMaxDuration);
+
+        // Get ads manager based data
+        List<Float> cuePoints = googleAdsManager.getAdCuePoints();
+
+        WritableArray adMarkers = Arguments.createArray();
+        for (Float cue : cuePoints) {
+            adMarkers.putFloat(cue.floatValue());
+        }
+        data.putArray("adMarkers", adMarkers);
+
+        return data;
+    }
+
+    public clickAd() {
+        adOverlay.performClick();
+    }
+
+    @Override
+    public void onAdsManagerLoaded(AdsManagerLoadedEvent event){
+        if (event == null) {
+            return;
+        }
+        googleAdsManager = event.getAdsManager();
+    }
+
     @Override
     public void onAdEvent(AdEvent event) {
         if (event == null) {
