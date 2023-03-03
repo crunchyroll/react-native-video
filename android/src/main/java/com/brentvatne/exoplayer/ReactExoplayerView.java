@@ -343,12 +343,11 @@ public class ReactExoplayerView extends FrameLayout implements
          // Ads overlay - it will be invisible - ads UI should be handled by JS
         LayoutParams adOverlayLayoutParams = new FrameLayout.LayoutParams(
             LayoutParams.MATCH_PARENT,
-            LayoutParams.MATCH_PARENT);
+            LayoutParams.MATCH_PARENT, Gravity.FILL);
         adOverlay = new FrameLayout(getContext());
-        adOverlay.setGravity(Gravity.CENTER);
-        exoPlayerView.adOverlay.setLayoutParams(adOverlayLayoutParams);
+        adOverlay.setLayoutParams(adOverlayLayoutParams);
 
-        addView(adOverlay, 1, adOverlayLayoutParams);
+        exoPlayerView.addView(adOverlay, 1, adOverlayLayoutParams);
 
         // Let ExoPlayerView know which FrameLayout can be used for ads rendering
         exoPlayerView.setAdOverlay(adOverlay);
