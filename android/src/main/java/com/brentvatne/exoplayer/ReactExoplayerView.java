@@ -382,7 +382,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Get ad markers
         if (adMarkers != null) {
             WritableArray adMarkersWritableArray = Arguments.createArray();
-            for (double marker : adMarkers) {
+            for (Double marker : adMarkers) {
                 adMarkersWritableArray.pushDouble(marker.doubleValue());
             }
             data.putArray("adMarkers", adMarkersWritableArray);
