@@ -129,6 +129,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.lang.Integer;
 import java.lang.Float;
+import java.lang.Double;
 import java.lang.reflect.Method;
 
 @SuppressLint("ViewConstructor")
@@ -172,7 +173,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private AdsLoader googleAdsLoader;
     private AdsManager googleAdsManager;
     private Ad activeAd;
-    private List<double> adMarkers;
+    private ArrayList<Double> adMarkers;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -382,7 +383,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (adMarkers != null) {
             WritableArray adMarkersWritableArray = Arguments.createArray();
             for (double marker : adMarkers) {
-                adMarkersWritableArray.pushDouble(marker);
+                adMarkersWritableArray.pushDouble(marker.doubleValue());
             }
             data.putArray("adMarkers", adMarkersWritableArray);
         }
@@ -1645,7 +1646,7 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         if (isCSAIEnabled) {
             int periodCount = timeline.getPeriodCount();
-            adMarkers = new ArrayList<double>();
+            adMarkers = new ArrayList<Double>();
             for (int i = 0; i < periodCount - 1; i++) {
                 Timeline.Period period = timeline.getPeriod(i, new Timeline.Period());
                 if (period != null) {
