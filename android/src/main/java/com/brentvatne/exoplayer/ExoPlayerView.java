@@ -88,7 +88,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         layout.addView(shutterView, 1, layoutParams);
         layout.addView(subtitleLayout, 2, layoutParams);
 
-        // Ads overlay - it will be invisible - ads UI should be handled by JS
         LayoutParams adOverlayLayoutParams = new FrameLayout.LayoutParams(
             LayoutParams.MATCH_PARENT,
             LayoutParams.MATCH_PARENT);

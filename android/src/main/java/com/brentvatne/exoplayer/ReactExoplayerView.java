@@ -333,7 +333,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
-
+        reLayout(this);
 
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
