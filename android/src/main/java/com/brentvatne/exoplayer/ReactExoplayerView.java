@@ -172,6 +172,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private AdsLoader googleAdsLoader;
     private AdsManager googleAdsManager;
     private Ad activeAd;
+    private WritableArray adMarkers;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -381,14 +382,10 @@ public class ReactExoplayerView extends FrameLayout implements
             data.putString("error", "No googleAdsManager!");
             return data;
         }
-        // Get ads manager based data
-        List<Float> cuePoints = googleAdsManager.getAdCuePoints();
-
-        WritableArray adMarkers = Arguments.createArray();
-        for (Float cue : cuePoints) {
-            adMarkers.pushDouble(cue.doubleValue());
+        // Get ad markers
+        if (adMarkers != null) {
+            data.putArray("adMarkers", adMarkers);
         }
-        data.putArray("adMarkers", adMarkers);
 
         return data;
     }
@@ -409,15 +406,6 @@ public class ReactExoplayerView extends FrameLayout implements
     public void onAdEvent(AdEvent event) {
         if (event == null) {
             return;
-        }
-        if (googleAdsLoader == null) {
-        // Get the underlying Google ads loader
-        googleAdsLoader = adsLoader.getAdsLoader();
-        }
-        if (googleAdsLoader != null) {
-            googleAdsLoader.addAdsLoadedListener(this);
-        } else {
-            Log.w("RNV_CSAI", "Could not get google AdsLoader!");
         }
 
         // Get ad data
@@ -1651,7 +1639,25 @@ public class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onTimelineChanged(Timeline timeline, int reason) {
-        // Do nothing.
+        if (timeline.isEmpty()) {
+            // The player is being reset or contains no media.
+            return;
+        }
+        if (isCSAIEnabled) {
+            int periodCount = getPeriodCount();
+            adMarkers = Arguments.createArray();
+            for (int i; i < periodCount - 1; i++) {
+                Timeline.Period period = timeline.getPeriod(i, Timeline.Period());
+                if (period != null) {
+                    int adGroupCount = getAdGroupCount();
+                    if (adGroupCount > 0) {
+                        long positionInWindow = period.getPositionInWindowMs();
+                        adMarkers.pushDouble((double)positionInWindow);
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
