@@ -54,6 +54,7 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.Timeline.Period;
 import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider;
@@ -1644,12 +1645,12 @@ public class ReactExoplayerView extends FrameLayout implements
             return;
         }
         if (isCSAIEnabled) {
-            int periodCount = getPeriodCount();
+            int periodCount = timeline.getPeriodCount();
             adMarkers = Arguments.createArray();
             for (int i; i < periodCount - 1; i++) {
                 Timeline.Period period = timeline.getPeriod(i, Timeline.Period());
                 if (period != null) {
-                    int adGroupCount = getAdGroupCount();
+                    int adGroupCount = period.getAdGroupCount();
                     if (adGroupCount > 0) {
                         long positionInWindow = period.getPositionInWindowMs();
                         adMarkers.pushDouble((double)positionInWindow);
