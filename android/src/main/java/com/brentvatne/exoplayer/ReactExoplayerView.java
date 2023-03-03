@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
+import android.view.Gravity;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -324,8 +325,8 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // ExoPlayer view init
         LayoutParams layoutParams = new LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT);
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT);
         exoPlayerView = new ExoPlayerView(getContext());
         exoPlayerView.setLayoutParams(layoutParams);
 
@@ -333,11 +334,14 @@ public class ReactExoplayerView extends FrameLayout implements
         addView(exoPlayerView, 0, layoutParams);
 
          // Ads overlay - it will be invisible - ads UI should be handled by JS
-        LayoutParams adOverlayLayoutParams = new FrameLayout.LayoutParams(0,0);
+        LayoutParams adOverlayLayoutParams = new FrameLayout.LayoutParams(
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT);
         adOverlay = new FrameLayout(getContext());
-        adOverlay.setLayoutParams(adOverlayLayoutParams);
+        adOverlay.setGravity(Gravity.CENTER);
+        exoPlayerView.adOverlay.setLayoutParams(adOverlayLayoutParams);
 
-        addView(adOverlay, -1, adOverlayLayoutParams);
+        addView(adOverlay, 1, adOverlayLayoutParams);
 
         // Let ExoPlayerView know which FrameLayout can be used for ads rendering
         exoPlayerView.setAdOverlay(adOverlay);
@@ -1655,12 +1659,9 @@ public class ReactExoplayerView extends FrameLayout implements
                     int adGroupCount = period.getAdGroupCount();
                     if (adGroupCount > 0) {
                         for (int k = 0; k < adGroupCount; k++) {
-                            Log.w("RNV_CSAI", "Period detected as an ad!");
-                            long positionInWindow = period.getPositionInWindowMs();
                             long adGroupTimeUs = period.getAdGroupTimeUs(k);
                             long adGroupTimeMs = TimeUnit.MICROSECONDS.toMillis(adGroupTimeUs);
                             adMarkers.add((double)adGroupTimeMs);
-                            // adMarkers.add((double)positionInWindow);
                         }
                         
                     }
