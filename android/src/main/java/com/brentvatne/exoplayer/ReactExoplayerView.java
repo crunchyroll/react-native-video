@@ -1647,16 +1647,22 @@ public class ReactExoplayerView extends FrameLayout implements
         if (isCSAIEnabled) {
             int periodCount = timeline.getPeriodCount();
             adMarkers = new ArrayList<Double>();
+            Log.w("RNV_CSAI", "Getting ad markers!");
             for (int i = 0; i < periodCount - 1; i++) {
                 Timeline.Period period = timeline.getPeriod(i, new Timeline.Period());
                 if (period != null) {
+                    Log.w("RNV_CSAI", "Period found!");
                     int adGroupCount = period.getAdGroupCount();
                     if (adGroupCount > 0) {
+                        Log.w("RNV_CSAI", "Period detected as an ad!");
                         long positionInWindow = period.getPositionInWindowMs();
                         adMarkers.add((double)positionInWindow);
                     }
+                } else {
+                    Log.w("RNV_CSAI", "Period is null! Cannot get ad markers!");
                 }
             }
+            Log.w("RNV_CSAI", "Finished processing ad markers!");
         }
 
     }
