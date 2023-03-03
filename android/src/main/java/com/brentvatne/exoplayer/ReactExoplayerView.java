@@ -178,6 +178,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private AdsManager googleAdsManager;
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
+    private WritableArray adMarkers;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -433,14 +434,10 @@ public class ReactExoplayerView extends FrameLayout implements
             data.putString("error", "No googleAdsManager!");
             return data;
         }
-        // Get ads manager based data
-        List<Float> cuePoints = googleAdsManager.getAdCuePoints();
-
-        WritableArray adMarkers = Arguments.createArray();
-        for (Float cue : cuePoints) {
-            adMarkers.pushDouble(cue.doubleValue());
+        // Get ad markers
+        if (adMarkers != null) {
+            data.putArray("adMarkers", adMarkers);
         }
-        data.putArray("adMarkers", adMarkers);
 
         return data;
     }
@@ -461,15 +458,6 @@ public class ReactExoplayerView extends FrameLayout implements
     public void onAdEvent(AdEvent event) {
         if (event == null) {
             return;
-        }
-        if (googleAdsLoader == null) {
-        // Get the underlying Google ads loader
-        googleAdsLoader = adsLoader.getAdsLoader();
-        }
-        if (googleAdsLoader != null) {
-            googleAdsLoader.addAdsLoadedListener(this);
-        } else {
-            Log.w("RNV_CSAI", "Could not get google AdsLoader!");
         }
 
         // Get ad data
