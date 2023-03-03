@@ -172,7 +172,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private AdsLoader googleAdsLoader;
     private AdsManager googleAdsManager;
     private Ad activeAd;
-    private WritableArray adMarkers;
+    private List<double> adMarkers;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -380,7 +380,11 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Get ad markers
         if (adMarkers != null) {
-            data.putArray("adMarkers", adMarkers);
+            WritableArray adMarkersWritableArray = Arguments.createArray();
+            for (double marker : adMarkers) {
+                adMarkersWritableArray.pushDouble(marker);
+            }
+            data.putArray("adMarkers", adMarkersWritableArray);
         }
 
         return data;
@@ -1641,14 +1645,14 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         if (isCSAIEnabled) {
             int periodCount = timeline.getPeriodCount();
-            adMarkers = Arguments.createArray();
+            adMarkers = new ArrayList<double>();
             for (int i = 0; i < periodCount - 1; i++) {
                 Timeline.Period period = timeline.getPeriod(i, new Timeline.Period());
                 if (period != null) {
                     int adGroupCount = period.getAdGroupCount();
                     if (adGroupCount > 0) {
                         long positionInWindow = period.getPositionInWindowMs();
-                        adMarkers.pushDouble((double)positionInWindow);
+                        adMarkers.add((double)positionInWindow);
                     }
                 }
             }
