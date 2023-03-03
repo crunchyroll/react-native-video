@@ -340,6 +340,20 @@ public class ReactExoplayerView extends FrameLayout implements
 
         imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
         imaSettings.setLanguage(uiLanguage);
+         // Ads overlay - it will be invisible - ads UI should be handled by JS
+        LayoutParams adOverlayLayoutParams = new FrameLayout.LayoutParams(
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT);
+        adOverlay = new FrameLayout(getContext());
+        adOverlay.setGravity(Gravity.CENTER);
+        exoPlayerView.adOverlay.setLayoutParams(adOverlayLayoutParams);
+
+        addView(adOverlay, 1, adOverlayLayoutParams);
+
+        // Let ExoPlayerView know which FrameLayout can be used for ads rendering
+        exoPlayerView.setAdOverlay(adOverlay);
+
+
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
             .setImaSdkSettings(imaSettings)
