@@ -178,12 +178,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private boolean shouldPlayAdBeforeStartPosition;
     private AdsManager googleAdsManager;
     private Ad activeAd;
-<<<<<<< HEAD
     private ArrayList<Double> adMarkers;
-    private WritableArray adMarkers;
-=======
-    private List<double> adMarkers;
->>>>>>> 4d80b311 (Fix runtime crash)
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -437,7 +432,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (adMarkers != null) {
             WritableArray adMarkersWritableArray = Arguments.createArray();
             for (double marker : adMarkers) {
-                adMarkersWritableArray.pushDouble(marker);
+                adMarkersWritableArray.pushDouble(marker.doubleValue());
             }
             data.putArray("adMarkers", adMarkersWritableArray);
         }
