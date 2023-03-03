@@ -177,8 +177,12 @@ public class ReactExoplayerView extends FrameLayout implements
     private ImaSdkSettings imaSettings;
     private AdsManager googleAdsManager;
     private Ad activeAd;
+<<<<<<< HEAD
     private ArrayList<Double> adMarkers;
     private WritableArray adMarkers;
+=======
+    private List<double> adMarkers;
+>>>>>>> 4d80b311 (Fix runtime crash)
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -424,7 +428,11 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Get ad markers
         if (adMarkers != null) {
-            data.putArray("adMarkers", adMarkers);
+            WritableArray adMarkersWritableArray = Arguments.createArray();
+            for (double marker : adMarkers) {
+                adMarkersWritableArray.pushDouble(marker);
+            }
+            data.putArray("adMarkers", adMarkersWritableArray);
         }
 
         return data;
