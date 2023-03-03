@@ -430,10 +430,6 @@ public class ReactExoplayerView extends FrameLayout implements
         data.putInt("adPodPosition", adPodPosition);
         data.putDouble("adPodMaxDuration", adPodMaxDuration);
 
-        if (googleAdsManager == null) {
-            data.putString("error", "No googleAdsManager!");
-            return data;
-        }
         // Get ad markers
         if (adMarkers != null) {
             data.putArray("adMarkers", adMarkers);
