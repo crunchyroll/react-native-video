@@ -333,8 +333,6 @@ public class ReactExoplayerView extends FrameLayout implements
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
-        reLayout(this);
-
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
             .build();
@@ -411,6 +409,7 @@ public class ReactExoplayerView extends FrameLayout implements
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
             case STARTED:
+                reLayout(exoPlayerView);
                 eventEmitter.adEvent("STARTED", payload);
                 break;
             case CONTENT_RESUME_REQUESTED:
