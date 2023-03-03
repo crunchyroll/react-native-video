@@ -1719,6 +1719,7 @@ public class ReactExoplayerView extends FrameLayout implements
             for (int i = 0; i < periodCount; i++) {
                 Timeline.Period period = timeline.getPeriod(i, new Timeline.Period());
                 if (period != null) {
+                    Log.w("RNV_CSAI", "Period found!");
                     int adGroupCount = period.getAdGroupCount();
                     if (adGroupCount > 0) {
                         for (int k = 0; k < adGroupCount; k++) {
@@ -1728,8 +1729,11 @@ public class ReactExoplayerView extends FrameLayout implements
                         }
                         
                     }
+                } else {
+                    Log.w("RNV_CSAI", "Period is null! Cannot get ad markers!");
                 }
             }
+            Log.w("RNV_CSAI", "Finished processing ad markers!");
         }
 
     }
