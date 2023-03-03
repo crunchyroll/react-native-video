@@ -1646,7 +1646,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (isCSAIEnabled) {
             int periodCount = timeline.getPeriodCount();
             adMarkers = Arguments.createArray();
-            for (int i; i < periodCount - 1; i++) {
+            for (int i = 0; i < periodCount - 1; i++) {
                 Timeline.Period period = timeline.getPeriod(i, new Timeline.Period());
                 if (period != null) {
                     int adGroupCount = period.getAdGroupCount();
