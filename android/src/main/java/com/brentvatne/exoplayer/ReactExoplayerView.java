@@ -352,6 +352,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Let ExoPlayerView know which FrameLayout can be used for ads rendering
         exoPlayerView.setAdOverlay(adOverlay);
 
+        reLayout(this);
 
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
