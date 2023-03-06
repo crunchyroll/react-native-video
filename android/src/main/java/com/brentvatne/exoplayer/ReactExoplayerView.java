@@ -41,6 +41,7 @@ import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
 import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdEvent.AdEventListener;
+import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -222,6 +223,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private Dynamic audioTrackValue;
     private String videoTrackType;
     private Dynamic videoTrackValue;
+    private String uiLanguage = "en";
     private String textTrackType;
     private Dynamic textTrackValue;
     private ReadableArray textTracks;
@@ -333,8 +335,12 @@ public class ReactExoplayerView extends FrameLayout implements
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
+        ImaSdkSettings imaSettings = new ImaSdkSettings();
+        imaSettings.setLanguage(uiLanguage);
+
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
+            .setImaSdkSettings(imaSettings)
             .build();
         mainHandler = new Handler();
     }
@@ -2137,6 +2143,10 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void setDisableFocus(boolean disableFocus) {
         this.disableFocus = disableFocus;
+    }
+
+    public void setUiLanguage(String language) {
+        this.uiLanguage = language;
     }
 
     public void setBackBufferDurationMs(int backBufferDurationMs) {
