@@ -339,8 +339,6 @@ public class ReactExoplayerView extends FrameLayout implements
 
         imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
         imaSettings.setLanguage(uiLanguage);
-        Log.w("RNV_CSAI", "UI Language:");
-        Log.w("RNV_CSAI", uiLanguage);
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
             .setImaSdkSettings(imaSettings)
@@ -388,10 +386,6 @@ public class ReactExoplayerView extends FrameLayout implements
         }
 
         return data;
-    }
-
-    public void clickAd() {
-        adOverlay.performClick();
     }
 
     @Override
@@ -1644,14 +1638,13 @@ public class ReactExoplayerView extends FrameLayout implements
             // The player is being reset or contains no media.
             return;
         }
+        // Go through the timeline and find ad markers
         if (isCSAIEnabled) {
             int periodCount = timeline.getPeriodCount();
             adMarkers = new ArrayList<Double>();
-            Log.w("RNV_CSAI", "Getting ad markers!");
             for (int i = 0; i < periodCount; i++) {
                 Timeline.Period period = timeline.getPeriod(i, new Timeline.Period());
                 if (period != null) {
-                    Log.w("RNV_CSAI", "Period found!");
                     int adGroupCount = period.getAdGroupCount();
                     if (adGroupCount > 0) {
                         for (int k = 0; k < adGroupCount; k++) {
@@ -1661,11 +1654,8 @@ public class ReactExoplayerView extends FrameLayout implements
                         }
                         
                     }
-                } else {
-                    Log.w("RNV_CSAI", "Period is null! Cannot get ad markers!");
                 }
             }
-            Log.w("RNV_CSAI", "Finished processing ad markers!");
         }
 
     }
@@ -2149,8 +2139,6 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     public void setUiLanguage(String language) {
-        Log.w("RNV_CSAI", "setUiLanguage:");
-        Log.w("RNV_CSAI", language);
         this.uiLanguage = language;
         if (imaSettings != null) {
             imaSettings.setLanguage(language);

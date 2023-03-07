@@ -100,9 +100,8 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
 
     @Override
     public ViewGroup getAdViewGroup() {
-        //return Assertions.checkStateNotNull(
-        //    adOverlayFrameLayout, "exo_ad_overlay must be present for ad playback");
-        return adOverlayFrameLayout;
+        return Assertions.checkStateNotNull(
+            adOverlayFrameLayout, "exo_ad_overlay must be present for ad playback");
     }
 
     @Override
