@@ -482,7 +482,7 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         Log.w("RNV_CSAI", "TrueX - Looking for companion ads!");
         List<CompanionAd> companionAds = activeAd.getCompanionAds();
-        for (int i; i < companionAds.size(); i++) {
+        for (int i = 0; i < companionAds.size(); i++) {
             CompanionAd companionAd = companionAds.get(i);
             String apiFramework = companionAd.getApiFramework();
             Log.w("RNV_CSAI", "ApiFramework for ad:");
