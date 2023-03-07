@@ -456,8 +456,9 @@ public class ReactExoplayerView extends FrameLayout implements
      * Display TrueX interactive Ad
      */
     private void displayInteractiveAd(String vastUrl) {
-        Log.d("RNV_CSAI", "displayInteractiveAds");
+        Log.w("RNV_CSAI", "displayInteractiveAds");
         if (player == null) {
+            Log.w("RNV_CSAI", "NO PLAYER CANNOT WILL NOT LOOK FOR TRUEX");
             return;
         }
 
@@ -479,8 +480,10 @@ public class ReactExoplayerView extends FrameLayout implements
             Log.w("RNV_CSAI", "No Active ad to determine TrueX");
             return;
         }
+        Log.w("RNV_CSAI", "TrueX - Looking for companion ads!");
         List<CompanionAd> companionAds = activeAd.getCompanionAds();
-        for (CompanionAd companionAd : companionAds) {
+        for (int i; i < companionAds.size(); i++) {
+            CompanionAd companionAd = companionAds.get(i);
             String apiFramework = companionAd.getApiFramework();
             Log.w("RNV_CSAI", "ApiFramework for ad:");
             Log.w("RNV_CSAI", apiFramework);
