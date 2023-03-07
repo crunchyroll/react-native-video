@@ -476,14 +476,20 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void handleAdStarted(AdEvent event) {
         if (activeAd == null) {
+            Log.w("RNV_CSAI", "No Active ad to determine TrueX");
             return;
         }
         List<CompanionAd> companionAds = activeAd.getCompanionAds();
         for (CompanionAd companionAd : companionAds) {
             String apiFramework = companionAd.getApiFramework();
+            Log.w("RNV_CSAI", "ApiFramework for ad:");
+            Log.w("RNV_CSAI", apiFramework);
             if (apiFramework == "truex") {
+                Log.w("RNV_CSAI", "ApiFramework is TrueX");
                 // TrueX ad found - starting the TrueX experience
                 String vastUrl = companionAd.getResourceValue();
+                Log.w("RNV_CSAI", "vastURL");
+                Log.w("RNV_CSAI", vastUrl);
                 displayInteractiveAd(vastUrl);
                 return;
             }
