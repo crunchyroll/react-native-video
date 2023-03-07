@@ -15,11 +15,13 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
+import android.view.ViewGroup;
 import android.view.Gravity;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.util.DisplayMetrics;
+import android.content.Intent;
 
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
@@ -34,6 +36,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.util.RNLog;
 import com.google.ads.interactivemedia.v3.api.Ad;
+import com.google.ads.interactivemedia.v3.api.CompanionAd;
 import com.google.ads.interactivemedia.v3.api.AdPodInfo;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
 import com.google.ads.interactivemedia.v3.api.AdsLoader;
@@ -135,6 +138,8 @@ import java.lang.Float;
 import java.lang.Double;
 import java.lang.reflect.Method;
 
+import com.brentvatne.exoplayer.PlaybackHandler;
+
 @SuppressLint("ViewConstructor")
 public class ReactExoplayerView extends FrameLayout implements
         AdEventListener,
@@ -144,7 +149,8 @@ public class ReactExoplayerView extends FrameLayout implements
         BandwidthMeter.EventListener,
         BecomingNoisyListener,
         AudioManager.OnAudioFocusChangeListener,
-        DrmSessionEventListener {
+        DrmSessionEventListener,
+        PlaybackHandler {
 
     public static final double DEFAULT_MAX_HEAP_ALLOCATION_PERCENT = 1;
     public static final double DEFAULT_MIN_BACK_BUFFER_MEMORY_RESERVE = 0;
@@ -171,9 +177,9 @@ public class ReactExoplayerView extends FrameLayout implements
     private MediaSourceEventListener mediaSourceEventListener;
 
     private ExoPlayerView exoPlayerView;
-    private FrameLayout adOverlay;
     private ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
+    private TruexAdManager truexAdManager;
     private ImaSdkSettings imaSettings;
     private AdsManager googleAdsManager;
     private Ad activeAd;
@@ -463,6 +469,94 @@ public class ReactExoplayerView extends FrameLayout implements
         googleAdsManager = event.getAdsManager();
     }
 
+    /**
+     * TrueX Playback Handlers
+     */
+    @Override
+    public void resumeStream() {
+        boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
+        if (haveResumePosition) {
+            player.seekTo(resumeWindow, resumePosition);
+        }
+    }
+    @Override
+    public void closeStream() {
+        releasePlayer();
+    }
+    @Override
+    public void displayLinearAds() {
+        Log.d("RNV_CSAI_TRUEX", "displayLinearAds");
+        if (player == null) {
+            return;
+        }
+        /* 
+        MediaSource[] ads = new MediaSource[3];
+
+        List<String> adUrls = this.currentAdBreak.adUrls;
+        List<String> playableAds = new ArrayList<>();
+        for (int i = 0; i < adUrls.size(); i++) {
+            String url = adUrls.get(i);
+            if (!isTruexAdUrl(url)) {
+                playableAds.add(url);
+            }
+        }
+
+        for(int i = 0; i < playableAds.size(); i++) {
+            Uri uri = Uri.parse(playableAds.get(i));
+            MediaSource source = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+            ads[i] = source;
+        }
+
+        MediaSource adPod = new ConcatenatingMediaSource(ads);
+        SimpleExoPlayer player = getPlayer();
+        player.prepare(adPod);
+        player.setPlayWhenReady(true);
+        playerView.setVisibility(View.VISIBLE);*/
+    }
+    @Override
+    public void handlePopup(String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        getContext().startActivity(browserIntent);
+    }
+
+    /**
+     * Display TrueX interactive Ad
+     */
+    private void displayInteractiveAd(String vastUrl) {
+        Log.d("RNV_CSAI", "displayInteractiveAds");
+        if (player == null) {
+            return;
+        }
+
+        // Pause the stream and display a true[X] engagement
+        pausePlayback();
+        Long position = player.getCurrentPosition();
+        if (position > 0) resumePosition = position;
+
+        //displayMode = DisplayMode.INTERACTIVE_AD;
+
+        // Start the true[X] engagement
+        ViewGroup viewGroup = (ViewGroup)this;
+        truexAdManager = new TruexAdManager(getContext(), this);
+        truexAdManager.startAd(viewGroup, vastUrl);
+    }
+
+    public void handleAdStarted(AdEvent event) {
+        if (activeAd == null) {
+            return;
+        }
+        List<CompanionAd> companionAds = activeAd.getCompanionAds();
+        for (CompanionAd companionAd : companionAds) {
+            String apiFramework = companionAd.getApiFramework();
+            if (apiFramework == "truex") {
+                // TrueX ad found - starting the TrueX experience
+                String vastUrl = companionAd.getResourceValue();
+                displayInteractiveAd(vastUrl);
+                return;
+            }
+        }
+    }
+
     @Override
     public void onAdEvent(AdEvent event) {
         if (event == null) {
@@ -481,6 +575,7 @@ public class ReactExoplayerView extends FrameLayout implements
             case STARTED:
                 reLayout(exoPlayerView);
                 eventEmitter.adEvent("STARTED", payload);
+                handleAdStarted(event);
                 break;
             case CONTENT_RESUME_REQUESTED:
                 activeAd = null;
