@@ -529,7 +529,7 @@ public class ReactExoplayerView extends FrameLayout implements
         reLayout(exoPlayerView);
     }
 
-    public void handleAdStarted(AdEvent event) {
+    public void handleCheckTruex(AdEvent event) {
         if (activeAd == null) {
             Log.w("RNV_CSAI", "No Active ad to determine TrueX");
             return;
@@ -573,7 +573,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 reLayout(exoPlayerView);
                 eventEmitter.adEvent("STARTED", payload);
                 Log.w("RNV_CSAI", "Ad started");
-                handleAdStarted(event);
+                handleCheckTruex(event);
                 break;
             case CONTENT_RESUME_REQUESTED:
                 activeAd = null;
@@ -581,6 +581,15 @@ public class ReactExoplayerView extends FrameLayout implements
                 break;
             case TAPPED:
                 eventEmitter.videoClickEvent();
+                break;
+            case LOADED:
+                Log.w("RNV_CSAI", "Ads loaded");
+                handleCheckTruex(event);
+                break;
+            case AD_BREAK_ENDED:
+                Log.w("RNV_CSAI", "Ads AD_BREAK_ENDED");
+                handleCheckTruex(event);
+                break;
         } 
     }
 
