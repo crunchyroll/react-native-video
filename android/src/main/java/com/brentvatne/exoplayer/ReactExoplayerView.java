@@ -174,6 +174,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private FrameLayout adOverlay;
     private ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
+    private ImaSdkSettings imaSettings;
     private AdsManager googleAdsManager;
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
@@ -336,7 +337,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
-        ImaSdkSettings imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
+        imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
         imaSettings.setLanguage(uiLanguage);
         Log.w("RNV_CSAI", "UI Language:");
         Log.w("RNV_CSAI", uiLanguage);
@@ -2148,7 +2149,12 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     public void setUiLanguage(String language) {
+        Log.w("RNV_CSAI", "setUiLanguage:");
+        Log.w("RNV_CSAI", language);
         this.uiLanguage = language;
+        if (imaSettings != null) {
+            imaSettings.setLanguage(language);
+        }
     }
 
     public void setBackBufferDurationMs(int backBufferDurationMs) {
