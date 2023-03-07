@@ -343,7 +343,7 @@ public class ReactExoplayerView extends FrameLayout implements
         exoPlayerView.setLayoutParams(layoutParams);
 
         // TrueX Layout
-        truexViewGroup = FrameLayout(getContext());
+        truexViewGroup = new FrameLayout(getContext());
         truexViewGroup.setLayoutParams(layoutParams);
         
 
