@@ -152,11 +152,6 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
         }
     }
 
-    @ReactMethod
-    public void clickAd(final ReactExoplayerView videoView) {
-        videoView.clickAd();
-    }
-
     @ReactProp(name = PROP_ENABLE_CSAI)
     public void setEnableCSAI(final ReactExoplayerView videoView, final boolean isEnabled) {
         videoView.setEnableCSAI(isEnabled);
