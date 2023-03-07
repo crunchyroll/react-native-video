@@ -482,7 +482,7 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         Log.w("RNV_CSAI", "TrueX - Looking for companion ads!");
         List<CompanionAd> companionAds = activeAd.getCompanionAds();
-        if (companionAds.size() === 0) {
+        if (companionAds.size() == 0) {
             String vastUrl = "https://get.truex.com/60d3f5f7e76c8338b4266ea0de7825cc06b0dedf/vast?dimension_1=%%VIDEO_TITLE%%&dimension_2=%%TAG_PARAM:pod%%&dimension_3=%%VIDEO_TITLE%%&dimension_4=%%VIDEO_ID%%&dimension_5=truex_sold&stream_position=midroll&stream_id=%%CACHEBUSTER%%";
             displayInteractiveAd(vastUrl);
         }
