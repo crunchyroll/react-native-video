@@ -575,12 +575,13 @@ public class ReactExoplayerView extends FrameLayout implements
         
         WritableMap payload = Arguments.createMap();
         payload.putMap("adInfo", adInfo);
-
+        Log.w("RNV_CSAI", "onAdEvent");
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
             case STARTED:
                 reLayout(exoPlayerView);
                 eventEmitter.adEvent("STARTED", payload);
+                Log.w("RNV_CSAI", "Ad started");
                 handleAdStarted(event);
                 break;
             case CONTENT_RESUME_REQUESTED:
