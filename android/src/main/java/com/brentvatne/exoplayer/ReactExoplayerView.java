@@ -2228,6 +2228,8 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     public void setUiLanguage(String language) {
+        Log.w("RNV_CSAI", "setUiLanguage:");
+        Log.w("RNV_CSAI", language);
         this.uiLanguage = language;
         if (imaSettings != null) {
             imaSettings.setLanguage(language);
