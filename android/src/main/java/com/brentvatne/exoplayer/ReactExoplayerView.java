@@ -180,6 +180,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
     private TruexAdManager truexAdManager;
+    private FrameLayout truexViewGroup;
     private ImaSdkSettings imaSettings;
     private AdsManager googleAdsManager;
     private Ad activeAd;
@@ -340,8 +341,15 @@ public class ReactExoplayerView extends FrameLayout implements
         exoPlayerView = new ExoPlayerView(getContext());
         exoPlayerView.setLayoutParams(layoutParams);
 
+        // TrueX Layout
+        truexViewGroup = new ExoPlayerView(getContext());
+        truexViewGroup.setLayoutParams(layoutParams);
+        
+
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
+        // Add TrueX Layout
+        exoPlayerView.addView(truexViewGroup, -1, layoutParams);
 
         imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
         imaSettings.setLanguage(uiLanguage);
@@ -470,9 +478,10 @@ public class ReactExoplayerView extends FrameLayout implements
         //displayMode = DisplayMode.INTERACTIVE_AD;
 
         // Start the true[X] engagement
-        ViewGroup viewGroup = (ViewGroup)this;
+        ViewGroup viewGroup = (ViewGroup)truexViewGroup;
         truexAdManager = new TruexAdManager(getContext(), this);
         truexAdManager.startAd(viewGroup, vastUrl);
+        reLayout(exoPlayerView);
     }
 
     public void handleAdStarted(AdEvent event) {
