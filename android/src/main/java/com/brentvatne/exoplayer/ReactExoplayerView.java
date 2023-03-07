@@ -338,7 +338,8 @@ public class ReactExoplayerView extends FrameLayout implements
 
         ImaSdkSettings imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
         imaSettings.setLanguage(uiLanguage);
-
+        Log.w("RNV_CSAI", "UI Language:");
+        Log.w("RNV_CSAI", uiLanguage);
         adsLoader = new ImaAdsLoader.Builder(getContext())
             .setAdEventListener(this)
             .setImaSdkSettings(imaSettings)
