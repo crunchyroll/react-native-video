@@ -564,7 +564,9 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         Log.w("RNV_CSAI", "====================== AD EVENT START ======================");
         // Get ad data
-        activeAd = event.getAd();
+        if (event.getAd() != null) {
+            activeAd = event.getAd();
+        }
         WritableMap adInfo = getAdInfo();
         
         WritableMap payload = Arguments.createMap();
@@ -599,6 +601,24 @@ public class ReactExoplayerView extends FrameLayout implements
         switch(eventType) {
             case STARTED:
                 reLayout(exoPlayerView);
+
+
+                Ad ad = adEvent.getAd();
+                if (ad.getAdSystem().contains("trueX")) {
+                // adsManager.pause();
+                String params = ad.getTraffickingParameters();
+
+                try {
+                    /*JSONObject json = new JSONObject(params);
+                    String url = json.getString("vast_config_url");
+                    playInteractiveAd(url);*/
+                    Log.w("RNV_CSAI", "Trafficking params: " + params);
+                    Log.w("RNV_CSAI", params);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                }
+
                 eventEmitter.adEvent("STARTED", payload);
                 Log.w("RNV_CSAI", "Ad started");
                 handleCheckTruex(event);
