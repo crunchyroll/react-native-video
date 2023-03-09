@@ -517,7 +517,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null) {
             return;
         }
-
+        Log.w("====================== AD EVENT START ======================");
         // Get ad data
         activeAd = event.getAd();
         WritableMap adInfo = getAdInfo();
@@ -544,8 +544,10 @@ public class ReactExoplayerView extends FrameLayout implements
             Log.w("RNV_CSAI", "Trafficking params: " + activeAd.getTraffickingParameters());
         }
 
-        for (Map.Entry<String, String> entry : event.getAdData().entrySet()) {
-            Log.w("RNV_CSAI", entry.getKey() + ":" + entry.getValue());
+        if (event.getAdData() != null) {
+            for (Map.Entry<String, String> entry : event.getAdData().entrySet()) {
+                Log.w("RNV_CSAI", entry.getKey() + ":" + entry.getValue());
+            }
         }
 
         AdEvent.AdEventType eventType = event.getType();
@@ -569,6 +571,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 handleCheckTruex(event);
                 break;
         } 
+        Log.w("====================== AD EVENT END ======================");
     }
 
     @Override
