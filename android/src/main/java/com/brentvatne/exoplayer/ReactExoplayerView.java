@@ -543,6 +543,11 @@ public class ReactExoplayerView extends FrameLayout implements
             Log.w("RNV_CSAI", "Survey URL: " + activeAd.getSurveyUrl());
             Log.w("RNV_CSAI", "Trafficking params: " + activeAd.getTraffickingParameters());
         }
+
+        for (Map.Entry<String, String> entry : event.getAdData().entrySet()) {
+            Log.w("RNV_CSAI", entry.getKey() + ":" + entry.getValue());
+        }
+
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
             case STARTED:
