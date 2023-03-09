@@ -603,20 +603,16 @@ public class ReactExoplayerView extends FrameLayout implements
                 reLayout(exoPlayerView);
 
 
-                Ad ad = adEvent.getAd();
+                Ad ad = event.getAd();
                 if (ad.getAdSystem().contains("trueX")) {
                 // adsManager.pause();
                 String params = ad.getTraffickingParameters();
 
-                try {
-                    /*JSONObject json = new JSONObject(params);
-                    String url = json.getString("vast_config_url");
-                    playInteractiveAd(url);*/
-                    Log.w("RNV_CSAI", "Trafficking params: " + params);
-                    Log.w("RNV_CSAI", params);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
+                /*JSONObject json = new JSONObject(params);
+                String url = json.getString("vast_config_url");
+                playInteractiveAd(url);*/
+                Log.w("RNV_CSAI", "Trafficking params: " + params);
+                Log.w("RNV_CSAI", params);
                 }
 
                 eventEmitter.adEvent("STARTED", payload);
