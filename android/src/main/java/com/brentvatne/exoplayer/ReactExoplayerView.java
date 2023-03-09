@@ -584,7 +584,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null) {
             return;
         }
-        Log.w("====================== AD EVENT START ======================");
+        Log.w("RNV_CSAI", "====================== AD EVENT START ======================");
         // Get ad data
         activeAd = event.getAd();
         WritableMap adInfo = getAdInfo();
@@ -641,7 +641,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 handleCheckTruex(event);
                 break;
         } 
-        Log.w("====================== AD EVENT END ======================");
+        Log.w("RNV_CSAI", "====================== AD EVENT END ======================");
     }
 
     @Override
