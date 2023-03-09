@@ -524,7 +524,25 @@ public class ReactExoplayerView extends FrameLayout implements
         
         WritableMap payload = Arguments.createMap();
         payload.putMap("adInfo", adInfo);
-        Log.w("RNV_CSAI", "onAdEvent");
+
+        if (activeAd != null) {
+            Log.w("RNV_CSAI", "AD DATA: ");
+            if (activeAd.isLinear()) {
+                Log.w("RNV_CSAI", "Ad is Linear!");
+            } else {
+                Log.w("RNV_CSAI", "Ad is NOT Linear!");
+            }
+            Log.w("RNV_CSAI", "-----------------------");
+            Log.w("RNV_CSAI", "Ad system: " + activeAd.getAdSystem());
+            Log.w("RNV_CSAI", "-----------------------");
+            Log.w("RNV_CSAI", "Advertiser Name: " + activeAd.getAdvertiserName());
+            Log.w("RNV_CSAI", "Companion ad count: " + String.valueOf(activeAd.getCompanionAds().size()));
+            if (activeAd.getContentType() != null) {
+                Log.w("RNC_CSAI", "Content type: " + activeAd.getContentType());
+            }
+            Log.w("RNV_CSAI", "Survey URL: " + activeAd.getSurveyUrl());
+            Log.w("RNV_CSAI", "Trafficking params: " + activeAd.getTraffickingParameters());
+        }
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
             case STARTED:
