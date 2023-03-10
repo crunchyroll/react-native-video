@@ -593,11 +593,9 @@ public class ReactExoplayerView extends FrameLayout implements
                 break;
             case LOADED:
                 Log.w("RNV_CSAI", "Ads loaded");
-                handleCheckTruex(event);
                 break;
             case AD_BREAK_ENDED:
                 Log.w("RNV_CSAI", "Ads AD_BREAK_ENDED");
-                handleCheckTruex(event);
                 break;
         }
     }
