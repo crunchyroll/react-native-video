@@ -345,11 +345,12 @@ public class ReactExoplayerView extends FrameLayout implements
         truexViewGroup = new FrameLayout(getContext());
         truexViewGroup.setLayoutParams(layoutParams);
         
+        // Add TrueX Layout
+        exoPlayerView.addViewInLayout(truexViewGroup, -1, layoutParams);
 
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
-        // Add TrueX Layout
-        exoPlayerView.addView(truexViewGroup, -1, layoutParams);
+        
 
         imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
         imaSettings.setLanguage(uiLanguage);
