@@ -48,7 +48,7 @@ public class TruexAdManager {
         truexAdRenderer.addEventListener(TruexAdEvent.POPUP_WEBSITE, this.popUp);
     }
 
-    public setReactExoPlayerView(ReactExoplayerView view) {
+    public void setReactExoPlayerView(ReactExoplayerView view) {
       this.reactExoplayerView = view;
     }
 
