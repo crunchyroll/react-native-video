@@ -471,7 +471,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
-        this.googleAdsLoader = this.imaAdsLoader.getAdsLoader();
+        this.googleAdsLoader = this.adsLoader.getAdsLoader();
         if (this.googleAdsLoader != null) {
            // this.adsManager.discardAdBreak();
            // this.adsManager.resume();
@@ -487,7 +487,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (this.player == null) {
             return;
         }
-        this.imaAdsLoader.skipAd();
+        this.adsLoader.skipAd();
         this.startPlayback();
         
     }
