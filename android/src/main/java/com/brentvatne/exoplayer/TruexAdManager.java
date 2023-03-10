@@ -24,6 +24,7 @@ public class TruexAdManager {
     private PlaybackHandler playbackHandler;
     private boolean didReceiveCredit;
     private TruexAdRenderer truexAdRenderer;
+    private ReactExoplayerView reactExoplayerView;
 
     public TruexAdManager(Context context, PlaybackHandler playbackHandler) {
         this.playbackHandler = playbackHandler;
@@ -45,6 +46,10 @@ public class TruexAdManager {
         truexAdRenderer.addEventListener(TruexAdEvent.OPT_OUT, this.optOut);
         truexAdRenderer.addEventListener(TruexAdEvent.SKIP_CARD_SHOWN, this.skipCardShown);
         truexAdRenderer.addEventListener(TruexAdEvent.POPUP_WEBSITE, this.popUp);
+    }
+
+    public setReactExoPlayerView(ReactExoplayerView view) {
+      this.reactExoplayerView = view;
     }
 
     /**
@@ -123,6 +128,9 @@ public class TruexAdManager {
      */
     private IEventHandler adStarted = (TruexAdEvent event, Map<String, ?> data) -> {
         Log.d(CLASSTAG, "adStarted");
+        if (this.reactExoplayerView != null) {
+          this.reactExoplayerView.reLayoutRoot();
+        }
     };
 
     /*
