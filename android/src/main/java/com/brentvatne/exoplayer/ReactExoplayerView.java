@@ -482,9 +482,13 @@ public class ReactExoplayerView extends FrameLayout implements
      */
     @Override
     public void resumeStream() {
-        boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
-        if (haveResumePosition) {
-            player.seekTo(resumeWindow, resumePosition);
+        if (player == null) {
+            return;
+        }
+        googleAdsLoader = imaAdsLoader.getAdsLoader();
+        if (googleAdsLoader != null) {
+            adsManager.discardAdBreak();
+            adsManager.resume();
         }
     }
     @Override
@@ -497,29 +501,9 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
-        /* 
-        MediaSource[] ads = new MediaSource[3];
-
-        List<String> adUrls = this.currentAdBreak.adUrls;
-        List<String> playableAds = new ArrayList<>();
-        for (int i = 0; i < adUrls.size(); i++) {
-            String url = adUrls.get(i);
-            if (!isTruexAdUrl(url)) {
-                playableAds.add(url);
-            }
-        }
-
-        for(int i = 0; i < playableAds.size(); i++) {
-            Uri uri = Uri.parse(playableAds.get(i));
-            MediaSource source = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
-            ads[i] = source;
-        }
-
-        MediaSource adPod = new ConcatenatingMediaSource(ads);
-        SimpleExoPlayer player = getPlayer();
-        player.prepare(adPod);
-        player.setPlayWhenReady(true);
-        playerView.setVisibility(View.VISIBLE);*/
+        imaAdsLoader.skipAd();
+        startPlayback();
+        
     }
     @Override
     public void handlePopup(String url) {
@@ -548,9 +532,14 @@ public class ReactExoplayerView extends FrameLayout implements
         Log.w("RNV_CSAI", "Starting TrueXAdManager");
         ViewGroup viewGroup = (ViewGroup)this;
         truexAdManager = new TruexAdManager(getContext(), this);
+        truexAdManager.setReactExoPlayerView(this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
         truexAdManager.startAd(viewGroup, vastUrl);
-        reLayout(exoPlayerView);
+    }
+
+    public void reLayoutRoot() {
+        Log.w("RNV_CSAI", "Forcing layout update - truex!");
+        this.reLayout(exoPlayerView);
     }
 
     public void handleCheckTruex(AdEvent event) {
