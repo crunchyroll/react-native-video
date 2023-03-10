@@ -467,13 +467,14 @@ public class ReactExoplayerView extends FrameLayout implements
      */
     @Override
     public void resumeStream() {
+        Log.d("RNV_CSAI_TRUEX", "resumeStream");
         if (player == null) {
             return;
         }
-        googleAdsLoader = imaAdsLoader.getAdsLoader();
-        if (googleAdsLoader != null) {
-            adsManager.discardAdBreak();
-            adsManager.resume();
+        googleAdsLoader = this.imaAdsLoader.getAdsLoader();
+        if (this.googleAdsLoader != null) {
+            this.adsManager.discardAdBreak();
+            this.adsManager.resume();
         }
     }
     @Override
@@ -483,11 +484,11 @@ public class ReactExoplayerView extends FrameLayout implements
     @Override
     public void displayLinearAds() {
         Log.d("RNV_CSAI_TRUEX", "displayLinearAds");
-        if (player == null) {
+        if (this.player == null) {
             return;
         }
-        imaAdsLoader.skipAd();
-        startPlayback();
+        this.imaAdsLoader.skipAd();
+        this.startPlayback();
         
     }
     @Override
