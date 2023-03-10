@@ -120,6 +120,9 @@ public class TruexAdManager {
      */
     private IEventHandler adFetchCompleted = (TruexAdEvent event, Map<String, ?> data) -> {
         Log.d(CLASSTAG, "adFetchCompleted");
+        if (this.reactExoplayerView != null) {
+          this.reactExoplayerView.reLayoutRoot();
+        }
         // Truex Ad Renderer is ready to start() if not started in the init callback
     };
 
