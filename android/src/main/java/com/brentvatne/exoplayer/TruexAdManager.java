@@ -11,6 +11,7 @@ import com.truex.adrenderer.TruexAdRenderer;
 import com.brentvatne.exoplayer.PlaybackHandler;
 
 import java.util.Map;
+import java.lang.System;
 
 /**
  * This class holds a reference to the true[X] ad renderer and handles all of the event handling
@@ -53,7 +54,7 @@ public class TruexAdManager {
      */
     public void startAd(ViewGroup viewGroup, String vastUrl) {
         TruexAdOptions options = new TruexAdOptions();
-
+        options.userAdvertisingId = "CR" + String.valueOf(System.currentTimeMillis()) + "TX";
         // After viewing a Truex Ad experience, there will could be a lockout period
         // That prevents the same user from getting another Truex ad for some period of time
         // To get around this for development, replace the TruexAdOptions.userAdvertisingId
