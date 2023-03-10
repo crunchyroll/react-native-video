@@ -594,7 +594,7 @@ public class ReactExoplayerView extends FrameLayout implements
             if (activeAd.getContentType() != null) {
                 Log.w("RNC_CSAI", "Content type: " + activeAd.getContentType());
             }
-            Log.w("RNV_CSAI", "Survey URL: " + activeAd.getSurveyUrl());
+            Log.w("RNV_CSAI", "Description: " + (activeAd.getDescription() != null ? activeAd.getDescription() : "[NO DESCRIPTION]"));
             Log.w("RNV_CSAI", "Trafficking params: " + activeAd.getTraffickingParameters());
         }
 
