@@ -542,26 +542,15 @@ public class ReactExoplayerView extends FrameLayout implements
             return;
         }
         Log.w("RNV_CSAI", "TrueX - Looking for companion ads!");
-        List<CompanionAd> companionAds = activeAd.getCompanionAds();
+        if (activeAd.getAdSystem().contains("trueX")) {
+        String vastUrl = activeAd.getDescription();
+        Log.w("RNV_CSAI", "Detected TrueX ad with VAST UTL: " + vastUrl);
+        displayInteractiveAd(vastUrl);
+        } else {
+            Log.w("RNV_CSAI", "Ad System is not TrueX");
+            
+        }
 
-        if (companionAds.size() == 0) {
-            Log.w("RNV_CSAI", "No companion ads found - exiting!");
-        }
-        for (int i = 0; i < companionAds.size(); i++) {
-            CompanionAd companionAd = companionAds.get(i);
-            String apiFramework = companionAd.getApiFramework();
-            Log.w("RNV_CSAI", "ApiFramework for ad:");
-            Log.w("RNV_CSAI", apiFramework);
-            if (apiFramework == "truex") {
-                Log.w("RNV_CSAI", "ApiFramework is TrueX");
-                // TrueX ad found - starting the TrueX experience
-                String vastUrl = companionAd.getResourceValue();
-                Log.w("RNV_CSAI", "vastURL");
-                Log.w("RNV_CSAI", vastUrl);
-                displayInteractiveAd(vastUrl);
-                return;
-            }
-        }
     }
 
     @Override
@@ -569,7 +558,6 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null || !isCSAIEnabled) {
             return;
         }
-        Log.w("RNV_CSAI", "====================== AD EVENT START ======================");
         // Get ad data
         if (event.getAd() != null) {
             activeAd = event.getAd();
@@ -578,25 +566,6 @@ public class ReactExoplayerView extends FrameLayout implements
         
         WritableMap payload = Arguments.createMap();
         payload.putMap("adInfo", adInfo);
-
-        if (activeAd != null) {
-            Log.w("RNV_CSAI", "AD DATA: ");
-            if (activeAd.isLinear()) {
-                Log.w("RNV_CSAI", "Ad is Linear!");
-            } else {
-                Log.w("RNV_CSAI", "Ad is NOT Linear!");
-            }
-            Log.w("RNV_CSAI", "-----------------------");
-            Log.w("RNV_CSAI", "Ad system: " + activeAd.getAdSystem());
-            Log.w("RNV_CSAI", "-----------------------");
-            Log.w("RNV_CSAI", "Advertiser Name: " + activeAd.getAdvertiserName());
-            Log.w("RNV_CSAI", "Companion ad count: " + String.valueOf(activeAd.getCompanionAds().size()));
-            if (activeAd.getContentType() != null) {
-                Log.w("RNC_CSAI", "Content type: " + activeAd.getContentType());
-            }
-            Log.w("RNV_CSAI", "Description: " + (activeAd.getDescription() != null ? activeAd.getDescription() : "[NO DESCRIPTION]"));
-            Log.w("RNV_CSAI", "Trafficking params: " + activeAd.getTraffickingParameters());
-        }
 
         if (event.getAdData() != null) {
             for (Map.Entry<String, String> entry : event.getAdData().entrySet()) {
@@ -608,19 +577,6 @@ public class ReactExoplayerView extends FrameLayout implements
         switch(eventType) {
             case STARTED:
                 reLayout(exoPlayerView);
-
-
-                Ad ad = event.getAd();
-                if (ad.getAdSystem().contains("trueX")) {
-                // adsManager.pause();
-                String params = ad.getTraffickingParameters();
-
-                /*JSONObject json = new JSONObject(params);
-                String url = json.getString("vast_config_url");
-                playInteractiveAd(url);*/
-                Log.w("RNV_CSAI", "Trafficking params: " + params);
-                Log.w("RNV_CSAI", params);
-                }
 
                 eventEmitter.adEvent("STARTED", payload);
                 Log.w("RNV_CSAI", "Ad started");
