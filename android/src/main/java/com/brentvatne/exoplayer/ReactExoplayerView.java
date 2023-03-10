@@ -350,7 +350,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
         // Add TrueX Layout
-        exoPlayerView.addView(truexViewGroup, -1, layoutParams);
+        addView(truexViewGroup, -1, layoutParams);
 
         mainHandler = new Handler();
     }
@@ -514,7 +514,7 @@ public class ReactExoplayerView extends FrameLayout implements
             Log.w("RNV_CSAI", "NO PLAYER CANNOT WILL NOT LOOK FOR TRUEX");
             return;
         }
-
+        Log.w("RNV_CSAI", "Pausing playback for TrueX");
         // Pause the stream and display a true[X] engagement
         pausePlayback();
         Long position = player.getCurrentPosition();
@@ -523,8 +523,10 @@ public class ReactExoplayerView extends FrameLayout implements
         //displayMode = DisplayMode.INTERACTIVE_AD;
 
         // Start the true[X] engagement
+        Log.w("RNV_CSAI", "Starting TrueXAdManager");
         ViewGroup viewGroup = (ViewGroup)truexViewGroup;
         truexAdManager = new TruexAdManager(getContext(), this);
+        Log.w("RNV_CSAI", "Starting TrueX Ad");
         truexAdManager.startAd(viewGroup, vastUrl);
         reLayout(exoPlayerView);
     }
@@ -590,8 +592,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 Log.w("RNV_CSAI", "Ads AD_BREAK_ENDED");
                 handleCheckTruex(event);
                 break;
-        } 
-        Log.w("RNV_CSAI", "====================== AD EVENT END ======================");
+        }
     }
 
     @Override
