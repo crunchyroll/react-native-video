@@ -479,7 +479,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Start the true[X] engagement
         Log.w("RNV_CSAI", "Starting TrueXAdManager");
-        ViewGroup viewGroup = (ViewGroup)truexViewGroup;
+        ViewGroup viewGroup = (ViewGroup)this;
         truexAdManager = new TruexAdManager(getContext(), this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
         truexAdManager.startAd(viewGroup, vastUrl);
