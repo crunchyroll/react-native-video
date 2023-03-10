@@ -177,7 +177,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private MediaSourceEventListener mediaSourceEventListener;
 
     private ExoPlayerView exoPlayerView;
-    private ImaAdsLoader adsLoader;
+    public ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
     private TruexAdManager truexAdManager;
     private FrameLayout truexViewGroup;
@@ -464,10 +464,10 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
-        googleAdsLoader = this.imaAdsLoader.getAdsLoader();
+        this.googleAdsLoader = this.imaAdsLoader.getAdsLoader();
         if (this.googleAdsLoader != null) {
-            this.adsManager.discardAdBreak();
-            this.adsManager.resume();
+           // this.adsManager.discardAdBreak();
+           // this.adsManager.resume();
         }
     }
     @Override
@@ -1283,7 +1283,7 @@ public class ReactExoplayerView extends FrameLayout implements
         }
     }
 
-    private void startPlayback() {
+    public void startPlayback() {
         if (player != null) {
             switch (player.getPlaybackState()) {
                 case Player.STATE_IDLE:
