@@ -342,17 +342,9 @@ public class ReactExoplayerView extends FrameLayout implements
         exoPlayerView = new ExoPlayerView(getContext());
         exoPlayerView.setLayoutParams(layoutParams);
 
-        // TrueX Layout
-        truexViewGroup = new FrameLayout(getContext());
-        truexViewGroup.setLayoutParams(layoutParams);
-        
-        // Add TrueX Layout
-        exoPlayerView.addView(truexViewGroup, -1, layoutParams);
-
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
         
-
         imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
         imaSettings.setLanguage(uiLanguage);
          // Ads overlay - it will be invisible - ads UI should be handled by JS
@@ -532,11 +524,11 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Start the true[X] engagement
         Log.w("RNV_CSAI", "Starting TrueXAdManager");
-        ViewGroup viewGroup = (ViewGroup)truexViewGroup;
+        ViewGroup viewGroup = (ViewGroup)exoplayerView.getTruexViewGroup();
         truexAdManager = new TruexAdManager(getContext(), this);
         truexAdManager.setReactExoPlayerView(this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
-        truexAdManager.startAd((ViewGroup)this, vastUrl);
+        truexAdManager.startAd(viewGroup, vastUrl);
     }
 
     public void reLayoutRoot() {
