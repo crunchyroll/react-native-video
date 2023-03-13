@@ -521,7 +521,7 @@ public class ReactExoplayerView extends FrameLayout implements
         truexAdManager = new TruexAdManager(getContext(), this);
         truexAdManager.setReactExoPlayerView(this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
-        truexAdManager.startAd(viewGroup, vastUrl);
+        truexAdManager.startAd((ViewGroup)this, vastUrl);
     }
 
     public void reLayoutRoot() {
