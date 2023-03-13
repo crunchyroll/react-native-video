@@ -98,8 +98,8 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         adOverlayFrameLayout.setLayoutParams(adOverlayLayoutParams);
 
         LayoutParams truexOverlayLayoutParams = new FrameLayout.LayoutParams(
-            500,
-            500);
+            LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT);
         truexOverlayFrameLayout = new FrameLayout(getContext());
         truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
 
@@ -109,7 +109,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     }
 
     public ViewGroup getTruexViewGroup() {
-        return adOverlayFrameLayout;
+        return truexOverlayFrameLayout;
     }
 
     @Override
