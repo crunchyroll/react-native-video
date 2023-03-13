@@ -527,15 +527,19 @@ public class ReactExoplayerView extends FrameLayout implements
     public void reLayoutRoot() {
         Log.w("RNV_CSAI", "Forcing layout update - truex!");
         //this.invalidate();
+        
         //exoPlayerView.invalidate();
-        this.reLayout(exoPlayerView);
         if (exoPlayerView.getTruexViewGroup() != null) {
             LayoutParams params = new FrameLayout.LayoutParams(
                 LayoutParams.FILL_PARENT,
                 LayoutParams.FILL_PARENT);
             exoPlayerView.updateViewLayout(exoPlayerView.getTruexViewGroup(), params);
+            exoPlayerView.getTruexViewGroup().requestLayout();
         }
+        exoPlayerView.postInvalidate();
         this.reLayout(exoPlayerView.getTruexViewGroup());
+        this.reLayout(exoPlayerView);
+        exoPlayerView.requestLayout();
     }
 
     public void handleCheckTruex(AdEvent event) {
