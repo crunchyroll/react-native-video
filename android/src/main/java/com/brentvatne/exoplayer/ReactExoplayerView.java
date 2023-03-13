@@ -514,6 +514,7 @@ public class ReactExoplayerView extends FrameLayout implements
         //this.invalidate();
         //exoPlayerView.invalidate();
         this.reLayout(exoPlayerView);
+        this.reLayout(exoPlayerView.getTruexViewGroup());
     }
 
     public void handleCheckTruex(AdEvent event) {
