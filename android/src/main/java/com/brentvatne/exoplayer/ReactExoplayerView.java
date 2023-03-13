@@ -518,8 +518,8 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void reLayoutRoot() {
         Log.w("RNV_CSAI", "Forcing layout update - truex!");
-        this.invalidate();
-        exoPlayerView.invalidate();
+        //this.invalidate();
+        //exoPlayerView.invalidate();
         this.reLayout(exoPlayerView);
     }
 
@@ -535,9 +535,8 @@ public class ReactExoplayerView extends FrameLayout implements
         displayInteractiveAd(vastUrl);
         } else {
             Log.w("RNV_CSAI", "Ad System is not TrueX");
-            
         }
-
+        reLayout(exoPlayerView);
     }
 
     @Override
@@ -563,8 +562,6 @@ public class ReactExoplayerView extends FrameLayout implements
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
             case STARTED:
-                reLayout(exoPlayerView);
-
                 eventEmitter.adEvent("STARTED", payload);
                 Log.w("RNV_CSAI", "Ad started");
                 handleCheckTruex(event);
