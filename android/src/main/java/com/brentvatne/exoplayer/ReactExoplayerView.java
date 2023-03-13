@@ -412,6 +412,8 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
+        WritableMap payload = Arguments.createMap();
+        eventEmitter.adEvent("ENDED_TRUEX", payload);
         this.googleAdsLoader = this.adsLoader.getAdsLoader();
         if (this.googleAdsLoader != null) {
            // this.adsManager.discardAdBreak();
@@ -428,6 +430,8 @@ public class ReactExoplayerView extends FrameLayout implements
         if (this.player == null) {
             return;
         }
+        WritableMap payload = Arguments.createMap();
+        eventEmitter.adEvent("ENDED_TRUEX", payload);
         this.adsLoader.skipAd();
         this.startPlayback();
         
@@ -447,6 +451,10 @@ public class ReactExoplayerView extends FrameLayout implements
             Log.w("RNV_CSAI", "NO PLAYER CANNOT WILL NOT LOOK FOR TRUEX");
             return;
         }
+
+        WritableMap payload = Arguments.createMap();
+        eventEmitter.adEvent("STARTED_TRUEX", payload);
+
         Log.w("RNV_CSAI", "Pausing playback for TrueX");
         // Pause the stream and display a true[X] engagement
         pausePlayback();
