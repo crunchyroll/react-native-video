@@ -536,6 +536,12 @@ public class ReactExoplayerView extends FrameLayout implements
         //this.invalidate();
         //exoPlayerView.invalidate();
         this.reLayout(exoPlayerView);
+        if (exoPlayerView.getTruexViewGroup() != null) {
+            LayoutParams params = new FrameLayout.LayoutParams(
+                LayoutParams.FILL_PARENT,
+                LayoutParams.FILL_PARENT);
+            exoPlayerView.updateViewLayout(exoPlayerView.getTruexViewGroup(), params);
+        }
         this.reLayout(exoPlayerView.getTruexViewGroup());
     }
 
