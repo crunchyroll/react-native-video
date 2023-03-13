@@ -337,12 +337,6 @@ public class ReactExoplayerView extends FrameLayout implements
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
-        imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
-        imaSettings.setLanguage(uiLanguage);
-        adsLoader = new ImaAdsLoader.Builder(getContext())
-            .setAdEventListener(this)
-            .setImaSdkSettings(imaSettings)
-            .build();
         mainHandler = new Handler();
     }
 
@@ -798,6 +792,13 @@ public class ReactExoplayerView extends FrameLayout implements
         DefaultRenderersFactory renderersFactory =
                 new DefaultRenderersFactory(getContext())
                         .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
+        
+        imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
+        imaSettings.setLanguage(uiLanguage);
+        adsLoader = new ImaAdsLoader.Builder(getContext())
+            .setAdEventListener(this)
+            .setImaSdkSettings(imaSettings)
+            .build();
         if (hasNativeSource) {
             player = new ExoPlayer.Builder(getContext(), renderersFactory)
                     .setTrackSelector(self.trackSelector)
@@ -976,6 +977,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 ).createMediaSource(mediaItem);
             case C.TYPE_DASH:
                 if(isCSAIEnabled) {
+                    Log.w("RNV_CSAI", "Using Ads media source");
                     return new DefaultMediaSourceFactory(mediaDataSourceFactory)
                         .setDataSourceFactory(buildDataSourceFactory(false))
                         .setDrmSessionManagerProvider(drmProvider)
