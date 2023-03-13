@@ -483,10 +483,10 @@ public class ReactExoplayerView extends FrameLayout implements
                 0);
             exoPlayerView.updateViewLayout(exoPlayerView.getTruexViewGroup(), params);
             exoPlayerView.getTruexViewGroup().requestLayout();
-            LayoutParams params = new FrameLayout.LayoutParams(
+            LayoutParams params2 = new FrameLayout.LayoutParams(
                 LayoutParams.FILL_PARENT,
                 LayoutParams.FILL_PARENT);
-            exoPlayerView.updateViewLayout(exoPlayerView.getTruexViewGroup(), params);
+            exoPlayerView.updateViewLayout(exoPlayerView.getTruexViewGroup(), params2);
             exoPlayerView.getTruexViewGroup().requestLayout();
         }
         exoPlayerView.postInvalidate();
