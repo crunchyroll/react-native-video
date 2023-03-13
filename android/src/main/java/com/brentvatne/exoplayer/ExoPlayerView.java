@@ -88,7 +88,26 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         layout.addView(shutterView, 1, layoutParams);
         layout.addView(subtitleLayout, 2, layoutParams);
 
+        LayoutParams adOverlayLayoutParams = new FrameLayout.LayoutParams(
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT);
+        adOverlayFrameLayout = new FrameLayout(getContext());
+        adOverlayFrameLayout.setLayoutParams(adOverlayLayoutParams);
+
         addViewInLayout(layout, 0, aspectRatioParams);
+        addViewInLayout(adOverlayFrameLayout, 1, adOverlayLayoutParams);
+    }
+
+    @Override
+    public ViewGroup getAdViewGroup() {
+        return Assertions.checkStateNotNull(
+            adOverlayFrameLayout, "exo_ad_overlay must be present for ad playback");
+    }
+
+    @Override
+    public List<AdOverlayInfo> getAdOverlayInfos() {
+        List<AdOverlayInfo> overlayViews = new ArrayList<>();
+        return ImmutableList.copyOf(overlayViews);
     }
 
     public void setAdOverlay(FrameLayout adOverlay) {
@@ -232,18 +251,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     public void invalidateAspectRatio() {
         // Resetting aspect ratio will force layout refresh on next video size changed
         layout.invalidateAspectRatio();
-    }
-
-    @Override
-    public ViewGroup getAdViewGroup() {
-        return Assertions.checkStateNotNull(
-            adOverlayFrameLayout, "exo_ad_overlay must be present for ad playback");
-    }
-
-    @Override
-    public List<AdOverlayInfo> getAdOverlayInfos() {
-        List<AdOverlayInfo> overlayViews = new ArrayList<>();
-        return ImmutableList.copyOf(overlayViews);
     }
 
     private final class ComponentListener implements Player.Listener {

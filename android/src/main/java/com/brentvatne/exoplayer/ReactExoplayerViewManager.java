@@ -67,6 +67,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     private static final String PROP_REPORT_BANDWIDTH = "reportBandwidth";
     private static final String PROP_SEEK = "seek";
     private static final String PROP_RATE = "rate";
+    private static final String PROP_UI_LANGUAGE = "uiLanguage";
     private static final String PROP_MIN_LOAD_RETRY_COUNT = "minLoadRetryCount";
     private static final String PROP_MAXIMUM_BIT_RATE = "maxBitRate";
     private static final String PROP_PLAY_IN_BACKGROUND = "playInBackground";
@@ -299,6 +300,10 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     @ReactProp(name = PROP_RATE)
     public void setRate(final ReactExoplayerView videoView, final float rate) {
         videoView.setRateModifier(rate);
+    }
+    @ReactProp(name = PROP_UI_LANGUAGE)
+    public void setUiLanguage(final ReactExoplayerView videoView, final String language) {
+        videoView.setUiLanguage(language);
     }
 
     @ReactProp(name = PROP_MAXIMUM_BIT_RATE)
