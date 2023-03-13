@@ -346,7 +346,7 @@ public class ReactExoplayerView extends FrameLayout implements
         truexViewGroup.setLayoutParams(layoutParams);
         
         // Add TrueX Layout
-        exoPlayerView.addViewInLayout(truexViewGroup, -1, layoutParams);
+        exoPlayerView.addView(truexViewGroup, -1, layoutParams);
 
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
@@ -474,6 +474,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void reLayoutRoot() {
         Log.w("RNV_CSAI", "Forcing layout update - truex!");
+        this.invalidate();
         exoPlayerView.invalidate();
         this.reLayout(exoPlayerView);
     }
