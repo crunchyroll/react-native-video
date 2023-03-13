@@ -109,7 +109,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     }
 
     public ViewGroup getTruexViewGroup() {
-        return truexOverlayFrameLayout;
+        return adOverlayFrameLayout;
     }
 
     @Override
