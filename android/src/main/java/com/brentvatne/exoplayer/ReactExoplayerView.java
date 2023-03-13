@@ -541,6 +541,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void reLayoutRoot() {
         Log.w("RNV_CSAI", "Forcing layout update - truex!");
+        exoPlayerView.invalidate();
         this.reLayout(exoPlayerView);
     }
 
