@@ -420,7 +420,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 activeAd = null;
                 eventEmitter.adEvent("CONTENT_RESUME_REQUESTED", payload);
                 break;
-            case CLICKED:
+            case TAPPED:
                 eventEmitter.videoClickEvent();
         } 
     }
