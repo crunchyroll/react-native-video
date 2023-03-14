@@ -28,6 +28,8 @@ import com.google.android.exoplayer2.ui.AdOverlayInfo;
 import com.google.android.exoplayer2.ui.AdViewProvider;
 import com.google.android.exoplayer2.video.VideoSize;
 
+import com.facebook.react.uimanager.util.ReactFindViewUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,6 +109,17 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     @Override
     public List<AdOverlayInfo> getAdOverlayInfos() {
         List<AdOverlayInfo> overlayViews = new ArrayList<>();
+        View rootView =  getRootView();
+        if (rootView != null) { 
+            View controlsView = ReactFindViewUtil.findView(rootView, "velocity-controls-package");
+            overlayViews.add(
+                new AdOverlayInfo(
+                    controlsView,
+                    AdOverlayInfo.PURPOSE_NOT_VISIBLE,
+                    /* detailedReason= */ "Controls overlay does not impact viewability"));
+        } else {
+            Log.w("ExoPlayerView", "Could not determine React Root View!");
+        }
         return ImmutableList.copyOf(overlayViews);
     }
 

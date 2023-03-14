@@ -344,6 +344,15 @@ public class ReactExoplayerView extends FrameLayout implements
             .setImaSdkSettings(imaSettings)
             .build();
         mainHandler = new Handler();
+
+        // Add click listener
+        exoPlayerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventEmitter.videoClickEvent();
+            }
+        });
+        
     }
 
     private WritableMap getAdInfo() {
