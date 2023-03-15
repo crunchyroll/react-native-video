@@ -31,6 +31,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
 
     private static final String PROP_SRC = "src";
     private static final String PROP_SRC_URI = "uri";
+    private static final String PROP_START_TIME = "startTime";
     private static final String PROP_SRC_TYPE = "type";
     private static final String PROP_AD_TAG_URL = "adTagUrl";
     private static final String PROP_ENABLE_CSAI = "enableCSAI";
@@ -202,6 +203,11 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
                 }
             }
         }
+    }
+
+    @ReactProp(name = PROP_START_TIME)
+    public void setStartTime(final ReactExoplayerView videoView, final float startTime) {
+        videoView.setStartTime(startTime);
     }
 
     @ReactProp(name = PROP_RESIZE_MODE)

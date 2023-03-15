@@ -1804,6 +1804,11 @@ public class ReactExoplayerView extends FrameLayout implements
         releasePlayer();
     }
 
+    public void setStartTime(final float startTime) {
+        resumeWindow = 0;
+        resumePosition = Math.max(0, (long) startTime);
+    }
+
     public void setProgressUpdateInterval(final float progressUpdateInterval) {
         mProgressUpdateInterval = progressUpdateInterval;
     }
