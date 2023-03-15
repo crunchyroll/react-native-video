@@ -30,6 +30,7 @@ class VideoEventEmitter {
 
     private static final String EVENT_AD_EVENT = "onAdEvent";
     private static final String EVENT_CDN_UPDATE = "onCdnUpdate";
+    private static final String EVENT_ON_VIDEO_CLICK = "onVideoClick";
     private static final String EVENT_LOAD_START = "onVideoLoadStart";
     private static final String EVENT_LOAD = "onVideoLoad";
     private static final String EVENT_ERROR = "onVideoError";
@@ -56,6 +57,7 @@ class VideoEventEmitter {
     static final String[] Events = {
             EVENT_AD_EVENT,
             EVENT_CDN_UPDATE,
+            EVENT_ON_VIDEO_CLICK,
             EVENT_LOAD_START,
             EVENT_LOAD,
             EVENT_ERROR,
@@ -83,6 +85,7 @@ class VideoEventEmitter {
     @StringDef({
             EVENT_AD_EVENT,
             EVENT_CDN_UPDATE,
+            EVENT_ON_VIDEO_CLICK,
             EVENT_LOAD_START,
             EVENT_LOAD,
             EVENT_ERROR,
@@ -195,6 +198,10 @@ class VideoEventEmitter {
         event.putString(EVENT_PROP_AD_EVENT_TYPE, eventType);
         event.putMap(EVENT_PROP_AD_EVENT_PAYLOAD, payload);
         receiveEvent(EVENT_AD_EVENT, event);
+    }
+
+    void videoClickEvent() {
+        receiveEvent(EVENT_ON_VIDEO_CLICK, null);
     }
 
     void progressChanged(double currentPosition, double bufferedDuration, double seekableDuration, double currentPlaybackTime, double duration) {

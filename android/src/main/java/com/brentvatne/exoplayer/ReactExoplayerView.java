@@ -344,6 +344,7 @@ public class ReactExoplayerView extends FrameLayout implements
             .setImaSdkSettings(imaSettings)
             .build();
         mainHandler = new Handler();
+        
     }
 
     private WritableMap getAdInfo() {
@@ -419,6 +420,8 @@ public class ReactExoplayerView extends FrameLayout implements
                 activeAd = null;
                 eventEmitter.adEvent("CONTENT_RESUME_REQUESTED", payload);
                 break;
+            case TAPPED:
+                eventEmitter.videoClickEvent();
         } 
     }
 
