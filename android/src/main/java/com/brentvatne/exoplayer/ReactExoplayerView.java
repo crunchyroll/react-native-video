@@ -1813,7 +1813,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (startTime > 0) {
             resumeWindow = 0;
             resumePosition = Math.max(0, (long) startTime);
-            startPosition = startTime;
+            startPosition = (long) startTime;
         }
     }
 
