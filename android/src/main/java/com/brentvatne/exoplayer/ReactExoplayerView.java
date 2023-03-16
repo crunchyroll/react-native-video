@@ -186,6 +186,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
     private int resumeWindow;
     private long resumePosition;
+    private long startPosition;
     private boolean loadVideoStarted;
     private boolean isFullscreen;
     private boolean isInBackground;
@@ -877,6 +878,10 @@ public class ReactExoplayerView extends FrameLayout implements
         boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
         if (haveResumePosition) {
             player.seekTo(resumeWindow, resumePosition);
+        }
+        if (startPosition > 0) {
+            player.seekTo(0, startPosition);
+            haveResumePosition = true;
         }
         player.prepare(mediaSource, !haveResumePosition, false);
         playerNeedsSource = false;
@@ -1802,6 +1807,14 @@ public class ReactExoplayerView extends FrameLayout implements
             clearResumePosition();
         }
         releasePlayer();
+    }
+
+    public void setStartTime(final float startTime) {
+        if (startTime > 0) {
+            resumeWindow = 0;
+            resumePosition = Math.max(0, (long) startTime);
+            startPosition = (long) startTime;
+        }
     }
 
     public void setProgressUpdateInterval(final float progressUpdateInterval) {
