@@ -1056,6 +1056,11 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     private void releasePlayer() {
+        if (adsLoader != null) {
+            adsLoader.setPlayer(null);
+            adsLoader.release();
+            adsLoader = null;
+        }
         if (player != null) {
             updateResumePosition();
             player.setPlayWhenReady(false);
@@ -1065,7 +1070,6 @@ public class ReactExoplayerView extends FrameLayout implements
             player.removeListener(this);
             trackSelector = null;
             player = null;
-            adsLoader.setPlayer(null);
             exoPlayerView.setPlayer(null);
             if (playerControlView != null) {
                 playerControlView.setPlayer(null);
