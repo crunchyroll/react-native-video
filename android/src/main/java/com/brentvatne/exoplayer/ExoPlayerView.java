@@ -112,11 +112,13 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         View rootView =  getRootView();
         if (rootView != null) { 
             View controlsView = ReactFindViewUtil.findView(rootView, "velocity-controls-package");
-            overlayViews.add(
-                new AdOverlayInfo(
-                    controlsView,
-                    AdOverlayInfo.PURPOSE_NOT_VISIBLE,
-                    /* detailedReason= */ "Controls overlay does not impact viewability"));
+            if (controlsView != null) {
+                overlayViews.add(
+                    new AdOverlayInfo(
+                        controlsView,
+                        AdOverlayInfo.PURPOSE_NOT_VISIBLE,
+                        /* detailedReason= */ "Controls overlay does not impact viewability"));
+            }
         } else {
             Log.w("ExoPlayerView", "Could not determine React Root View!");
         }

@@ -338,14 +338,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
-        imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
-        imaSettings.setLanguage(uiLanguage);
-        adsLoader = new ImaAdsLoader.Builder(getContext())
-            .setAdEventListener(this)
-            .setImaSdkSettings(imaSettings)
-            .build();
         mainHandler = new Handler();
-        
     }
 
     private WritableMap getAdInfo() {
@@ -771,6 +764,17 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     private void initializePlayerCore(ReactExoplayerView self) {
+
+        // Init Ads Loader
+        if (self.isCSAIEnabled) {
+            imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
+            imaSettings.setLanguage(uiLanguage);
+            adsLoader = new ImaAdsLoader.Builder(getContext())
+                .setAdEventListener(this)
+                .setImaSdkSettings(imaSettings)
+                .build();
+        }
+
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
         self.trackSelector = new DefaultTrackSelector(getContext(), videoTrackSelectionFactory);
         self.trackSelector.setParameters(trackSelector.buildUponParameters()
@@ -1056,6 +1060,12 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     private void releasePlayer() {
+        if (adsLoader != null) {
+            adsLoader.setPlayer(null);
+            adsLoader.release();
+            adsLoader = null;
+            imaSettings = null;
+        }
         if (player != null) {
             updateResumePosition();
             player.setPlayWhenReady(false);
@@ -1065,7 +1075,6 @@ public class ReactExoplayerView extends FrameLayout implements
             player.removeListener(this);
             trackSelector = null;
             player = null;
-            adsLoader.setPlayer(null);
             exoPlayerView.setPlayer(null);
             if (playerControlView != null) {
                 playerControlView.setPlayer(null);
