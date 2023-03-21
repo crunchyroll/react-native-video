@@ -1238,7 +1238,10 @@ public class ReactExoplayerView extends FrameLayout implements
             Format videoFormat = player.getVideoFormat();
             int width = videoFormat != null ? videoFormat.width : 0;
             int height = videoFormat != null ? videoFormat.height : 0;
-            long bitrate = (videoFormat != null || videoFormat.bitrate == Format.NO_VALUE) ? 0 : videoFormat.bitrate;
+            long bitrate = 0L;
+            if (videoFormat != null) {
+                bitrate = videoFormat.bitrate == Format.NO_VALUE ? 0L : videoFormat.bitrate;
+            }
             String trackId = videoFormat != null ? videoFormat.id : "-1";
 
             if (isUriNativeSource(this.srcUri) && mReportBandwidth) {
