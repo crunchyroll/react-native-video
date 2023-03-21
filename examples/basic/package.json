@@ -11,7 +11,7 @@
   "dependencies": {
     "react": "16.9.0",
     "react-native": "0.60.5",
-    "react-native-video": "file:../.."
+    "react-native-video": "5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
