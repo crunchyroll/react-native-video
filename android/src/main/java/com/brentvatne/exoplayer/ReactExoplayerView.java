@@ -344,6 +344,19 @@ public class ReactExoplayerView extends FrameLayout implements
     private WritableMap getAdInfo() {
         WritableMap data = Arguments.createMap();
         
+        // Get ad markers
+        Timeline timeline = player.getCurrentTimeline();
+        if (timeline != null) {
+            updateAdCuePoints(timeline);
+        }
+        if (adMarkers != null) {
+            WritableArray adMarkersWritableArray = Arguments.createArray();
+            for (Double marker : adMarkers) {
+                adMarkersWritableArray.pushDouble(marker.doubleValue());
+            }
+            data.putArray("adMarkers", adMarkersWritableArray);
+        }
+
         if (activeAd == null) {
             if (activeAd == null) {
                 data.putString("error", "No activeAd!");
@@ -373,20 +386,6 @@ public class ReactExoplayerView extends FrameLayout implements
         data.putInt("adPodPosition", adPodPosition);
         data.putDouble("adPodMaxDuration", adPodMaxDuration);
         data.putDouble("adDuration", adDuration);
-
-        // Get ad markers
-        Timeline timeline = player.getCurrentTimeline();
-        if (timeline != null) {
-            updateAdCuePoints(timeline);
-        }
-        if (adMarkers != null) {
-            WritableArray adMarkersWritableArray = Arguments.createArray();
-            for (Double marker : adMarkers) {
-                adMarkersWritableArray.pushDouble(marker.doubleValue());
-            }
-            data.putArray("adMarkers", adMarkersWritableArray);
-        }
-
         return data;
     }
 
