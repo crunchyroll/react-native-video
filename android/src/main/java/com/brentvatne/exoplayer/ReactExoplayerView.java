@@ -1670,7 +1670,10 @@ public class ReactExoplayerView extends FrameLayout implements
                         for (int k = 0; k < adGroupCount; k++) {
                             long adGroupTimeUs = period.getAdGroupTimeUs(k);
                             long adGroupTimeMs = TimeUnit.MICROSECONDS.toMillis(adGroupTimeUs);
-                            adMarkers.add((double)adGroupTimeMs);
+                            boolean isAdGroupPlayed = period.hasPlayedAdGroup(k);
+                            if (!isAdGroupPlayed) {
+                                adMarkers.add((double)adGroupTimeMs);
+                            }
                         }
                         
                     }
