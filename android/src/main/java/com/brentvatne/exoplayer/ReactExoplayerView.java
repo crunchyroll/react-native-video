@@ -356,8 +356,10 @@ public class ReactExoplayerView extends FrameLayout implements
         int adPodIndex = 0;
         int adPodTotalAds = 0;
         double adPodMaxDuration = 0;
+        double adDuration = 0;
         if (activeAd != null) {
             AdPodInfo podInfo = activeAd.getAdPodInfo();
+            adDuration = activeAd.getDuration();
             if (podInfo != null) {
                 adPodIndex = podInfo.getPodIndex();
                 adPodTotalAds = podInfo.getTotalAds();
@@ -370,8 +372,13 @@ public class ReactExoplayerView extends FrameLayout implements
         data.putInt("adPodTotalAds", adPodTotalAds);
         data.putInt("adPodPosition", adPodPosition);
         data.putDouble("adPodMaxDuration", adPodMaxDuration);
+        data.putDouble("adDuration", adDuration);
 
         // Get ad markers
+        Timeline timeline = player.getCurrentTimeline();
+        if (timeline != null) {
+            updateAdCuePoints(timeline);
+        }
         if (adMarkers != null) {
             WritableArray adMarkersWritableArray = Arguments.createArray();
             for (Double marker : adMarkers) {
@@ -1652,12 +1659,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
     }
 
-    @Override
-    public void onTimelineChanged(Timeline timeline, int reason) {
-        if (timeline.isEmpty()) {
-            // The player is being reset or contains no media.
-            return;
-        }
+    public void updateAdCuePoints(Timeline timeline) {
         // Go through the timeline and find ad markers
         if (isCSAIEnabled) {
             int periodCount = timeline.getPeriodCount();
@@ -1680,6 +1682,15 @@ public class ReactExoplayerView extends FrameLayout implements
                 }
             }
         }
+    }
+
+    @Override
+    public void onTimelineChanged(Timeline timeline, int reason) {
+        if (timeline.isEmpty()) {
+            // The player is being reset or contains no media.
+            return;
+        }
+        updateAdCuePoints(timeline);
 
     }
 
