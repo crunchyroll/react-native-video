@@ -175,6 +175,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
     private ImaSdkSettings imaSettings;
+    private boolean shouldPlayAdBeforeStartPosition;
     private AdsManager googleAdsManager;
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
@@ -358,9 +359,7 @@ public class ReactExoplayerView extends FrameLayout implements
         }
 
         if (activeAd == null) {
-            if (activeAd == null) {
-                data.putString("error", "No activeAd!");
-            }
+            data.putString("error", "No activeAd!");
             return data;
         }
 
@@ -778,6 +777,7 @@ public class ReactExoplayerView extends FrameLayout implements
             adsLoader = new ImaAdsLoader.Builder(getContext())
                 .setAdEventListener(this)
                 .setImaSdkSettings(imaSettings)
+                .setPlayAdBeforeStartPosition(shouldPlayAdBeforeStartPosition)
                 .build();
         }
 
@@ -1071,6 +1071,7 @@ public class ReactExoplayerView extends FrameLayout implements
             adsLoader.release();
             adsLoader = null;
             imaSettings = null;
+            shouldPlayAdBeforeStartPosition = true;
         }
         if (player != null) {
             updateResumePosition();
@@ -2184,6 +2185,10 @@ public class ReactExoplayerView extends FrameLayout implements
         if (imaSettings != null) {
             imaSettings.setLanguage(language);
         }
+    }
+
+    public void setPlayAdBeforeStartPosition(boolean shouldPlay) {
+        shouldPlayAdBeforeStartPosition = shouldPlay;
     }
 
     public void setBackBufferDurationMs(int backBufferDurationMs) {

@@ -33,6 +33,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     private static final String PROP_SRC_URI = "uri";
     private static final String PROP_START_TIME = "startTime";
     private static final String PROP_SRC_TYPE = "type";
+    private static final String PROP_AD_INITIAL_PLAYBACK = "playAdBeforeStart";
     private static final String PROP_AD_TAG_URL = "adTagUrl";
     private static final String PROP_ENABLE_CSAI = "enableCSAI";
     private static final String PROP_DRM = "drm";
@@ -310,6 +311,11 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     @ReactProp(name = PROP_UI_LANGUAGE)
     public void setUiLanguage(final ReactExoplayerView videoView, final String language) {
         videoView.setUiLanguage(language);
+    }
+
+    @ReactProp(name = PROP_AD_INITIAL_PLAYBACK)
+    public void setPlayAdBeforeStartPosition(final ReactExoplayerView videoView, final boolean shouldPlay) {
+        videoView.setPlayAdBeforeStartPosition(shouldPlay);
     }
 
     @ReactProp(name = PROP_MAXIMUM_BIT_RATE)
