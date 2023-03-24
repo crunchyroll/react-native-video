@@ -696,6 +696,16 @@ public class ReactExoplayerView extends FrameLayout implements
                         initializePlayerCore(self);
                     }
                     if (playerNeedsSource && srcUri != null) {
+                        // Init Ads Loader
+                        if (self.isCSAIEnabled) {
+                            imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
+                            imaSettings.setLanguage(uiLanguage);
+                            adsLoader = new ImaAdsLoader.Builder(getContext())
+                                .setAdEventListener(this)
+                                .setImaSdkSettings(imaSettings)
+                                .setPlayAdBeforeStartPosition(shouldPlayAdBeforeStartPosition)
+                                .build();
+                        }
                         exoPlayerView.invalidateAspectRatio();
                         // DRM session manager creation must be done on a different thread to prevent crashes so we start a new thread
                         ExecutorService es = Executors.newSingleThreadExecutor();
@@ -769,17 +779,6 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     private void initializePlayerCore(ReactExoplayerView self) {
-
-        // Init Ads Loader
-        if (self.isCSAIEnabled) {
-            imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
-            imaSettings.setLanguage(uiLanguage);
-            adsLoader = new ImaAdsLoader.Builder(getContext())
-                .setAdEventListener(this)
-                .setImaSdkSettings(imaSettings)
-                .setPlayAdBeforeStartPosition(shouldPlayAdBeforeStartPosition)
-                .build();
-        }
 
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
         self.trackSelector = new DefaultTrackSelector(getContext(), videoTrackSelectionFactory);
