@@ -701,7 +701,7 @@ public class ReactExoplayerView extends FrameLayout implements
                             imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
                             imaSettings.setLanguage(uiLanguage);
                             adsLoader = new ImaAdsLoader.Builder(getContext())
-                                .setAdEventListener(this)
+                                .setAdEventListener(self)
                                 .setImaSdkSettings(imaSettings)
                                 .setPlayAdBeforeStartPosition(shouldPlayAdBeforeStartPosition)
                                 .build();
