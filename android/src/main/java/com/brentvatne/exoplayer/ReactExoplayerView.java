@@ -705,6 +705,7 @@ public class ReactExoplayerView extends FrameLayout implements
                                 .setImaSdkSettings(imaSettings)
                                 .setPlayAdBeforeStartPosition(shouldPlayAdBeforeStartPosition)
                                 .build();
+                            adsLoader.setPlayer(player);
                         }
                         exoPlayerView.invalidateAspectRatio();
                         // DRM session manager creation must be done on a different thread to prevent crashes so we start a new thread
@@ -829,9 +830,6 @@ public class ReactExoplayerView extends FrameLayout implements
 
         player.addListener(self);
         exoPlayerView.setPlayer(player);
-        if (self.isCSAIEnabled) {
-            adsLoader.setPlayer(player);
-        }
         audioBecomingNoisyReceiver.setListener(self);
         setPlayWhenReady(!isPaused);
         playerNeedsSource = true;
