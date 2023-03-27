@@ -31,6 +31,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
 
     private static final String PROP_SRC = "src";
     private static final String PROP_SRC_URI = "uri";
+    private static final String PROP_SRC_START_TIME = "startTime";
     private static final String PROP_START_TIME = "startTime";
     private static final String PROP_SRC_TYPE = "type";
     private static final String PROP_AD_INITIAL_PLAYBACK = "playAdBeforeStart";
@@ -171,6 +172,8 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
         Context context = videoView.getContext().getApplicationContext();
         String uriString = src.hasKey(PROP_SRC_URI) ? src.getString(PROP_SRC_URI) : null;
         String extension = src.hasKey(PROP_SRC_TYPE) ? src.getString(PROP_SRC_TYPE) : null;
+        float startTime = src.hasKey(PROP_SRC_START_TIME) ? src.getString(PROP_SRC_START_TIME) : null;
+
         Map<String, String> headers = src.hasKey(PROP_SRC_HEADERS) ? toStringMap(src.getMap(PROP_SRC_HEADERS)) : null;
 
         if (TextUtils.isEmpty(uriString)) {
@@ -182,7 +185,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
             Uri srcUri = Uri.parse(uriString);
 
             if (srcUri != null) {
-                videoView.setSrc(srcUri, extension, headers);
+                videoView.setSrc(srcUri, extension, headers, startTime);
             }
         } else {
             int identifier = context.getResources().getIdentifier(

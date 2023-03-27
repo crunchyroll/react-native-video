@@ -1794,8 +1794,13 @@ public class ReactExoplayerView extends FrameLayout implements
 
     // ReactExoplayerViewManager public api
 
-    public void setSrc(final Uri uri, final String extension, Map<String, String> headers) {
+    public void setSrc(final Uri uri, final String extension, Map<String, String> headers, float startTime) {
         if (uri != null) {
+            if (startTime > 0) {
+                resumeWindow = 0;
+                resumePosition = Math.max(0, (long) startTime);
+                startPosition = (long) startTime;
+            }
             boolean hasNativeSource = isUriNativeSource(uri);
             boolean isSourceEqual = uri.equals(srcUri) && !hasNativeSource;
             hasDrmFailed = false;
