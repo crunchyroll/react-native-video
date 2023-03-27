@@ -275,10 +275,12 @@ public class ReactExoplayerView extends FrameLayout implements
                         msg = obtainMessage(SHOW_PROGRESS);
                         sendMessageDelayed(msg, Math.round(mProgressUpdateInterval));
 
-                        WritableMap payload = Arguments.createMap();
-                        WritableMap adInfo = getAdInfo();
-                        payload.putMap("adInfo", adInfo);
-                        eventEmitter.adEvent("AD_INFO_UPDATE", payload);  
+                        if (isCSAIEnabled) {
+                            WritableMap payload = Arguments.createMap();
+                            WritableMap adInfo = getAdInfo();
+                            payload.putMap("adInfo", adInfo);
+                            eventEmitter.adEvent("AD_INFO_UPDATE", payload);
+                        }  
                     }
                     break;
             }
@@ -398,7 +400,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onAdEvent(AdEvent event) {
-        if (event == null) {
+        if (event == null || !isCSAIEnabled) {
             return;
         }
 
