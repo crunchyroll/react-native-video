@@ -172,7 +172,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
         Context context = videoView.getContext().getApplicationContext();
         String uriString = src.hasKey(PROP_SRC_URI) ? src.getString(PROP_SRC_URI) : null;
         String extension = src.hasKey(PROP_SRC_TYPE) ? src.getString(PROP_SRC_TYPE) : null;
-        float startTime = src.hasKey(PROP_SRC_START_TIME) ? src.getString(PROP_SRC_START_TIME) : null;
+        float startTime = src.hasKey(PROP_SRC_START_TIME) ? (float) src.getDouble(PROP_SRC_START_TIME) : 0;
 
         Map<String, String> headers = src.hasKey(PROP_SRC_HEADERS) ? toStringMap(src.getMap(PROP_SRC_HEADERS)) : null;
 
