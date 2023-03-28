@@ -98,10 +98,12 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         adOverlayFrameLayout.setLayoutParams(adOverlayLayoutParams);
 
         LayoutParams truexOverlayLayoutParams = new FrameLayout.LayoutParams(
-            LayoutParams.WRAP_CONTENT,
-            LayoutParams.WRAP_CONTENT);
+            LayoutParams.FILL_PARENT,
+            LayoutParams.FILL_PARENT);
         truexOverlayFrameLayout = new FrameLayout(getContext());
         truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
+        truexOverlayFrameLayout.setMeasureAllChildren(true);
+        truexOverlayFrameLayout.setForegroundGravity(Gravity.CENTER);
 
         addViewInLayout(layout, 0, aspectRatioParams);
         addViewInLayout(adOverlayFrameLayout, 1, adOverlayLayoutParams);
