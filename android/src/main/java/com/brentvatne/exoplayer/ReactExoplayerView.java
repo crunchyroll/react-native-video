@@ -472,7 +472,7 @@ public class ReactExoplayerView extends FrameLayout implements
         //this.invalidate();
         
         //exoPlayerView.invalidate();
-        if (exoPlayerView.getTruexViewGroup() != null) {
+        /*if (exoPlayerView.getTruexViewGroup() != null) {
             LayoutParams params = new FrameLayout.LayoutParams(
                 0,
                 0);
@@ -487,7 +487,9 @@ public class ReactExoplayerView extends FrameLayout implements
         exoPlayerView.postInvalidate();
         this.reLayout(exoPlayerView.getTruexViewGroup());
         this.reLayout(exoPlayerView);
-        exoPlayerView.requestLayout();
+        exoPlayerView.requestLayout();*/
+        exoplayerView.updateTruexLayout();
+        this.reLayout(exoplayerView);
     }
 
     public void handleCheckTruex(AdEvent event) {
