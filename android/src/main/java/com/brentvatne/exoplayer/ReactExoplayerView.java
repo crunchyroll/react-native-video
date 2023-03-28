@@ -495,8 +495,8 @@ public class ReactExoplayerView extends FrameLayout implements
         this.reLayout(exoPlayerView.getTruexViewGroup());
         this.reLayout(exoPlayerView);
         exoPlayerView.requestLayout();*/
-        this.exoplayerView.updateTruexLayout();
-        this.reLayout(this.exoplayerView);
+        exoPlayerView.updateTruexLayout();
+        this.reLayout(exoPlayerView);
     }
 
     public void handleCheckTruex(AdEvent event) {
