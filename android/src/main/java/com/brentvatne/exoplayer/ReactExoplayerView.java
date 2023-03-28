@@ -405,56 +405,6 @@ public class ReactExoplayerView extends FrameLayout implements
         googleAdsManager = event.getAdsManager();
     }
 
-    private WritableMap getAdInfo() {
-        WritableMap data = Arguments.createMap();
-        
-        if (activeAd == null) {
-            if (activeAd == null) {
-                data.putString("error", "No activeAd!");
-            }
-            return data;
-        }
-
-        // Get ad based data
-        int adPodPosition = 0;
-        int adPodIndex = 0;
-        int adPodTotalAds = 0;
-        double adPodMaxDuration = 0;
-        if (activeAd != null) {
-            AdPodInfo podInfo = activeAd.getAdPodInfo();
-            if (podInfo != null) {
-                adPodIndex = podInfo.getPodIndex();
-                adPodTotalAds = podInfo.getTotalAds();
-                adPodPosition = podInfo.getAdPosition();
-                adPodMaxDuration = podInfo.getMaxDuration();
-            }
-        }
-
-        data.putInt("adPodIndex", adPodIndex);
-        data.putInt("adPodTotalAds", adPodTotalAds);
-        data.putInt("adPodPosition", adPodPosition);
-        data.putDouble("adPodMaxDuration", adPodMaxDuration);
-
-        // Get ad markers
-        if (adMarkers != null) {
-            WritableArray adMarkersWritableArray = Arguments.createArray();
-            for (Double marker : adMarkers) {
-                adMarkersWritableArray.pushDouble(marker.doubleValue());
-            }
-            data.putArray("adMarkers", adMarkersWritableArray);
-        }
-
-        return data;
-    }
-
-    @Override
-    public void onAdsManagerLoaded(AdsManagerLoadedEvent event){
-        if (event == null) {
-            return;
-        }
-        googleAdsManager = event.getAdsManager();
-    }
-
     /**
      * TrueX Playback Handlers
      */
