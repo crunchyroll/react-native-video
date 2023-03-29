@@ -127,8 +127,8 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
             childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
             childView.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
-            childView.getLayoutParams().width = 600;
-            childView.getLayoutParams().height = 600;
+            childView.getLayoutParams().width = view.getMeasuredWidth();
+            childView.getLayoutParams().height = view.getMeasuredHeight();
             childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
             Log.w("RNV_CSAI", "Child position - left: " + String.valueOf(childView.getLeft()) + " top: " + String.valueOf(childView.getTop()));
