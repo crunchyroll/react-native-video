@@ -117,13 +117,13 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         if (view == null) return;
         view.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-        // view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());*/
+        view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());*/
 
-        if (adOverlayFrameLayout != null) {
-            adOverlayFrameLayout.setVisibility(View.GONE);
-        }
+        //if (adOverlayFrameLayout != null) {
+          //  adOverlayFrameLayout.setVisibility(View.GONE);
+        //}
         View childView = truexOverlayFrameLayout.getChildAt(0);
-        if (childView != null) {
+        /*if (childView != null) {
             childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
             childView.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
@@ -137,13 +137,13 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
             childView.requestLayout();
             childView.invalidate();
             Log.w("RNV_CSAI", "Redrawing truex element");
-        }
+        }*/
 
         /*LayoutParams viewLayoutParams = new FrameLayout.LayoutParams(
             LayoutParams.FILL_PARENT,
             LayoutParams.FILL_PARENT);
         view.setLayoutParams(viewLayoutParams);*/
-        view.postInvalidate();
+        //view.postInvalidate();
     }
 
     public ViewGroup getTruexViewGroup() {

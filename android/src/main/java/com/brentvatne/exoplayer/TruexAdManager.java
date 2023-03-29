@@ -68,7 +68,7 @@ public class TruexAdManager {
             Log.w("RNV_CSAI", "Truex Initialized - calling start!");
             truexAdRenderer.start(viewGroup);
         });
-        truexAdRenderer.start(viewGroup);
+        // truexAdRenderer.start(viewGroup);
         /*truexAdRenderer.init(vastUrl, options, () -> {
             Log.w("RNV_CSAI", "Truex Initialized - calling start!");
             truexAdRenderer.start(viewGroup);
