@@ -123,7 +123,6 @@ public class TruexAdManager {
         if (this.reactExoplayerView != null) {
           this.reactExoplayerView.reLayoutRoot();
         }
-        truexAdRenderer.pause();
         // Truex Ad Renderer is ready to start() if not started in the init callback
     };
 
@@ -135,6 +134,7 @@ public class TruexAdManager {
         if (this.reactExoplayerView != null) {
           this.reactExoplayerView.reLayoutRoot();
         }
+        truexAdRenderer.pause();
         truexAdRenderer.resume();
     };
 
