@@ -64,7 +64,12 @@ public class TruexAdManager {
         // That prevents the same user from getting another Truex ad for some period of time
         // To get around this for development, replace the TruexAdOptions.userAdvertisingId
         // with some different/random value
-        truexAdRenderer.init(vastUrl, options, () -> { truexAdRenderer.start(viewGroup); });
+        truexAdRenderer.init(vastConfigUrl, options, () -> {});
+        truexAdRenderer.start(viewGroup);
+        /*truexAdRenderer.init(vastUrl, options, () -> {
+            Log.w("RNV_CSAI", "Truex Initialized - calling start!");
+            truexAdRenderer.start(viewGroup);
+        });*/
     }
 
     /**
@@ -134,8 +139,8 @@ public class TruexAdManager {
         if (this.reactExoplayerView != null) {
           this.reactExoplayerView.reLayoutRoot();
         }
-        truexAdRenderer.pause();
-        truexAdRenderer.resume();
+        //truexAdRenderer.pause();
+        //truexAdRenderer.resume();
     };
 
     /*
