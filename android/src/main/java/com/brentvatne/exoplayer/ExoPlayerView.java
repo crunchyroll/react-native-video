@@ -98,8 +98,8 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         adOverlayFrameLayout.setLayoutParams(adOverlayLayoutParams);
 
         LayoutParams truexOverlayLayoutParams = new FrameLayout.LayoutParams(
-            LayoutParams.FILL_PARENT,
-            LayoutParams.FILL_PARENT);
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT);
         truexOverlayFrameLayout = new FrameLayout(getContext());
         truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
         truexOverlayFrameLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
@@ -122,6 +122,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         View childView = truexOverlayFrameLayout.getChildAt(0);
         if (childView != null) {
             childView.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
+            childView.invalidate();
             Log.w("RNV_CSAI", "Redrawing truex element");
         }
 
