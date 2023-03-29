@@ -495,8 +495,15 @@ public class ReactExoplayerView extends FrameLayout implements
         this.reLayout(exoPlayerView.getTruexViewGroup());
         this.reLayout(exoPlayerView);
         exoPlayerView.requestLayout();*/
-        exoPlayerView.updateTruexLayout();
-        this.reLayout(exoPlayerView);
+        // Initialize handler to run on the main thread
+        Activity activity = themedReactContext.getCurrentActivity();
+        ReactExoplayerView self = this;
+        activity.runOnUiThread(new Runnable() {
+            public void run() {
+                self.exoPlayerView.updateTruexLayout();
+                self.reLayout(self.exoPlayerView);
+            }
+        });
     }
 
     public void handleCheckTruex(AdEvent event) {
