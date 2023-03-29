@@ -115,13 +115,19 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     public void updateTruexLayout() {
         View view = (View) truexOverlayFrameLayout;
         if (view == null) return;
-        /*view.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+        view.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-        view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());*/
+        // view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());*/
 
         View childView = truexOverlayFrameLayout.getChildAt(0);
         if (childView != null) {
-            childView.layout(view.getLeft(), view.getTop(), 250, 250);
+            childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
+            childView.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
+            childView.getLayoutParams().width = LayoutParams.FILL_PARENT;
+            childView.getLayoutParams().height = LayoutParams.FILL_PARENT;
+            childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
             Log.w("RNV_CSAI", "Child position - left: " + String.valueOf(childView.getLeft()) + " top: " + String.valueOf(childView.getTop()));
             Log.w("RNV_CSAI", "Child dimensions - width: " + String.valueOf(childView.getMeasuredWidth()) + " height: " + String.valueOf(childView.getMeasuredHeight()));
             childView.invalidate();
