@@ -98,8 +98,8 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         adOverlayFrameLayout.setLayoutParams(adOverlayLayoutParams);
 
         LayoutParams truexOverlayLayoutParams = new FrameLayout.LayoutParams(
-            LayoutParams.MATCH_PARENT,
-            LayoutParams.MATCH_PARENT);
+            LayoutParams.FILL_PARENT,
+            LayoutParams.FILL_PARENT);
         truexOverlayFrameLayout = new FrameLayout(getContext());
         truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
         //truexOverlayFrameLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
