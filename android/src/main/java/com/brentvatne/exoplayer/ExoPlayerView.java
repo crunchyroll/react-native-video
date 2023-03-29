@@ -102,9 +102,10 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
             LayoutParams.FILL_PARENT);
         truexOverlayFrameLayout = new FrameLayout(getContext());
         truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
-        truexOverlayFrameLayout.setMeasureAllChildren(true);
-        truexOverlayFrameLayout.setForegroundGravity(Gravity.CENTER);
-        truexOverlayFrameLayout.layout(1, 1, 1, 1);
+        truexOverlayFrameLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.red));
+        //truexOverlayFrameLayout.setMeasureAllChildren(true);
+        //truexOverlayFrameLayout.setForegroundGravity(Gravity.CENTER);
+        //truexOverlayFrameLayout.layout(1, 1, 1, 1);
 
         addViewInLayout(layout, 0, aspectRatioParams);
         addViewInLayout(adOverlayFrameLayout, 1, adOverlayLayoutParams);
@@ -121,6 +122,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
             LayoutParams.FILL_PARENT,
             LayoutParams.FILL_PARENT);
         view.setLayoutParams(viewLayoutParams);
+        view.postInvalidate();
     }
 
     public ViewGroup getTruexViewGroup() {
