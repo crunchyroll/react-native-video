@@ -104,7 +104,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
         truexOverlayFrameLayout.setMeasureAllChildren(true);
         truexOverlayFrameLayout.setForegroundGravity(Gravity.CENTER);
-        truexOverlayFrameLayout.layout(true, 1, 1, 1, 1);
+        truexOverlayFrameLayout.layout(1, 1, 1, 1);
 
         addViewInLayout(layout, 0, aspectRatioParams);
         addViewInLayout(adOverlayFrameLayout, 1, adOverlayLayoutParams);
@@ -116,7 +116,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         if (view == null) return;
         view.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-        view.layout(true, view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
+        view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
         LayoutParams viewLayoutParams = new FrameLayout.LayoutParams(
             LayoutParams.FILL_PARENT,
             LayoutParams.FILL_PARENT);
