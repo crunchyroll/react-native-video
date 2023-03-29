@@ -64,7 +64,7 @@ public class TruexAdManager {
         // That prevents the same user from getting another Truex ad for some period of time
         // To get around this for development, replace the TruexAdOptions.userAdvertisingId
         // with some different/random value
-        truexAdRenderer.init(vastConfigUrl, options, () -> {});
+        truexAdRenderer.init(vastUrl, options, () -> {});
         truexAdRenderer.start(viewGroup);
         /*truexAdRenderer.init(vastUrl, options, () -> {
             Log.w("RNV_CSAI", "Truex Initialized - calling start!");
