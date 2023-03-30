@@ -142,8 +142,6 @@ public class TruexAdManager {
         if (this.reactExoplayerView != null) {
           this.reactExoplayerView.reLayoutRoot();
         }
-        truexAdRenderer.pause();
-        truexAdRenderer.resume();
     };
 
     /*
