@@ -47,6 +47,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     private Context context;
     private ViewGroup.LayoutParams layoutParams;
 
+    private boolean isViewAdded = false;
     private boolean useTextureView = true;
     private boolean useSecureView = false;
     private boolean hideShutterView = false;
@@ -97,9 +98,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         adOverlayFrameLayout = new FrameLayout(getContext());
         adOverlayFrameLayout.setLayoutParams(adOverlayLayoutParams);
 
-        LayoutParams truexOverlayLayoutParams = new FrameLayout.LayoutParams(
-            LayoutParams.FILL_PARENT,
-            LayoutParams.FILL_PARENT);
         truexOverlayFrameLayout = new FrameLayout(getContext());
         truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
         //truexOverlayFrameLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
@@ -109,7 +107,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
 
         addViewInLayout(layout, 0, aspectRatioParams);
         addViewInLayout(adOverlayFrameLayout, 1, adOverlayLayoutParams);
-        addViewInLayout(truexOverlayFrameLayout, 2, truexOverlayLayoutParams);
     }
 
     public void updateTruexLayout() {
@@ -119,10 +116,16 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
         view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
 
+        if (isViewAdded == false) {
+            LayoutParams truexOverlayLayoutParams = new FrameLayout.LayoutParams(
+                LayoutParams.FILL_PARENT,
+                LayoutParams.FILL_PARENT);
+            addView(truexOverlayFrameLayout, -1, truexOverlayLayoutParams);
+        }
         //if (adOverlayFrameLayout != null) {
           //  adOverlayFrameLayout.setVisibility(View.GONE);
         //}
-        //View childView = truexOverlayFrameLayout.getChildAt(0);
+        View childView = truexOverlayFrameLayout.getChildAt(0);
         /*if (childView != null) {
             childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
