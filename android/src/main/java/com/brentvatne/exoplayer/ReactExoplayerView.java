@@ -515,6 +515,7 @@ public class ReactExoplayerView extends FrameLayout implements
             public void run() {
                 self.exoPlayerView.updateTruexLayout();
                 self.reLayout(self.exoPlayerView);
+                self.reLayout(self);
             }
         });
     }
