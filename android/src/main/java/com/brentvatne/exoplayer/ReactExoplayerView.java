@@ -454,6 +454,8 @@ public class ReactExoplayerView extends FrameLayout implements
             return;
         }
 
+        this.reLayoutRoot();
+
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("STARTED_TRUEX", payload);
 
@@ -472,7 +474,6 @@ public class ReactExoplayerView extends FrameLayout implements
         truexAdManager.setReactExoPlayerView(this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
         truexAdManager.startAd(viewGroup, vastUrl);
-        this.reLayoutRoot();
     }
 
     public void reLayoutRoot() {
