@@ -177,6 +177,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private MediaSourceEventListener mediaSourceEventListener;
 
     public ExoPlayerView exoPlayerView;
+    public FrameLayout truexOverlayFrameLayout;
     public ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
     private TruexAdManager truexAdManager;
@@ -347,6 +348,16 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
+
+        // ExoPlayer view init
+        LayoutParams layoutParamsTruex = new LayoutParams(
+            LayoutParams.FILL_PARENT,
+            LayoutParams.FILL_PARENT);
+        truexOverlayFrameLayout = FrameLayout(getContext());
+        truexOverlayFrameLayout.setLayoutParams(layoutParams);
+
+        // Add Exoplayer view
+        addView(truexOverlayFrameLayout, -1, layoutParamsTruex);
         
         mainHandler = new Handler();
     }
@@ -469,7 +480,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Start the true[X] engagement
         Log.w("RNV_CSAI", "Starting TrueXAdManager");
-        ViewGroup viewGroup = (ViewGroup)exoPlayerView.getTruexViewGroup();
+        ViewGroup viewGroup = (ViewGroup)truexOverlayFrameLayout;
         truexAdManager = new TruexAdManager(getContext(), this);
         truexAdManager.setReactExoPlayerView(this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
