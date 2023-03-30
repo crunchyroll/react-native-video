@@ -68,11 +68,6 @@ public class TruexAdManager {
             Log.w("RNV_CSAI", "Truex Initialized - calling start!");
             truexAdRenderer.start(viewGroup);
         });
-        // truexAdRenderer.start(viewGroup);
-        /*truexAdRenderer.init(vastUrl, options, () -> {
-            Log.w("RNV_CSAI", "Truex Initialized - calling start!");
-            truexAdRenderer.start(viewGroup);
-        });*/
     }
 
     /**
@@ -130,6 +125,11 @@ public class TruexAdManager {
         Log.d(CLASSTAG, "adFetchCompleted");
         if (this.reactExoplayerView != null) {
           this.reactExoplayerView.reLayoutRoot();
+          if (this.reactExoplayerView.exoPlayerView != null) {
+            if (this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout != null) {
+                this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.GONE);
+            }
+          }
         }
         // Truex Ad Renderer is ready to start() if not started in the init callback
     };
@@ -141,6 +141,11 @@ public class TruexAdManager {
         Log.d(CLASSTAG, "adStarted");
         if (this.reactExoplayerView != null) {
           this.reactExoplayerView.reLayoutRoot();
+          if (this.reactExoplayerView.exoPlayerView != null) {
+            if (this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout != null) {
+                this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.VISIBLE);
+            }
+          }
         }
     };
 
