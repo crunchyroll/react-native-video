@@ -41,7 +41,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     private final SubtitleView subtitleLayout;
     private final AspectRatioFrameLayout layout;
     private final ComponentListener componentListener;
-    private FrameLayout adOverlayFrameLayout;
+    public FrameLayout adOverlayFrameLayout;
     public FrameLayout truexOverlayFrameLayout;
     private ExoPlayer player;
     private Context context;
