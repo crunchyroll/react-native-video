@@ -175,6 +175,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
     private ImaSdkSettings imaSettings;
+    private boolean shouldPlayAdBeforeStartPosition;
     private AdsManager googleAdsManager;
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
@@ -274,10 +275,12 @@ public class ReactExoplayerView extends FrameLayout implements
                         msg = obtainMessage(SHOW_PROGRESS);
                         sendMessageDelayed(msg, Math.round(mProgressUpdateInterval));
 
-                        WritableMap payload = Arguments.createMap();
-                        WritableMap adInfo = getAdInfo();
-                        payload.putMap("adInfo", adInfo);
-                        eventEmitter.adEvent("AD_INFO_UPDATE", payload);  
+                        if (isCSAIEnabled) {
+                            WritableMap payload = Arguments.createMap();
+                            WritableMap adInfo = getAdInfo();
+                            payload.putMap("adInfo", adInfo);
+                            eventEmitter.adEvent("AD_INFO_UPDATE", payload);
+                        }  
                     }
                     break;
             }
@@ -344,10 +347,21 @@ public class ReactExoplayerView extends FrameLayout implements
     private WritableMap getAdInfo() {
         WritableMap data = Arguments.createMap();
         
-        if (activeAd == null) {
-            if (activeAd == null) {
-                data.putString("error", "No activeAd!");
+        // Get ad markers
+        Timeline timeline = player.getCurrentTimeline();
+        if (timeline != null) {
+            updateAdCuePoints(timeline);
+        }
+        if (adMarkers != null) {
+            WritableArray adMarkersWritableArray = Arguments.createArray();
+            for (Double marker : adMarkers) {
+                adMarkersWritableArray.pushDouble(marker.doubleValue());
             }
+            data.putArray("adMarkers", adMarkersWritableArray);
+        }
+
+        if (activeAd == null) {
+            data.putString("error", "No activeAd!");
             return data;
         }
 
@@ -356,8 +370,10 @@ public class ReactExoplayerView extends FrameLayout implements
         int adPodIndex = 0;
         int adPodTotalAds = 0;
         double adPodMaxDuration = 0;
+        double adDuration = 0;
         if (activeAd != null) {
             AdPodInfo podInfo = activeAd.getAdPodInfo();
+            adDuration = activeAd.getDuration();
             if (podInfo != null) {
                 adPodIndex = podInfo.getPodIndex();
                 adPodTotalAds = podInfo.getTotalAds();
@@ -370,16 +386,7 @@ public class ReactExoplayerView extends FrameLayout implements
         data.putInt("adPodTotalAds", adPodTotalAds);
         data.putInt("adPodPosition", adPodPosition);
         data.putDouble("adPodMaxDuration", adPodMaxDuration);
-
-        // Get ad markers
-        if (adMarkers != null) {
-            WritableArray adMarkersWritableArray = Arguments.createArray();
-            for (Double marker : adMarkers) {
-                adMarkersWritableArray.pushDouble(marker.doubleValue());
-            }
-            data.putArray("adMarkers", adMarkersWritableArray);
-        }
-
+        data.putDouble("adDuration", adDuration);
         return data;
     }
 
@@ -393,7 +400,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onAdEvent(AdEvent event) {
-        if (event == null) {
+        if (event == null || !isCSAIEnabled) {
             return;
         }
 
@@ -691,6 +698,16 @@ public class ReactExoplayerView extends FrameLayout implements
                         initializePlayerCore(self);
                     }
                     if (playerNeedsSource && srcUri != null) {
+                        // Init Ads Loader
+                        if (self.isCSAIEnabled) {
+                            imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
+                            imaSettings.setLanguage(uiLanguage);
+                            adsLoader = new ImaAdsLoader.Builder(getContext())
+                                .setAdEventListener(self)
+                                .setImaSdkSettings(imaSettings)
+                                .setPlayAdBeforeStartPosition(shouldPlayAdBeforeStartPosition)
+                                .build();
+                        }
                         exoPlayerView.invalidateAspectRatio();
                         // DRM session manager creation must be done on a different thread to prevent crashes so we start a new thread
                         ExecutorService es = Executors.newSingleThreadExecutor();
@@ -765,16 +782,6 @@ public class ReactExoplayerView extends FrameLayout implements
 
     private void initializePlayerCore(ReactExoplayerView self) {
 
-        // Init Ads Loader
-        if (self.isCSAIEnabled) {
-            imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
-            imaSettings.setLanguage(uiLanguage);
-            adsLoader = new ImaAdsLoader.Builder(getContext())
-                .setAdEventListener(this)
-                .setImaSdkSettings(imaSettings)
-                .build();
-        }
-
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
         self.trackSelector = new DefaultTrackSelector(getContext(), videoTrackSelectionFactory);
         self.trackSelector.setParameters(trackSelector.buildUponParameters()
@@ -824,9 +831,6 @@ public class ReactExoplayerView extends FrameLayout implements
 
         player.addListener(self);
         exoPlayerView.setPlayer(player);
-        if (self.isCSAIEnabled) {
-            adsLoader.setPlayer(player);
-        }
         audioBecomingNoisyReceiver.setListener(self);
         setPlayWhenReady(!isPaused);
         playerNeedsSource = true;
@@ -889,6 +893,10 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         player.prepare(mediaSource, !haveResumePosition, false);
         playerNeedsSource = false;
+
+        if (self.isCSAIEnabled) {
+            adsLoader.setPlayer(player);
+        }
 
         reLayout(exoPlayerView);
         eventEmitter.loadStart();
@@ -1065,6 +1073,7 @@ public class ReactExoplayerView extends FrameLayout implements
             adsLoader.release();
             adsLoader = null;
             imaSettings = null;
+            shouldPlayAdBeforeStartPosition = true;
         }
         if (player != null) {
             updateResumePosition();
@@ -1652,12 +1661,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
     }
 
-    @Override
-    public void onTimelineChanged(Timeline timeline, int reason) {
-        if (timeline.isEmpty()) {
-            // The player is being reset or contains no media.
-            return;
-        }
+    public void updateAdCuePoints(Timeline timeline) {
         // Go through the timeline and find ad markers
         if (isCSAIEnabled) {
             int periodCount = timeline.getPeriodCount();
@@ -1670,13 +1674,25 @@ public class ReactExoplayerView extends FrameLayout implements
                         for (int k = 0; k < adGroupCount; k++) {
                             long adGroupTimeUs = period.getAdGroupTimeUs(k);
                             long adGroupTimeMs = TimeUnit.MICROSECONDS.toMillis(adGroupTimeUs);
-                            adMarkers.add((double)adGroupTimeMs);
+                            boolean isAdGroupPlayed = period.hasPlayedAdGroup(k);
+                            if (!isAdGroupPlayed) {
+                                adMarkers.add((double)adGroupTimeMs);
+                            }
                         }
                         
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void onTimelineChanged(Timeline timeline, int reason) {
+        if (timeline.isEmpty()) {
+            // The player is being reset or contains no media.
+            return;
+        }
+        updateAdCuePoints(timeline);
 
     }
 
@@ -1780,8 +1796,13 @@ public class ReactExoplayerView extends FrameLayout implements
 
     // ReactExoplayerViewManager public api
 
-    public void setSrc(final Uri uri, final String extension, Map<String, String> headers) {
+    public void setSrc(final Uri uri, final String extension, Map<String, String> headers, float startTime) {
         if (uri != null) {
+            if (startTime > 0) {
+                resumeWindow = 0;
+                resumePosition = Math.max(0, (long) startTime);
+                startPosition = (long) startTime;
+            }
             boolean hasNativeSource = isUriNativeSource(uri);
             boolean isSourceEqual = uri.equals(srcUri) && !hasNativeSource;
             hasDrmFailed = false;
@@ -2171,6 +2192,10 @@ public class ReactExoplayerView extends FrameLayout implements
         if (imaSettings != null) {
             imaSettings.setLanguage(language);
         }
+    }
+
+    public void setPlayAdBeforeStartPosition(boolean shouldPlay) {
+        shouldPlayAdBeforeStartPosition = shouldPlay;
     }
 
     public void setBackBufferDurationMs(int backBufferDurationMs) {

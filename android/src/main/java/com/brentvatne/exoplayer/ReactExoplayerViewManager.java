@@ -31,8 +31,10 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
 
     private static final String PROP_SRC = "src";
     private static final String PROP_SRC_URI = "uri";
+    private static final String PROP_SRC_START_TIME = "startTime";
     private static final String PROP_START_TIME = "startTime";
     private static final String PROP_SRC_TYPE = "type";
+    private static final String PROP_AD_INITIAL_PLAYBACK = "playAdBeforeStart";
     private static final String PROP_AD_TAG_URL = "adTagUrl";
     private static final String PROP_ENABLE_CSAI = "enableCSAI";
     private static final String PROP_DRM = "drm";
@@ -170,6 +172,8 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
         Context context = videoView.getContext().getApplicationContext();
         String uriString = src.hasKey(PROP_SRC_URI) ? src.getString(PROP_SRC_URI) : null;
         String extension = src.hasKey(PROP_SRC_TYPE) ? src.getString(PROP_SRC_TYPE) : null;
+        float startTime = src.hasKey(PROP_SRC_START_TIME) ? (float) src.getDouble(PROP_SRC_START_TIME) : 0;
+
         Map<String, String> headers = src.hasKey(PROP_SRC_HEADERS) ? toStringMap(src.getMap(PROP_SRC_HEADERS)) : null;
 
         if (TextUtils.isEmpty(uriString)) {
@@ -181,7 +185,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
             Uri srcUri = Uri.parse(uriString);
 
             if (srcUri != null) {
-                videoView.setSrc(srcUri, extension, headers);
+                videoView.setSrc(srcUri, extension, headers, startTime);
             }
         } else {
             int identifier = context.getResources().getIdentifier(
@@ -310,6 +314,11 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     @ReactProp(name = PROP_UI_LANGUAGE)
     public void setUiLanguage(final ReactExoplayerView videoView, final String language) {
         videoView.setUiLanguage(language);
+    }
+
+    @ReactProp(name = PROP_AD_INITIAL_PLAYBACK)
+    public void setPlayAdBeforeStartPosition(final ReactExoplayerView videoView, final boolean shouldPlay) {
+        videoView.setPlayAdBeforeStartPosition(shouldPlay);
     }
 
     @ReactProp(name = PROP_MAXIMUM_BIT_RATE)
