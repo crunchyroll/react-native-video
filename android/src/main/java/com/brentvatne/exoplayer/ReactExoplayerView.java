@@ -353,7 +353,7 @@ public class ReactExoplayerView extends FrameLayout implements
         LayoutParams layoutParamsTruex = new LayoutParams(
             LayoutParams.FILL_PARENT,
             LayoutParams.FILL_PARENT);
-        truexOverlayFrameLayout = FrameLayout(getContext());
+        truexOverlayFrameLayout = new FrameLayout(getContext());
         truexOverlayFrameLayout.setLayoutParams(layoutParams);
 
         // Add Exoplayer view
