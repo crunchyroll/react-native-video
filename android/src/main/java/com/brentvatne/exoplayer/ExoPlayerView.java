@@ -128,10 +128,36 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         truexOverlayFrameLayout.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
         truexOverlayFrameLayout.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
+
+
+        View childView = truexOverlayFrameLayout.getChildAt(0);
+
+        if (childView != null) {
+
+            int childCount = childView.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                View v = childView.getChildAt(i);
+                Log.w("RNV_CSAI", "TrueX element: " + v.getClass().getSimpleName());
+                v.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
+                v.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
+                // V is TrueX internal child
+                
+            }
+
+        }
+
+
+
+
+
+
+
+
         //if (adOverlayFrameLayout != null) {
           //  adOverlayFrameLayout.setVisibility(View.GONE);
         //}
-        View childView = truexOverlayFrameLayout.getChildAt(0);
+        
         /*if (childView != null) {
             childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
