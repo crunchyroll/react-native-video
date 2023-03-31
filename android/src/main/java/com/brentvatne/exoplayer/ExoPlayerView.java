@@ -11,6 +11,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import java.lang.reflect.Method;
 
 import com.google.common.collect.ImmutableList;
 import com.google.android.exoplayer2.C;
@@ -138,6 +139,17 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
             for (int i = 0; i < childCount; i++) {
                 View v = truexOverlayFrameLayout.getChildAt(i);
                 Log.w("RNV_CSAI", "TrueX element: " + v.getClass().getSimpleName());
+                Log.w("RNV_CSAI", "TrueX toString(): " + v.getClass().toString());
+                Log.w("RNV_CSAI", "TrueX toGenericString(): " + v.getClass().toGenericString());
+
+                Methods method = v.getClass().getMethods();
+                if (method != null) {
+                    for (Method m : method) {
+                        Log.w("RNV_CSAI", "Method generic string: " + m.toGenericString());
+                        Log.w("RNV_CSAI", "Method string: " + m.toString());
+                    }
+                }
+
                 v.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
                 v.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
