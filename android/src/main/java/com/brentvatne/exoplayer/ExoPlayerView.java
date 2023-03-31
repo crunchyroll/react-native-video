@@ -147,7 +147,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                 if (methods != null) {
                     for (Method m : methods) {
                         Log.w("RNV_CSAI", "Method generic string: " + m.toGenericString());
-                        Log.w("RNV_CSAI", "Method string: " + m.toString());
+                        //Log.w("RNV_CSAI", "Method string: " + m.toString());
                     }
                 }
                 WebView wv = (WebView) truexOverlayFrameLayout.getChildAt(i);
