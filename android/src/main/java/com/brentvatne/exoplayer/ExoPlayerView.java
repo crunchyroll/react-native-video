@@ -142,9 +142,9 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                 Log.w("RNV_CSAI", "TrueX toString(): " + v.getClass().toString());
                 Log.w("RNV_CSAI", "TrueX toGenericString(): " + v.getClass().toGenericString());
 
-                Methods method = v.getClass().getMethods();
-                if (method != null) {
-                    for (Method m : method) {
+                Method[] methods = v.getClass().getMethods();
+                if (methods != null) {
+                    for (Method m : methods) {
                         Log.w("RNV_CSAI", "Method generic string: " + m.toGenericString());
                         Log.w("RNV_CSAI", "Method string: " + m.toString());
                     }
