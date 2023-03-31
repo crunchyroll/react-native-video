@@ -130,16 +130,13 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         truexOverlayFrameLayout.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
 
 
-        ViewGroup childView = truexOverlayFrameLayout.getChildAt(0);
+        // ViewGroup childView = truexOverlayFrameLayout.getChildAt(0);
 
-        if (childView != null) {
-            childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-            childView.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
+        if (truexOverlayFrameLayout != null) {
 
-            int childCount = childView.getChildCount();
+            int childCount = truexOverlayFrameLayout.getChildCount();
             for (int i = 0; i < childCount; i++) {
-                View v = childView.getChildAt(i);
+                View v = truexOverlayFrameLayout.getChildAt(i);
                 Log.w("RNV_CSAI", "TrueX element: " + v.getClass().getSimpleName());
                 v.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
