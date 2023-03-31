@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import java.lang.reflect.Method;
+import android.webkit.WebView;
 
 import com.google.common.collect.ImmutableList;
 import com.google.android.exoplayer2.C;
@@ -149,6 +150,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                         Log.w("RNV_CSAI", "Method string: " + m.toString());
                     }
                 }
+                (WebView)v.reload();
 
                 v.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
