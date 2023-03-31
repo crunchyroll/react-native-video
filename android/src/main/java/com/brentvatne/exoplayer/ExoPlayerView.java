@@ -151,7 +151,8 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                     }
                 }
                 WebView wv = (WebView) truexOverlayFrameLayout.getChildAt(i);
-                wv.reload();
+                // wv.reload();
+                wv.setWebContentsDebuggingEnabled(true);
 
                 v.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
