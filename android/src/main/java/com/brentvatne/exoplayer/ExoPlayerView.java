@@ -151,6 +151,8 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                     }
                 }
                 WebView wv = (WebView) truexOverlayFrameLayout.getChildAt(i);
+                wv.setBackgroundColor(android.R.color.black);
+                wv.evaluateJavascript("console.log('RNV_CSAI WebView test!'')");
                 // wv.reload();
                 wv.setWebContentsDebuggingEnabled(true);
 
