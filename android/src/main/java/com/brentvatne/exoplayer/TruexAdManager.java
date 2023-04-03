@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.View;
-
 import com.truex.adrenderer.IEventEmitter.IEventHandler;
 import com.truex.adrenderer.TruexAdEvent;
 import com.truex.adrenderer.TruexAdOptions;

@@ -342,7 +342,8 @@ public class ReactExoplayerView extends FrameLayout implements
             LayoutParams.MATCH_PARENT);
         exoPlayerView = new ExoPlayerView(getContext());
         exoPlayerView.setLayoutParams(layoutParams);
-
+        Activity activity = themedReactContext.getCurrentActivity();
+        exoPlayerView.setActivity(activity);
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
