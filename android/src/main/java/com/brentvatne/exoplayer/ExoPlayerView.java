@@ -126,6 +126,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                 LayoutParams.FILL_PARENT,
                 LayoutParams.FILL_PARENT);
             addView(truexOverlayFrameLayout, -1, truexOverlayLayoutParams);
+            isViewAdded = true;
         }
         truexOverlayFrameLayout.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
