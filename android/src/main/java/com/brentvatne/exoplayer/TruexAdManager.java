@@ -79,8 +79,9 @@ public class TruexAdManager {
         if (this.reactExoplayerView != null) {
             if (this.reactExoplayerView.exoPlayerView != null) {
                 if (this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout != null) {
-                    this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.GONE);
-                    this.reactExoplayerView.exoPlayerView.adOverlayFrameLayout.setVisibility(View.GONE);
+                   // this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.GONE);
+                   // this.reactExoplayerView.exoPlayerView.adOverlayFrameLayout.setVisibility(View.GONE);
+                   this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.VISIBLE);
                 }
             }
         }
