@@ -138,6 +138,9 @@ import java.lang.Float;
 import java.lang.Double;
 import java.lang.reflect.Method;
 
+import com.facebook.react.uimanager.util.ReactFindViewUtil;
+
+
 import com.brentvatne.exoplayer.PlaybackHandler;
 
 @SuppressLint("ViewConstructor")
@@ -474,7 +477,8 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Start the true[X] engagement
         Log.w("RNV_CSAI", "Starting TrueXAdManager");
-        ViewGroup viewGroup = (ViewGroup)exoPlayerView.getTruexViewGroup();
+        ViewGroup truexView = (ViewGroup) ReactFindViewUtil.findView(rootView, "velocity-truex-overlay");
+        ViewGroup viewGroup = truexView; //(ViewGroup)exoPlayerView.getTruexViewGroup();
         truexAdManager = new TruexAdManager(getContext(), this);
         truexAdManager.setReactExoPlayerView(this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
