@@ -110,10 +110,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                 LayoutParams.FILL_PARENT,
                 LayoutParams.FILL_PARENT);
         truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
-        //truexOverlayFrameLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
-        //truexOverlayFrameLayout.setMeasureAllChildren(true);
-        //truexOverlayFrameLayout.setForegroundGravity(Gravity.CENTER);
-        //truexOverlayFrameLayout.layout(1, 1, 1, 1);
 
         addViewInLayout(layout, 0, aspectRatioParams);
         addViewInLayout(adOverlayFrameLayout, 1, adOverlayLayoutParams);
@@ -121,94 +117,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
 
     public void setActivity(Activity activity) {
         this.activity = activity;
-    }
-
-    public void updateTruexLayout() {
-        View view = (View) truexOverlayFrameLayout;
-        if (view == null) return;
-        view.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-        view.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
-
-        if (isViewAdded == false) {
-            LayoutParams truexOverlayLayoutParams = new FrameLayout.LayoutParams(
-                LayoutParams.FILL_PARENT,
-                LayoutParams.FILL_PARENT);
-            addView(truexOverlayFrameLayout, -1, truexOverlayLayoutParams);
-            isViewAdded = true;
-        }
-        truexOverlayFrameLayout.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-        truexOverlayFrameLayout.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
-
-
-        // ViewGroup childView = truexOverlayFrameLayout.getChildAt(0);
-
-        if (truexOverlayFrameLayout != null) {
-
-            int childCount = truexOverlayFrameLayout.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                View v = truexOverlayFrameLayout.getChildAt(i);
-                Log.w("TRX_ELEMENT", "TrueX element: " + v.getClass().getSimpleName());
-                // Log.w("RNV_CSAI", "TrueX toString(): " + v.getClass().toString());
-                // Log.w("RNV_CSAI", "TrueX toGenericString(): " + v.getClass().toGenericString());
-
-                v.invalidate();
-                v.requestLayout();
-                Method[] methods = v.getClass().getMethods();
-                if (methods != null) {
-                    for (Method m : methods) {
-                        Log.w("TRX_ELEMENT", "Method generic string: " + m.toGenericString());
-                        //Log.w("RNV_CSAI", "Method string: " + m.toString());
-                    }
-                }
-                WebView wv = (WebView) truexOverlayFrameLayout.getChildAt(i);
-                wv.setBackgroundColor(android.R.color.holo_red_light);
-                wv.evaluateJavascript("console.log('RNV_CSAI WebView test!')", null);
-                // wv.reload();
-                wv.setWebContentsDebuggingEnabled(true);
-
-                v.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-                v.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
-                // V is TrueX internal child
-                
-            }
-
-        }
-
-
-
-        
-
-
-
-
-        //if (adOverlayFrameLayout != null) {
-          //  adOverlayFrameLayout.setVisibility(View.GONE);
-        //}
-        
-        /*if (childView != null) {
-            childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-            childView.layout(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
-            childView.getLayoutParams().width = view.getMeasuredWidth();
-            childView.getLayoutParams().height = view.getMeasuredHeight();
-            childView.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-            Log.w("RNV_CSAI", "Child position - left: " + String.valueOf(childView.getLeft()) + " top: " + String.valueOf(childView.getTop()));
-            Log.w("RNV_CSAI", "Child dimensions - width: " + String.valueOf(childView.getMeasuredWidth()) + " height: " + String.valueOf(childView.getMeasuredHeight()));
-            childView.setVisibility(View.VISIBLE);
-            childView.requestLayout();
-            childView.invalidate();
-            Log.w("RNV_CSAI", "Redrawing truex element");
-        }*/
-
-        /*LayoutParams viewLayoutParams = new FrameLayout.LayoutParams(
-            LayoutParams.FILL_PARENT,
-            LayoutParams.FILL_PARENT);
-        view.setLayoutParams(viewLayoutParams);*/
-        //view.postInvalidate();
     }
 
     public ViewGroup getTruexViewGroup() {
