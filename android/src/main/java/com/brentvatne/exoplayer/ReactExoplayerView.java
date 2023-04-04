@@ -189,6 +189,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private AdsManager googleAdsManager;
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
+    private boolean isAdsManagerListenerAdded = false;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -889,6 +890,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 .setAdEventListener(this)
                 .setImaSdkSettings(imaSettings)
                 .build();
+            this.addAdsManagerListener();
         }
 
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
@@ -942,6 +944,7 @@ public class ReactExoplayerView extends FrameLayout implements
         exoPlayerView.setPlayer(player);
         if (self.isCSAIEnabled) {
             adsLoader.setPlayer(player);
+            this.addAdsManagerListener();
         }
         audioBecomingNoisyReceiver.setListener(self);
         setPlayWhenReady(!isPaused);
@@ -1774,13 +1777,14 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     public void addAdsManagerListener() {
-        if (isCSAIEnabled) {
+        if (isCSAIEnabled && !isAdsManagerListenerAdded) {
             if (this.adsLoader != null) {
                 Log.w("RNV_CSAI", "Exo Ads Loader found - looking for Google Ads Loader");
                 this.googleAdsLoader = this.adsLoader.getAdsLoader();	
                 if (this.googleAdsLoader != null) {
                     Log.w("RNV_CSAI", "Adding ads loaded listener");
                     this.googleAdsLoader.addAdsLoadedListener(this);
+                    isAdsManagerListenerAdded = true;
                 } else {
                     Log.w("RNV_CSAI", "No google ads Loader!");
                 }
