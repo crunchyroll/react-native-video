@@ -477,6 +477,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Start the true[X] engagement
         Log.w("RNV_CSAI", "Starting TrueXAdManager");
+        View rootView =  getRootView();
         ViewGroup truexView = (ViewGroup) ReactFindViewUtil.findView(rootView, "velocity-truex-overlay");
         ViewGroup viewGroup = truexView; //(ViewGroup)exoPlayerView.getTruexViewGroup();
         truexAdManager = new TruexAdManager(getContext(), this);
