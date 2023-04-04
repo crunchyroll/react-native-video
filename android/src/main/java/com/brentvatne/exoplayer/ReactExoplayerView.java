@@ -180,7 +180,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private MediaSourceEventListener mediaSourceEventListener;
 
     public ExoPlayerView exoPlayerView;
-    public FrameLayout truexOverlayFrameLayout;
+    public static FrameLayout truexOverlayFrameLayout;
     public ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
     private TruexAdManager truexAdManager;
