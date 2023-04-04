@@ -190,6 +190,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private AdsManager googleAdsManager;
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
+    private boolean isAdsManagerListenerAdded = false;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
