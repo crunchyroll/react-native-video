@@ -1785,7 +1785,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 this.googleAdsLoader = this.adsLoader.getAdsLoader();	
                 if (this.googleAdsLoader != null) {
                     Log.w("RNV_CSAI", "Adding ads loaded listener");
-                    this.googleAdsLoader.addAdsLoadedListener = this;
+                    this.googleAdsLoader.addAdsLoadedListener(this);
                 }
             }
 
