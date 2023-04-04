@@ -39,7 +39,7 @@ public class TruexAdManager {
         Method[] methods = truexAdRenderer.getClass().getMethods();
         if (methods != null) {
             for (Method m : methods) {
-                Log.w("RNV_CSAI", "TruexAdManager method: " + m.toGenericString());
+                Log.w("TRX_ELEMENT", "TruexAdManager method: " + m.toGenericString());
                 //Log.w("RNV_CSAI", "Method string: " + m.toString());
             }
         }
@@ -80,7 +80,7 @@ public class TruexAdManager {
                 if (this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout != null) {
                    // this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.GONE);
                    // this.reactExoplayerView.exoPlayerView.adOverlayFrameLayout.setVisibility(View.GONE);
-                   this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.VISIBLE);
+                   // this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -145,7 +145,7 @@ public class TruexAdManager {
     private IEventHandler adFetchCompleted = (TruexAdEvent event, Map<String, ?> data) -> {
         Log.d(CLASSTAG, "adFetchCompleted");
         if (this.reactExoplayerView != null) {
-          // this.reactExoplayerView.reLayoutRoot();
+           this.reactExoplayerView.reLayoutRoot();
         }
         // Truex Ad Renderer is ready to start() if not started in the init callback
     };
@@ -159,7 +159,7 @@ public class TruexAdManager {
           this.reactExoplayerView.reLayoutRoot();
           if (this.reactExoplayerView.exoPlayerView != null) {
             if (this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout != null) {
-                this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.VISIBLE);
+              // this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.VISIBLE);
             }
           }
         }

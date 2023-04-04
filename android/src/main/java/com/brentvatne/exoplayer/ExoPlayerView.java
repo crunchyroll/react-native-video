@@ -149,8 +149,8 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
             int childCount = truexOverlayFrameLayout.getChildCount();
             for (int i = 0; i < childCount; i++) {
                 View v = truexOverlayFrameLayout.getChildAt(i);
-                Log.w("RNV_CSAI", "TrueX element: " + v.getClass().getSimpleName());
-                Log.w("RNV_CSAI", "TrueX toString(): " + v.getClass().toString());
+                Log.w("TRX_ELEMENT", "TrueX element: " + v.getClass().getSimpleName());
+                // Log.w("RNV_CSAI", "TrueX toString(): " + v.getClass().toString());
                 // Log.w("RNV_CSAI", "TrueX toGenericString(): " + v.getClass().toGenericString());
 
                 v.invalidate();
@@ -159,7 +159,7 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
                 Method[] methods = v.getClass().getMethods();
                 if (methods != null) {
                     for (Method m : methods) {
-                        Log.w("RNV_CSAI", "Method generic string: " + m.toGenericString());
+                        Log.w("TRX_ELEMENT", "Method generic string: " + m.toGenericString());
                         //Log.w("RNV_CSAI", "Method string: " + m.toString());
                     }
                 }
