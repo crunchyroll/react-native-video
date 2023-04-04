@@ -74,19 +74,7 @@ public class TruexAdManager {
         // That prevents the same user from getting another Truex ad for some period of time
         // To get around this for development, replace the TruexAdOptions.userAdvertisingId
         // with some different/random value
-
-        if (this.reactExoplayerView != null) {
-            if (this.reactExoplayerView.exoPlayerView != null) {
-                if (this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout != null) {
-                   // this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.GONE);
-                   // this.reactExoplayerView.exoPlayerView.adOverlayFrameLayout.setVisibility(View.GONE);
-                   // this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.VISIBLE);
-                }
-            }
-        }
-
         truexAdRenderer.init(vastUrl, options, () -> {
-            Log.w("RNV_CSAI", "Truex Initialized - calling start!");
             truexAdRenderer.start(viewGroup);
         });
     }
@@ -144,9 +132,6 @@ public class TruexAdManager {
      */
     private IEventHandler adFetchCompleted = (TruexAdEvent event, Map<String, ?> data) -> {
         Log.d(CLASSTAG, "adFetchCompleted");
-        if (this.reactExoplayerView != null) {
-           this.reactExoplayerView.reLayoutRoot();
-        }
         // Truex Ad Renderer is ready to start() if not started in the init callback
     };
 
@@ -155,14 +140,6 @@ public class TruexAdManager {
      */
     private IEventHandler adStarted = (TruexAdEvent event, Map<String, ?> data) -> {
         Log.d(CLASSTAG, "adStarted");
-        if (this.reactExoplayerView != null) {
-          this.reactExoplayerView.reLayoutRoot();
-          if (this.reactExoplayerView.exoPlayerView != null) {
-            if (this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout != null) {
-              // this.reactExoplayerView.exoPlayerView.truexOverlayFrameLayout.setVisibility(View.VISIBLE);
-            }
-          }
-        }
     };
 
     /*

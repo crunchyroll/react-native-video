@@ -352,16 +352,6 @@ public class ReactExoplayerView extends FrameLayout implements
         exoPlayerView.setActivity(activity);
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
-
-        // ExoPlayer view init
-       // LayoutParams layoutParamsTruex = new LayoutParams(
-       //     LayoutParams.FILL_PARENT,
-       //     LayoutParams.FILL_PARENT);
-       // truexOverlayFrameLayout = new FrameLayout(getContext());
-       // truexOverlayFrameLayout.setLayoutParams(layoutParams);
-
-        // Add Exoplayer view
-       // addView(truexOverlayFrameLayout, -1, layoutParamsTruex);
         
         mainHandler = new Handler();
     }
@@ -417,6 +407,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null) {
             return;
         }
+        Log.w("RNV_CSAI", "onAdsManagerLoaded!");
         googleAdsManager = event.getAdsManager();
     }
 
@@ -463,13 +454,9 @@ public class ReactExoplayerView extends FrameLayout implements
      * Display TrueX interactive Ad
      */
     private void displayInteractiveAd(String vastUrl) {
-        Log.w("RNV_CSAI", "displayInteractiveAds");
         if (player == null) {
-            Log.w("RNV_CSAI", "NO PLAYER CANNOT WILL NOT LOOK FOR TRUEX");
             return;
         }
-
-        // this.reLayoutRoot();
 
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("STARTED_TRUEX", payload);
@@ -485,8 +472,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Start the true[X] engagement
         Log.w("RNV_CSAI", "Starting TrueXAdManager");
         View rootView =  getRootView();
-        // ViewGroup truexView = (ViewGroup) ReactFindViewUtil.findView(rootView, "velocity-truex-overlay");
-        ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout; //(ViewGroup)exoPlayerView.getTruexViewGroup();
+        ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout;
         truexAdManager = new TruexAdManager(getContext(), this);
         truexAdManager.setReactExoPlayerView(this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
@@ -494,36 +480,7 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     public void reLayoutRoot() {
-        Log.w("RNV_CSAI", "Forcing layout update - truex!");
-        //this.invalidate();
         
-        //exoPlayerView.invalidate();
-        /*if (exoPlayerView.getTruexViewGroup() != null) {
-            LayoutParams params = new FrameLayout.LayoutParams(
-                0,
-                0);
-            exoPlayerView.updateViewLayout(exoPlayerView.getTruexViewGroup(), params);
-            exoPlayerView.getTruexViewGroup().requestLayout();
-            LayoutParams params2 = new FrameLayout.LayoutParams(
-                LayoutParams.FILL_PARENT,
-                LayoutParams.FILL_PARENT);
-            exoPlayerView.updateViewLayout(exoPlayerView.getTruexViewGroup(), params2);
-            exoPlayerView.getTruexViewGroup().requestLayout();
-        }
-        exoPlayerView.postInvalidate();
-        this.reLayout(exoPlayerView.getTruexViewGroup());
-        this.reLayout(exoPlayerView);
-        exoPlayerView.requestLayout();*/
-        // Initialize handler to run on the main thread
-        Activity activity = themedReactContext.getCurrentActivity();
-        ReactExoplayerView self = this;
-        activity.runOnUiThread(new Runnable() {
-            public void run() {
-                self.exoPlayerView.updateTruexLayout();
-                self.reLayout(self.exoPlayerView);
-                self.reLayout(self);
-            }
-        });
     }
 
     public void handleCheckTruex(AdEvent event) {
@@ -531,7 +488,6 @@ public class ReactExoplayerView extends FrameLayout implements
             Log.w("RNV_CSAI", "No Active ad to determine TrueX");
             return;
         }
-        Log.w("RNV_CSAI", "TrueX - Looking for companion ads!");
         if (activeAd.getAdSystem().contains("trueX")) {
         String vastUrl = activeAd.getDescription();
         Log.w("RNV_CSAI", "Detected TrueX ad with VAST UTL: " + vastUrl);
@@ -1233,6 +1189,7 @@ public class ReactExoplayerView extends FrameLayout implements
             adsLoader = null;
             imaSettings = null;
             shouldPlayAdBeforeStartPosition = true;
+            truexOverlayFrameLayout = null;
         }
         if (player != null) {
             updateResumePosition();
@@ -1823,6 +1780,15 @@ public class ReactExoplayerView extends FrameLayout implements
     public void updateAdCuePoints(Timeline timeline) {
         // Go through the timeline and find ad markers
         if (isCSAIEnabled) {
+
+            if (this.adsLoader != null) {
+                this.googleAdsLoader = this.adsLoader.getAdsLoader();	
+                if (this.googleAdsLoader != null) {
+                    Log.w("RNV_CSAI", "Adding ads loaded listener");
+                    this.googleAdsLoader.addAdsLoadedListener = this;
+                }
+            }
+
             int periodCount = timeline.getPeriodCount();
             adMarkers = new ArrayList<Double>();
             for (int i = 0; i < periodCount; i++) {
