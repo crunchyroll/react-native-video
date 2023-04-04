@@ -496,6 +496,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null) {
             return;
         }
+        this.addAdsManagerListener();
         // Get ad data
         if (event.getAd() != null) {
             activeAd = event.getAd();
@@ -1112,6 +1113,7 @@ public class ReactExoplayerView extends FrameLayout implements
                         .setAdsLoaderProvider(unusedAdTagUri -> adsLoader)
                         .setAdViewProvider(exoPlayerView)
                         .createMediaSource(mediaItem);
+                    this.addAdsManagerListener();
                 }
             
                 return new DashMediaSource.Factory(
@@ -1768,6 +1770,23 @@ public class ReactExoplayerView extends FrameLayout implements
 
     }
 
+    public void addAdsManagerListener() {
+        if (isCSAIEnabled) {
+            if (this.adsLoader != null) {
+                Log.w("RNV_CSAI", "Exo Ads Loader found - looking for Google Ads Loader");
+                this.googleAdsLoader = this.adsLoader.getAdsLoader();	
+                if (this.googleAdsLoader != null) {
+                    Log.w("RNV_CSAI", "Adding ads loaded listener");
+                    this.googleAdsLoader.addAdsLoadedListener(this);
+                } else {
+                    Log.w("RNV_CSAI", "No google ads Loader!");
+                }
+            } else {
+                Log.w("RNV_CSAI", "No Exo ads loader!");
+            }
+        }
+    }
+
     @Override
     public void onTimelineChanged(Timeline timeline, int reason) {
         if (timeline.isEmpty()) {
@@ -1777,13 +1796,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Go through the timeline and find ad markers
         if (isCSAIEnabled) {
 
-            if (this.adsLoader != null) {
-                this.googleAdsLoader = this.adsLoader.getAdsLoader();	
-                if (this.googleAdsLoader != null) {
-                    Log.w("RNV_CSAI", "Adding ads loaded listener");
-                    this.googleAdsLoader.addAdsLoadedListener(this);
-                }
-            }
+            this.addAdsManagerListener();
 
             int periodCount = timeline.getPeriodCount();
             adMarkers = new ArrayList<Double>();
