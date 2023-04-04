@@ -155,7 +155,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
 
                 v.invalidate();
                 v.requestLayout();
-                // Log.w("RNV_CSAI", "IS TRUEX CHILD VISIBLE: " + String.valueOf(v.isVisibleToUser()));
                 Method[] methods = v.getClass().getMethods();
                 if (methods != null) {
                     for (Method m : methods) {
