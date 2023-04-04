@@ -989,6 +989,10 @@ public class ReactExoplayerView extends FrameLayout implements
             mediaSource = new MergingMediaSource(textSourceArray);
         }
 
+        if (isCSAIEnabled) {
+            this.addAdsManagerListener();
+        }
+
         // wait for player to be set
         while (player == null) {
             try {
@@ -1121,7 +1125,6 @@ public class ReactExoplayerView extends FrameLayout implements
                         .setAdsLoaderProvider(unusedAdTagUri -> adsLoader)
                         .setAdViewProvider(exoPlayerView)
                         .createMediaSource(mediaItem);
-                    this.addAdsManagerListener();
                 }
             
                 return new DashMediaSource.Factory(
