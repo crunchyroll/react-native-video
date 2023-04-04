@@ -503,6 +503,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null || !isCSAIEnabled) {
             return;
         }
+        this.addAdsManagerListener();
         // Get ad data
         if (event.getAd() != null) {
             activeAd = event.getAd();
@@ -1120,6 +1121,7 @@ public class ReactExoplayerView extends FrameLayout implements
                         .setAdsLoaderProvider(unusedAdTagUri -> adsLoader)
                         .setAdViewProvider(exoPlayerView)
                         .createMediaSource(mediaItem);
+                    this.addAdsManagerListener();
                 }
             
                 return new DashMediaSource.Factory(
@@ -1781,13 +1783,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Go through the timeline and find ad markers
         if (isCSAIEnabled) {
 
-            if (this.adsLoader != null) {
-                this.googleAdsLoader = this.adsLoader.getAdsLoader();	
-                if (this.googleAdsLoader != null) {
-                    Log.w("RNV_CSAI", "Adding ads loaded listener");
-                    this.googleAdsLoader.addAdsLoadedListener(this);
-                }
-            }
+            this.addAdsManagerListener();
 
             int periodCount = timeline.getPeriodCount();
             adMarkers = new ArrayList<Double>();
