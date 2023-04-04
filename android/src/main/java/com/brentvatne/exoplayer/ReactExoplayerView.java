@@ -354,14 +354,14 @@ public class ReactExoplayerView extends FrameLayout implements
         addView(exoPlayerView, 0, layoutParams);
 
         // ExoPlayer view init
-        LayoutParams layoutParamsTruex = new LayoutParams(
-            LayoutParams.FILL_PARENT,
-            LayoutParams.FILL_PARENT);
-        truexOverlayFrameLayout = new FrameLayout(getContext());
-        truexOverlayFrameLayout.setLayoutParams(layoutParams);
+       // LayoutParams layoutParamsTruex = new LayoutParams(
+       //     LayoutParams.FILL_PARENT,
+       //     LayoutParams.FILL_PARENT);
+       // truexOverlayFrameLayout = new FrameLayout(getContext());
+       // truexOverlayFrameLayout.setLayoutParams(layoutParams);
 
         // Add Exoplayer view
-        addView(truexOverlayFrameLayout, -1, layoutParamsTruex);
+       // addView(truexOverlayFrameLayout, -1, layoutParamsTruex);
         
         mainHandler = new Handler();
     }
@@ -485,8 +485,8 @@ public class ReactExoplayerView extends FrameLayout implements
         // Start the true[X] engagement
         Log.w("RNV_CSAI", "Starting TrueXAdManager");
         View rootView =  getRootView();
-        ViewGroup truexView = (ViewGroup) ReactFindViewUtil.findView(rootView, "velocity-truex-overlay");
-        ViewGroup viewGroup = truexView; //(ViewGroup)exoPlayerView.getTruexViewGroup();
+        // ViewGroup truexView = (ViewGroup) ReactFindViewUtil.findView(rootView, "velocity-truex-overlay");
+        ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout; //(ViewGroup)exoPlayerView.getTruexViewGroup();
         truexAdManager = new TruexAdManager(getContext(), this);
         truexAdManager.setReactExoPlayerView(this);
         Log.w("RNV_CSAI", "Starting TrueX Ad");
