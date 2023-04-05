@@ -439,8 +439,6 @@ public class ReactExoplayerView extends FrameLayout implements
         //this.skipAd();
 
         //this.googleAdsLoader = this.adsLoader.getAdsLoader();
-
-
         this.startPlayback();
         
     }
@@ -463,7 +461,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         Log.w("RNV_CSAI", "Pausing playback for TrueX");
         // Pause the stream and display a true[X] engagement
-        pausePlayback();
+        // pausePlayback();
         Long position = player.getCurrentPosition();
         if (position > 0) resumePosition = position;
 
