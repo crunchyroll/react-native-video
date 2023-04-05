@@ -435,11 +435,19 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("ENDED_TRUEX", payload);
-        this.adsLoader.skipAd();
+        Activity activity = themedReactContext.getCurrentActivity();
+        ReactExoplayerView self = this;
+        activity.runOnUiThread(new Runnable() {
+            public void run() {
+                Log.w("RNV_CSAI_TRUEX", "Calling skipAd and startPlayback!");
+                self.adsLoader.skipAd();
+                self.startPlayback();
+            }
+        });
         //this.skipAd();
 
         //this.googleAdsLoader = this.adsLoader.getAdsLoader();
-        this.startPlayback();
+        
         
     }
     @Override
