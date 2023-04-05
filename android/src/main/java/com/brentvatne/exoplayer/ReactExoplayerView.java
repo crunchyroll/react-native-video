@@ -527,7 +527,6 @@ public class ReactExoplayerView extends FrameLayout implements
                 if (this.adsLoader != null && this.googleAdsLoader == null) {
                  this.googleAdsLoader = this.adsLoader.getAdsLoader();
                 }
-                this.googleAdsLoader.start();
                 break;
             case STARTED:
                 eventEmitter.adEvent("STARTED", payload);
@@ -1787,7 +1786,6 @@ public class ReactExoplayerView extends FrameLayout implements
     }
 
     public void skipAd() {
-        this.playerTimeline = timeline;
         // Go through the timeline and find ad markers
         if (isCSAIEnabled) {
             this.seekTo(30000);
