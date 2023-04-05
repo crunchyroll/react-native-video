@@ -15,14 +15,14 @@
  */
 package com.brentvatne.exoplayer.ext.ima;
 
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.addLiveAdBreak;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.expandAdGroupPlaceholder;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.getAdGroupAndIndexInMultiPeriodWindow;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.secToMsRounded;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.secToUsRounded;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.splitAdGroup;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.splitAdPlaybackStateForPeriods;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.updateAdDurationInAdGroup;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.addLiveAdBreak;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.expandAdGroupPlaceholder;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.getAdGroupAndIndexInMultiPeriodWindow;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.secToMsRounded;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.secToUsRounded;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.splitAdGroup;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.splitAdPlaybackStateForPeriods;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.updateAdDurationInAdGroup;
 import static com.google.android.exoplayer2.source.ads.AdPlaybackState.AD_STATE_AVAILABLE;
 import static com.google.android.exoplayer2.source.ads.AdPlaybackState.AD_STATE_UNAVAILABLE;
 import static com.google.android.exoplayer2.source.ads.ServerSideAdInsertionUtil.addAdGroupToAdPlaybackState;
@@ -67,7 +67,7 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider;
-import com.google.android.exoplayer2.ext.ima.ImaUtil.ServerSideAdInsertionConfiguration;
+import com.brentvatne.exoplayer.ext.ima.ImaUtil.ServerSideAdInsertionConfiguration;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.emsg.EventMessage;
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;

@@ -16,10 +16,10 @@
 package com.brentvatne.exoplayer.ext.ima;
 
 import static com.google.android.exoplayer2.Player.COMMAND_GET_VOLUME;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.BITRATE_UNSET;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.TIMEOUT_UNSET;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.getAdGroupTimesUsForCuePoints;
-import static com.google.android.exoplayer2.ext.ima.ImaUtil.getImaLooper;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.BITRATE_UNSET;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.TIMEOUT_UNSET;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.getAdGroupTimesUsForCuePoints;
+import static com.brentvatne.exoplayer.ext.ima.ImaUtil.getImaLooper;
 import static com.google.android.exoplayer2.util.Assertions.checkNotNull;
 import static com.google.android.exoplayer2.util.Assertions.checkState;
 import static com.google.android.exoplayer2.util.Util.msToUs;
