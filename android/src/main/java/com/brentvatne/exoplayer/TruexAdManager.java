@@ -13,8 +13,6 @@ import com.brentvatne.exoplayer.PlaybackHandler;
 import java.util.Map;
 import java.lang.System;
 
-import java.lang.reflect.Method;
-
 /**
  * This class holds a reference to the true[X] ad renderer and handles all of the event handling
  * for the example integration application. This class interacts with the video player by resuming
@@ -35,14 +33,6 @@ public class TruexAdManager {
 
         // Set-up the true[X] ad renderer
         truexAdRenderer = new TruexAdRenderer(context);
-
-        Method[] methods = truexAdRenderer.getClass().getMethods();
-        if (methods != null) {
-            for (Method m : methods) {
-                Log.w("TRX_ELEMENT", "TruexAdManager method: " + m.toGenericString());
-                //Log.w("RNV_CSAI", "Method string: " + m.toString());
-            }
-        }
 
         // Set-up the event listeners
         truexAdRenderer.addEventListener(TruexAdEvent.AD_FETCH_COMPLETED, this.adFetchCompleted);
