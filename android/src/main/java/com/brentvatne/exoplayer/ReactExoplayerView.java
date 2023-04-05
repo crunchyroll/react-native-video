@@ -442,8 +442,12 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("ENDED_TRUEX", payload);
-        //this.adsLoader.skipAd();
-        this.skipAd();
+        this.adsLoader.skipAd();
+        //this.skipAd();
+
+        //this.googleAdsLoader = this.adsLoader.getAdsLoader();
+
+
         this.startPlayback();
         
     }
