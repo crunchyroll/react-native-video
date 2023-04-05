@@ -190,6 +190,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
     private boolean isAdsManagerListenerAdded = false;
+    private Timeline playerTimeline;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -434,7 +435,8 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("ENDED_TRUEX", payload);
-        this.adsLoader.skipAd();
+        //this.adsLoader.skipAd();
+        this.skipAd();
         this.startPlayback();
         
     }
@@ -497,7 +499,6 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null) {
             return;
         }
-        this.addAdsManagerListener();
         // Get ad data
         if (event.getAd() != null) {
             activeAd = event.getAd();
@@ -515,6 +516,12 @@ public class ReactExoplayerView extends FrameLayout implements
 
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
+            case AD_BREAK_READY:
+                if (this.adsLoader != null && this.googleAdsLoader == null) {
+                 this.googleAdsLoader = this.adsLoader.getAdsLoader();
+                }
+                this.googleAdsLoader.start();
+                break;
             case STARTED:
                 eventEmitter.adEvent("STARTED", payload);
                 Log.w("RNV_CSAI", "Ad started");
@@ -886,11 +893,11 @@ public class ReactExoplayerView extends FrameLayout implements
         if (self.isCSAIEnabled) {
             imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
             imaSettings.setLanguage(uiLanguage);
+            imaSettings.setAutoPlayAdBreaks(false);
             adsLoader = new ImaAdsLoader.Builder(getContext())
                 .setAdEventListener(this)
                 .setImaSdkSettings(imaSettings)
                 .build();
-            this.addAdsManagerListener();
         }
 
         ExoTrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory();
@@ -944,7 +951,6 @@ public class ReactExoplayerView extends FrameLayout implements
         exoPlayerView.setPlayer(player);
         if (self.isCSAIEnabled) {
             adsLoader.setPlayer(player);
-            this.addAdsManagerListener();
         }
         audioBecomingNoisyReceiver.setListener(self);
         setPlayWhenReady(!isPaused);
@@ -986,10 +992,6 @@ public class ReactExoplayerView extends FrameLayout implements
                     new MediaSource[mediaSourceList.size()]
             );
             mediaSource = new MergingMediaSource(textSourceArray);
-        }
-
-        if (isCSAIEnabled) {
-            this.addAdsManagerListener();
         }
 
         // wait for player to be set
@@ -1776,21 +1778,28 @@ public class ReactExoplayerView extends FrameLayout implements
 
     }
 
-    public void addAdsManagerListener() {
-        if (isCSAIEnabled && !isAdsManagerListenerAdded) {
-            if (this.adsLoader != null) {
-                Log.w("RNV_CSAI", "Exo Ads Loader found - looking for Google Ads Loader");
-                this.googleAdsLoader = this.adsLoader.getAdsLoader();	
-                if (this.googleAdsLoader != null) {
-                    Log.w("RNV_CSAI", "Adding ads loaded listener");
-                    this.googleAdsLoader.addAdsLoadedListener(this);
-                    isAdsManagerListenerAdded = true;
-                } else {
-                    Log.w("RNV_CSAI", "No google ads Loader!");
+    public void skipAd() {
+        this.playerTimeline = timeline;
+        // Go through the timeline and find ad markers
+        if (isCSAIEnabled) {
+            this.seekTo(30000);
+            /*int periodCount = timeline.getPeriodCount();
+            adMarkers = new ArrayList<Double>();
+            for (int i = 0; i < periodCount; i++) {
+                Timeline.Period period = timeline.getPeriod(i, new Timeline.Period());
+                if (period != null) {
+                    int adGroupCount = period.getAdGroupCount();
+                    if (adGroupCount > 0) {
+                        for (int k = 0; k < adGroupCount; k++) {
+                            long adGroupTimeUs = period.getAdGroupTimeUs(k);
+                            long adGroupTimeMs = TimeUnit.MICROSECONDS.toMillis(adGroupTimeUs);
+                            adMarkers.add((double)adGroupTimeMs);
+                        }
+                        
+                    }
                 }
-            } else {
-                Log.w("RNV_CSAI", "No Exo ads loader!");
-            }
+            }*/
+
         }
     }
 
@@ -1800,11 +1809,9 @@ public class ReactExoplayerView extends FrameLayout implements
             // The player is being reset or contains no media.
             return;
         }
+        this.playerTimeline = timeline;
         // Go through the timeline and find ad markers
         if (isCSAIEnabled) {
-
-            this.addAdsManagerListener();
-
             int periodCount = timeline.getPeriodCount();
             adMarkers = new ArrayList<Double>();
             for (int i = 0; i < periodCount; i++) {
