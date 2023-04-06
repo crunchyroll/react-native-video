@@ -282,8 +282,12 @@ import java.util.Map;
   /** Skips the current skippable ad, if there is one. */
   public void skipAd() {
     if (adsManager != null) {
-      imaAdState = IMA_AD_STATE_NONE;
-      adsManager.skip();
+      if(imaAdInfo != null) {
+        imaAdState = IMA_AD_STATE_NONE;
+        adPlaybackState = adPlaybackState.withSkippedAd(imaAdInfo.adGroupIndex, imaAdInfo.adIndexInAdGroup);
+        updateAdPlaybackState();
+        adsManager.skip();
+      }
     } else {
       Log.w("RNV_IMA_ADS_LOADER", "No ads manager! - cannot skip ads!");
     }
