@@ -282,6 +282,7 @@ import java.util.Map;
   /** Skips the current skippable ad, if there is one. */
   public void skipAd() {
     if (adsManager != null) {
+      imaAdState = IMA_AD_STATE_NONE;
       adsManager.skip();
     } else {
       Log.w("RNV_IMA_ADS_LOADER", "No ads manager! - cannot skip ads!");
@@ -291,6 +292,7 @@ import java.util.Map;
   /** Discards ad breaks */
   public void discardAdBreak() {
     if (adsManager != null) {
+      imaAdState = IMA_AD_STATE_NONE;
       adsManager.discardAdBreak();
     } else {
       Log.w("RNV_IMA_ADS_LOADER", "No ads manager! - cannot discard ad breaks!");
