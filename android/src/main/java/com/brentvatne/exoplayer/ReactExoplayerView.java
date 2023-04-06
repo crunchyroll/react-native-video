@@ -415,6 +415,10 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
+        WritableMap payload = Arguments.createMap();
+        eventEmitter.adEvent("ENDED_TRUEX", payload);
+
+        Activity activity = themedReactContext.getCurrentActivity();
         ReactExoplayerView self = this;
         activity.runOnUiThread(new Runnable() {
             public void run() {
@@ -436,6 +440,7 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("ENDED_TRUEX", payload);
+
         Activity activity = themedReactContext.getCurrentActivity();
         ReactExoplayerView self = this;
         activity.runOnUiThread(new Runnable() {
