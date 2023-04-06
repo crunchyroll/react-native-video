@@ -288,6 +288,15 @@ import java.util.Map;
     }
   }
 
+  /** Discards ad breaks */
+  public void discardAdBreak() {
+    if (adsManager != null) {
+      adsManager.discardAdBreak();
+    } else {
+      Log.w("RNV_IMA_ADS_LOADER", "No ads manager! - cannot discard ad breaks!");
+    }
+  }
+
   /**
    * Moves UI focus to the skip button (or other interactive elements), if currently shown. See
    * {@link AdsManager#focus()}.

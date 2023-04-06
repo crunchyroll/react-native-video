@@ -415,13 +415,14 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
-        WritableMap payload = Arguments.createMap();
-        eventEmitter.adEvent("ENDED_TRUEX", payload);
-        this.googleAdsLoader = this.adsLoader.getAdsLoader();
-        if (this.googleAdsLoader != null) {
-           // this.adsManager.discardAdBreak();
-           // this.adsManager.resume();
-        }
+        ReactExoplayerView self = this;
+        activity.runOnUiThread(new Runnable() {
+            public void run() {
+                Log.w("RNV_CSAI_TRUEX", "Calling skipAd and startPlayback!");
+                self.adsLoader.discardAdBreak();
+                self.startPlayback();
+            }
+        });
     }
     @Override
     public void closeStream() {
