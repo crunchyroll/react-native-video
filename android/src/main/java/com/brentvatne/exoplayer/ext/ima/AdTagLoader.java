@@ -296,8 +296,12 @@ import java.util.Map;
   /** Discards ad breaks */
   public void discardAdBreak() {
     if (adsManager != null) {
-      imaAdState = IMA_AD_STATE_NONE;
-      adsManager.discardAdBreak();
+      if(imaAdInfo != null) {
+        imaAdState = IMA_AD_STATE_NONE;
+        adPlaybackState = adPlaybackState.withSkippedAdGroup(imaAdInfo.adGroupIndex);
+        updateAdPlaybackState();
+        adsManager.discardAdBreak();
+      }
     } else {
       Log.w("RNV_IMA_ADS_LOADER", "No ads manager! - cannot discard ad breaks!");
     }
