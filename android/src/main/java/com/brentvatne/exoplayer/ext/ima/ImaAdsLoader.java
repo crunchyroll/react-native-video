@@ -477,6 +477,8 @@ public final class ImaAdsLoader implements AdsLoader {
   public void skipAd() {
     if (currentAdTagLoader != null) {
       currentAdTagLoader.skipAd();
+    } else {
+      Log.w("RNV_IMA_ADS_LOADER", "No ad tag loader - cannot skip ads!");
     }
   }
 
