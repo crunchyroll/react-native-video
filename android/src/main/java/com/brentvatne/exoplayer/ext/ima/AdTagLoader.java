@@ -283,6 +283,8 @@ import java.util.Map;
   public void skipAd() {
     if (adsManager != null) {
       adsManager.skip();
+    } else {
+      Log.w("RNV_IMA_ADS_LOADER", "No ads manager! - cannot skip ads!");
     }
   }
 
