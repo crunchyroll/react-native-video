@@ -146,7 +146,6 @@ import com.brentvatne.exoplayer.PlaybackHandler;
 @SuppressLint("ViewConstructor")
 public class ReactExoplayerView extends FrameLayout implements
         AdEventListener,
-        AdsLoader.AdsLoadedListener,
         LifecycleEventListener,
         Player.Listener,
         BandwidthMeter.EventListener,
