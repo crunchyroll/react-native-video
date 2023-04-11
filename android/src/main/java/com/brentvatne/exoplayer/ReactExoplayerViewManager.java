@@ -37,6 +37,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     private static final String PROP_AD_INITIAL_PLAYBACK = "playAdBeforeStart";
     private static final String PROP_AD_TAG_URL = "adTagUrl";
     private static final String PROP_ENABLE_CSAI = "enableCSAI";
+    private static final String PROP_ENABLE_TRUEX = "enableTruex";
     private static final String PROP_DRM = "drm";
     private static final String PROP_DRM_TYPE = "type";
     private static final String PROP_DRM_LICENSESERVER = "licenseServer";
@@ -155,6 +156,11 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     @ReactProp(name = PROP_ENABLE_CSAI)
     public void setEnableCSAI(final ReactExoplayerView videoView, final boolean isEnabled) {
         videoView.setEnableCSAI(isEnabled);
+    }
+
+    @ReactProp(name = PROP_ENABLE_TRUEX)
+    public void setEnableTruex(final ReactExoplayerView videoView, final boolean isEnabled) {
+        videoView.setEnableTruex(isEnabled);
     }
 
     @ReactProp(name = PROP_AD_TAG_URL)

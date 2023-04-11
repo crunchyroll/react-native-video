@@ -233,6 +233,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private Uri srcUri;
     private String extension;
     private boolean isCSAIEnabled = false;
+    private boolean isTruexEnabled = false;
     private String adTagUrl;
     private boolean repeat;
     private String audioTrackType;
@@ -468,15 +469,21 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void handleCheckTruex(AdEvent event) {
         if (activeAd == null) {
-            Log.w("RNV_CSAI", "No Active ad to determine TrueX");
+            Log.d("RNV_CSAI", "No Active ad to determine TrueX");
             return;
         }
         if (activeAd.getAdSystem().contains("trueX")) {
-        String vastUrl = activeAd.getDescription();
-        Log.w("RNV_CSAI", "Detected TrueX ad with VAST UTL: " + vastUrl);
-        displayInteractiveAd(vastUrl);
+            String vastUrl = activeAd.getDescription();
+            Log.d("RNV_CSAI", "Detected TrueX ad with VAST UTL: " + vastUrl);
+            if (isTruexEnabled) {
+                Log.d("RNV_CSAI", "TrueX is enabled. Displaying interactive ads!");
+                displayInteractiveAd(vastUrl);
+            } else {
+                Log.d("RNV_CSAI", "TrueX is not enabled. Displaying linear ads!");
+                adsLoader.skipAd();
+            }
         } else {
-            Log.w("RNV_CSAI", "Ad System is not TrueX");
+            Log.d("RNV_CSAI", "Ad System is not TrueX");
         }
         reLayout(exoPlayerView);
     }
@@ -2330,6 +2337,10 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void setEnableCSAI(boolean isEnabled) {
         this.isCSAIEnabled = isEnabled;
+    }
+
+    public void setEnableTruex(boolean isEnabled) {
+        this.isTruexEnabled = isEnabled;
     }
 
     public void setAdTagUrl(String url) {
