@@ -11,7 +11,6 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import java.lang.reflect.Method;
 import android.webkit.WebView;
 
 import com.google.common.collect.ImmutableList;
@@ -30,10 +29,6 @@ import com.google.android.exoplayer2.ui.AdOverlayInfo;
 import com.google.android.exoplayer2.ui.AdViewProvider;
 import com.google.android.exoplayer2.video.VideoSize;
 
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-
 import com.facebook.react.uimanager.util.ReactFindViewUtil;
 
 import java.util.ArrayList;
@@ -47,13 +42,11 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     private final SubtitleView subtitleLayout;
     private final AspectRatioFrameLayout layout;
     private final ComponentListener componentListener;
-    public FrameLayout adOverlayFrameLayout;
+    private FrameLayout adOverlayFrameLayout;
     private ExoPlayer player;
     private Context context;
     private ViewGroup.LayoutParams layoutParams;
-    private Activity activity;
 
-    private boolean isViewAdded = false;
     private boolean useTextureView = true;
     private boolean useSecureView = false;
     private boolean hideShutterView = false;
@@ -106,10 +99,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
 
         addViewInLayout(layout, 0, aspectRatioParams);
         addViewInLayout(adOverlayFrameLayout, 1, adOverlayLayoutParams);
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
     }
 
     @Override

@@ -36,12 +36,10 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.util.RNLog;
 import com.google.ads.interactivemedia.v3.api.Ad;
-import com.google.ads.interactivemedia.v3.api.CompanionAd;
 import com.google.ads.interactivemedia.v3.api.AdPodInfo;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
 import com.google.ads.interactivemedia.v3.api.AdsLoader;
 import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
-import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdEvent.AdEventListener;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
@@ -186,7 +184,6 @@ public class ReactExoplayerView extends FrameLayout implements
     private FrameLayout truexViewGroup;
     private ImaSdkSettings imaSettings;
     private boolean shouldPlayAdBeforeStartPosition;
-    private AdsManager googleAdsManager;
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
     private boolean isAdsManagerListenerAdded = false;
@@ -350,11 +347,9 @@ public class ReactExoplayerView extends FrameLayout implements
             LayoutParams.MATCH_PARENT);
         exoPlayerView = new ExoPlayerView(getContext());
         exoPlayerView.setLayoutParams(layoutParams);
-        Activity activity = themedReactContext.getCurrentActivity();
-        exoPlayerView.setActivity(activity);
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
-        
+
         mainHandler = new Handler();
     }
 
@@ -409,7 +404,6 @@ public class ReactExoplayerView extends FrameLayout implements
      */
     @Override
     public void resumeStream() {
-        Log.d("RNV_CSAI_TRUEX", "resumeStream");
         if (player == null) {
             return;
         }
@@ -460,30 +454,22 @@ public class ReactExoplayerView extends FrameLayout implements
         if (position > 0) resumePosition = position;
 
         // Start the true[X] engagement
-        View rootView =  getRootView();
         ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout;
         truexAdManager = new TruexAdManager(getContext(), this);
-        truexAdManager.setReactExoPlayerView(this);
         truexAdManager.startAd(viewGroup, vastUrl);
     }
 
     public void handleCheckTruex(AdEvent event) {
         if (activeAd == null) {
-            Log.d("RNV_CSAI", "No Active ad to determine TrueX");
             return;
         }
-        if (activeAd.getAdSystem().contains("trueX")) {
+        boolean isTrueXAd = activeAd.getAdSystem().contains("trueX");
+        if (isTrueXAd && isTruexEnabled) {
             String vastUrl = activeAd.getDescription();
-            Log.d("RNV_CSAI", "Detected TrueX ad with VAST UTL: " + vastUrl);
-            if (isTruexEnabled) {
-                Log.d("RNV_CSAI", "TrueX is enabled. Displaying interactive ads!");
-                displayInteractiveAd(vastUrl);
-            } else {
-                Log.d("RNV_CSAI", "TrueX is not enabled. Displaying linear ads!");
-                adsLoader.skipAd();
-            }
-        } else {
-            Log.d("RNV_CSAI", "Ad System is not TrueX");
+            displayInteractiveAd(vastUrl);
+        } else if (isTrueXAd && !isTruexEnabled) {
+            // Don't display interactive ads if TrueX is disabled
+            adsLoader.skipAd();
         }
         reLayout(exoPlayerView);
     }
@@ -502,22 +488,10 @@ public class ReactExoplayerView extends FrameLayout implements
         WritableMap payload = Arguments.createMap();
         payload.putMap("adInfo", adInfo);
 
-        if (event.getAdData() != null) {
-            for (Map.Entry<String, String> entry : event.getAdData().entrySet()) {
-                Log.w("RNV_CSAI", entry.getKey() + ":" + entry.getValue());
-            }
-        }
-
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
-            case AD_BREAK_READY:
-                if (this.adsLoader != null && this.googleAdsLoader == null) {
-                 this.googleAdsLoader = this.adsLoader.getAdsLoader();
-                }
-                break;
             case STARTED:
                 eventEmitter.adEvent("STARTED", payload);
-                Log.w("RNV_CSAI", "Ad started");
                 handleCheckTruex(event);
                 break;
             case CONTENT_RESUME_REQUESTED:
@@ -526,12 +500,6 @@ public class ReactExoplayerView extends FrameLayout implements
                 break;
             case TAPPED:
                 eventEmitter.videoClickEvent();
-                break;
-            case LOADED:
-                Log.w("RNV_CSAI", "Ads loaded");
-                break;
-            case AD_BREAK_ENDED:
-                Log.w("RNV_CSAI", "Ads AD_BREAK_ENDED");
                 break;
         }
     }
