@@ -48,7 +48,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     private final AspectRatioFrameLayout layout;
     private final ComponentListener componentListener;
     public FrameLayout adOverlayFrameLayout;
-    public FrameLayout truexOverlayFrameLayout;
     private ExoPlayer player;
     private Context context;
     private ViewGroup.LayoutParams layoutParams;
@@ -105,22 +104,12 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         adOverlayFrameLayout = new FrameLayout(getContext());
         adOverlayFrameLayout.setLayoutParams(adOverlayLayoutParams);
 
-        truexOverlayFrameLayout = new FrameLayout(getContext());
-        LayoutParams truexOverlayLayoutParams = new FrameLayout.LayoutParams(
-                LayoutParams.FILL_PARENT,
-                LayoutParams.FILL_PARENT);
-        truexOverlayFrameLayout.setLayoutParams(truexOverlayLayoutParams);
-
         addViewInLayout(layout, 0, aspectRatioParams);
         addViewInLayout(adOverlayFrameLayout, 1, adOverlayLayoutParams);
     }
 
     public void setActivity(Activity activity) {
         this.activity = activity;
-    }
-
-    public ViewGroup getTruexViewGroup() {
-        return truexOverlayFrameLayout;
     }
 
     @Override

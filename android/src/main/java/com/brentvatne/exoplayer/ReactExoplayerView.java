@@ -404,15 +404,6 @@ public class ReactExoplayerView extends FrameLayout implements
         return data;
     }
 
-    @Override
-    public void onAdsManagerLoaded(AdsManagerLoadedEvent event){
-        if (event == null) {
-            return;
-        }
-        Log.w("RNV_CSAI", "onAdsManagerLoaded!");
-        googleAdsManager = event.getAdsManager();
-    }
-
     /**
      * TrueX Playback Handlers
      */
@@ -422,47 +413,32 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
+
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("ENDED_TRUEX", payload);
 
-        Activity activity = themedReactContext.getCurrentActivity();
-        ReactExoplayerView self = this;
-        activity.runOnUiThread(new Runnable() {
-            public void run() {
-                Log.w("RNV_CSAI_TRUEX", "Calling skipAd and startPlayback!");
-                self.adsLoader.discardAdBreak();
-                self.startPlayback();
-            }
-        });
+        adsLoader.discardAdBreak();
+        startPlayback();
     }
+
     @Override
     public void closeStream() {
         releasePlayer();
     }
+
     @Override
     public void displayLinearAds() {
-        Log.d("RNV_CSAI_TRUEX", "displayLinearAds");
         if (this.player == null) {
             return;
         }
+
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("ENDED_TRUEX", payload);
 
-        Activity activity = themedReactContext.getCurrentActivity();
-        ReactExoplayerView self = this;
-        activity.runOnUiThread(new Runnable() {
-            public void run() {
-                Log.w("RNV_CSAI_TRUEX", "Calling skipAd and startPlayback!");
-                self.adsLoader.skipAd();
-                self.startPlayback();
-            }
-        });
-        //this.skipAd();
-
-        //this.googleAdsLoader = this.adsLoader.getAdsLoader();
-        
-        
+        adsLoader.skipAd();
+        startPlayback();      
     }
+
     @Override
     public void handlePopup(String url) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -476,30 +452,19 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
-
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("STARTED_TRUEX", payload);
 
-        Log.w("RNV_CSAI", "Pausing playback for TrueX");
         // Pause the stream and display a true[X] engagement
-        // pausePlayback();
         Long position = player.getCurrentPosition();
         if (position > 0) resumePosition = position;
 
-        //displayMode = DisplayMode.INTERACTIVE_AD;
-
         // Start the true[X] engagement
-        Log.w("RNV_CSAI", "Starting TrueXAdManager");
         View rootView =  getRootView();
         ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout;
         truexAdManager = new TruexAdManager(getContext(), this);
         truexAdManager.setReactExoPlayerView(this);
-        Log.w("RNV_CSAI", "Starting TrueX Ad");
         truexAdManager.startAd(viewGroup, vastUrl);
-    }
-
-    public void reLayoutRoot() {
-        
     }
 
     public void handleCheckTruex(AdEvent event) {
@@ -1799,30 +1764,6 @@ public class ReactExoplayerView extends FrameLayout implements
             eventEmitter.end();
         }
 
-    }
-
-    public void skipAd() {
-        // Go through the timeline and find ad markers
-        if (isCSAIEnabled) {
-            this.seekTo(30000);
-            /*int periodCount = timeline.getPeriodCount();
-            adMarkers = new ArrayList<Double>();
-            for (int i = 0; i < periodCount; i++) {
-                Timeline.Period period = timeline.getPeriod(i, new Timeline.Period());
-                if (period != null) {
-                    int adGroupCount = period.getAdGroupCount();
-                    if (adGroupCount > 0) {
-                        for (int k = 0; k < adGroupCount; k++) {
-                            long adGroupTimeUs = period.getAdGroupTimeUs(k);
-                            long adGroupTimeMs = TimeUnit.MICROSECONDS.toMillis(adGroupTimeUs);
-                            adMarkers.add((double)adGroupTimeMs);
-                        }
-                        
-                    }
-                }
-            }*/
-
-        }
     }
 
     public void updateAdCuePoints(Timeline timeline) {
