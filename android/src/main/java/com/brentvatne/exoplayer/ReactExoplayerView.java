@@ -480,9 +480,7 @@ public class ReactExoplayerView extends FrameLayout implements
             return;
         }
         // Get ad data
-        if (event.getAd() != null) {
-            activeAd = event.getAd();
-        }
+        activeAd = event.getAd();
         WritableMap adInfo = getAdInfo();
         
         WritableMap payload = Arguments.createMap();
