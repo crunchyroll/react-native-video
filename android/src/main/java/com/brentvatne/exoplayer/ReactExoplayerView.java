@@ -1133,6 +1133,10 @@ public class ReactExoplayerView extends FrameLayout implements
             switch (player.getPlaybackState()) {
                 case Player.STATE_IDLE:
                 case Player.STATE_ENDED:
+                    if (isUriNativeSource(this.srcUri)) {
+                        // Native source does not need to be initialized again
+                        break;
+                    }
                     initializePlayer();
                     break;
                 case Player.STATE_BUFFERING:
