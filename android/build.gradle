@@ -29,6 +29,7 @@ android {
 repositories {
     // Remove this repository line after google releases to google() or mavenCentral()
     maven { url "https://dl.google.com/android/maven2" }
+    maven { url "https://s3.amazonaws.com/android.truex.com/mobile/prod/maven/" }
 }
 
 dependencies {
@@ -43,6 +44,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-core:2.18.1'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.1'
     implementation 'com.google.android.exoplayer:extension-ima:2.18.1'
+    implementation 'com.truex:TruexAdRenderer-Mobile:2.1.+'
+
+    compileOnly 'org.checkerframework:checker-qual:3.13.0'
 
     // All support libs must use the same version
     implementation "androidx.annotation:annotation:1.1.0"

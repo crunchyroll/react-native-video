@@ -15,11 +15,13 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
+import android.view.ViewGroup;
 import android.view.Gravity;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.util.DisplayMetrics;
+import android.content.Intent;
 
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
@@ -38,7 +40,6 @@ import com.google.ads.interactivemedia.v3.api.AdPodInfo;
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
 import com.google.ads.interactivemedia.v3.api.AdsLoader;
 import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
-import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdEvent.AdEventListener;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
@@ -49,7 +50,7 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.drm.DrmSession.DrmSessionException;
-import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
+import com.brentvatne.exoplayer.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
@@ -135,16 +136,21 @@ import java.lang.Float;
 import java.lang.Double;
 import java.lang.reflect.Method;
 
+import com.facebook.react.uimanager.util.ReactFindViewUtil;
+
+
+import com.brentvatne.exoplayer.PlaybackHandler;
+
 @SuppressLint("ViewConstructor")
 public class ReactExoplayerView extends FrameLayout implements
         AdEventListener,
-        AdsLoader.AdsLoadedListener,
         LifecycleEventListener,
         Player.Listener,
         BandwidthMeter.EventListener,
         BecomingNoisyListener,
         AudioManager.OnAudioFocusChangeListener,
-        DrmSessionEventListener {
+        DrmSessionEventListener,
+        PlaybackHandler {
 
     public static final double DEFAULT_MAX_HEAP_ALLOCATION_PERCENT = 1;
     public static final double DEFAULT_MIN_BACK_BUFFER_MEMORY_RESERVE = 0;
@@ -170,15 +176,18 @@ public class ReactExoplayerView extends FrameLayout implements
     private Player.Listener eventListener;
     private MediaSourceEventListener mediaSourceEventListener;
 
-    private ExoPlayerView exoPlayerView;
-    private FrameLayout adOverlay;
-    private ImaAdsLoader adsLoader;
+    public ExoPlayerView exoPlayerView;
+    public static FrameLayout truexOverlayFrameLayout;
+    public ImaAdsLoader adsLoader;
     private AdsLoader googleAdsLoader;
+    private TruexAdManager truexAdManager;
+    private FrameLayout truexViewGroup;
     private ImaSdkSettings imaSettings;
     private boolean shouldPlayAdBeforeStartPosition;
-    private AdsManager googleAdsManager;
     private Ad activeAd;
     private ArrayList<Double> adMarkers;
+    private boolean isAdsManagerListenerAdded = false;
+    private Timeline playerTimeline;
 
     private DataSource.Factory mediaDataSourceFactory;
     private ExoPlayer player;
@@ -221,6 +230,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private Uri srcUri;
     private String extension;
     private boolean isCSAIEnabled = false;
+    private boolean isTruexEnabled = false;
     private String adTagUrl;
     private boolean repeat;
     private String audioTrackType;
@@ -337,7 +347,6 @@ public class ReactExoplayerView extends FrameLayout implements
             LayoutParams.MATCH_PARENT);
         exoPlayerView = new ExoPlayerView(getContext());
         exoPlayerView.setLayoutParams(layoutParams);
-
         // Add Exoplayer view
         addView(exoPlayerView, 0, layoutParams);
 
@@ -390,12 +399,79 @@ public class ReactExoplayerView extends FrameLayout implements
         return data;
     }
 
+    /**
+     * TrueX Playback Handlers
+     */
     @Override
-    public void onAdsManagerLoaded(AdsManagerLoadedEvent event){
-        if (event == null) {
+    public void resumeStream() {
+        if (player == null) {
             return;
         }
-        googleAdsManager = event.getAdsManager();
+
+        WritableMap payload = Arguments.createMap();
+        eventEmitter.adEvent("ENDED_TRUEX", payload);
+
+        adsLoader.discardAdBreak();
+        startPlayback();
+    }
+
+    @Override
+    public void closeStream() {
+        releasePlayer();
+    }
+
+    @Override
+    public void displayLinearAds() {
+        if (this.player == null) {
+            return;
+        }
+
+        WritableMap payload = Arguments.createMap();
+        eventEmitter.adEvent("ENDED_TRUEX", payload);
+
+        adsLoader.skipAd();
+        startPlayback();      
+    }
+
+    @Override
+    public void handlePopup(String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        getContext().startActivity(browserIntent);
+    }
+
+    /**
+     * Display TrueX interactive Ad
+     */
+    private void displayInteractiveAd(String vastUrl) {
+        if (player == null) {
+            return;
+        }
+        WritableMap payload = Arguments.createMap();
+        eventEmitter.adEvent("STARTED_TRUEX", payload);
+
+        // Pause the stream and display a true[X] engagement
+        Long position = player.getCurrentPosition();
+        if (position > 0) resumePosition = position;
+
+        // Start the true[X] engagement
+        ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout;
+        truexAdManager = new TruexAdManager(getContext(), this);
+        truexAdManager.startAd(viewGroup, vastUrl);
+    }
+
+    public void handleCheckTruex(AdEvent event) {
+        if (activeAd == null) {
+            return;
+        }
+        boolean isTrueXAd = activeAd.getAdSystem().contains("trueX");
+        if (isTrueXAd && isTruexEnabled) {
+            String vastUrl = activeAd.getDescription();
+            displayInteractiveAd(vastUrl);
+        } else if (isTrueXAd && !isTruexEnabled) {
+            // Don't display interactive ads if TrueX is disabled
+            adsLoader.skipAd();
+        }
+        reLayout(exoPlayerView);
     }
 
     @Override
@@ -403,7 +479,6 @@ public class ReactExoplayerView extends FrameLayout implements
         if (event == null || !isCSAIEnabled) {
             return;
         }
-
         // Get ad data
         activeAd = event.getAd();
         WritableMap adInfo = getAdInfo();
@@ -414,8 +489,8 @@ public class ReactExoplayerView extends FrameLayout implements
         AdEvent.AdEventType eventType = event.getType();
         switch(eventType) {
             case STARTED:
-                reLayout(exoPlayerView);
                 eventEmitter.adEvent("STARTED", payload);
+                handleCheckTruex(event);
                 break;
             case CONTENT_RESUME_REQUESTED:
                 activeAd = null;
@@ -423,7 +498,8 @@ public class ReactExoplayerView extends FrameLayout implements
                 break;
             case TAPPED:
                 eventEmitter.videoClickEvent();
-        } 
+                break;
+        }
     }
 
     @Override
@@ -1074,6 +1150,7 @@ public class ReactExoplayerView extends FrameLayout implements
             adsLoader = null;
             imaSettings = null;
             shouldPlayAdBeforeStartPosition = true;
+            truexOverlayFrameLayout = null;
         }
         if (player != null) {
             updateResumePosition();
@@ -1128,7 +1205,7 @@ public class ReactExoplayerView extends FrameLayout implements
         }
     }
 
-    private void startPlayback() {
+    public void startPlayback() {
         if (player != null) {
             switch (player.getPlaybackState()) {
                 case Player.STATE_IDLE:
@@ -2230,6 +2307,10 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void setEnableCSAI(boolean isEnabled) {
         this.isCSAIEnabled = isEnabled;
+    }
+
+    public void setEnableTruex(boolean isEnabled) {
+        this.isTruexEnabled = isEnabled;
     }
 
     public void setAdTagUrl(String url) {
