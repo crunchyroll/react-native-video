@@ -1364,9 +1364,9 @@ public class ReactExoplayerView extends FrameLayout implements
             case Player.STATE_READY:
                 text += "ready";
                 eventEmitter.ready();
-                onBuffering(false);
                 startProgressHandler();
                 videoLoaded();
+                onBuffering(false);
                 if (selectTrackWhenReady && isUsingContentResolution) {
                     selectTrackWhenReady = false;
                     setSelectedTrack(C.TRACK_TYPE_VIDEO, videoTrackType, videoTrackValue);
