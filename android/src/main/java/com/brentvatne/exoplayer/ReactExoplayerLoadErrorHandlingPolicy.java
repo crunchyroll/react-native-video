@@ -19,7 +19,7 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
   public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
     if (
       loadErrorInfo.exception instanceof HttpDataSourceException &&
-      !(loadErrorInfo.exception instanceof InvalidResponseCodeException && loadErrorInfo.exception.responseCode == 403)
+      !(loadErrorInfo.exception instanceof InvalidResponseCodeException && loadErrorInfo.exception.responseCode == 403) &&
       (loadErrorInfo.exception.getMessage() == "Unable to connect" || loadErrorInfo.exception.getMessage() == "Software caused connection abort")
     ) {
       // Capture the error we get when there is no network connectivity and keep retrying it
