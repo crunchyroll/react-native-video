@@ -7,6 +7,8 @@ import com.google.android.exoplayer2.upstream.HttpDataSource.InvalidResponseCode
 import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorInfo;
 import com.google.android.exoplayer2.C;
 
+import android.util.Log;
+
 public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErrorHandlingPolicy {
   private int minLoadRetryCount = Integer.MAX_VALUE;
 
@@ -17,9 +19,17 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
 
   @Override
   public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
+
+    if (loadErrorInfo.exception instanceof InvalidResponseCodeException) {
+      Log.w("RNV", "Invalid response code"!);
+      if (((InvalidResponseCodeException)loadErrorInfo.exception).responseCode == 403) {
+        Log.w("RNV", "Request returned 403 - stopping retry!");
+        return C.TIME_UNSET
+      }
+    }
+
     if (
       loadErrorInfo.exception instanceof HttpDataSourceException &&
-      !(loadErrorInfo.exception instanceof InvalidResponseCodeException && ((InvalidResponseCodeException)loadErrorInfo.exception).responseCode == 403) &&
       (loadErrorInfo.exception.getMessage() == "Unable to connect" || loadErrorInfo.exception.getMessage() == "Software caused connection abort")
     ) {
       // Capture the error we get when there is no network connectivity and keep retrying it
