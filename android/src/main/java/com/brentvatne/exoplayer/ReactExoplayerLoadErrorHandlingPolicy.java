@@ -21,10 +21,10 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
   public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
 
     if (loadErrorInfo.exception instanceof InvalidResponseCodeException) {
-      Log.w("RNV", "Invalid response code"!);
+      Log.w("RNV", "Invalid response code");
       if (((InvalidResponseCodeException)loadErrorInfo.exception).responseCode == 403) {
         Log.w("RNV", "Request returned 403 - stopping retry!");
-        return C.TIME_UNSET
+        return C.TIME_UNSET;
       }
     }
 
