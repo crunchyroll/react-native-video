@@ -255,6 +255,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private String drmLicenseUrl = null;
     private String[] drmLicenseHeader = null; 
     private boolean controls;
+    private boolean disableTruexRateLimit = false;
     // \ End props
 
     // DASH Offline Source
@@ -456,7 +457,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Start the true[X] engagement
         ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout;
         truexAdManager = new TruexAdManager(getContext(), this);
-        truexAdManager.startAd(viewGroup, vastUrl);
+        truexAdManager.startAd(viewGroup, vastUrl, disableTruexRateLimit);
     }
 
     public void handleCheckTruex(AdEvent event) {
@@ -2383,6 +2384,10 @@ public class ReactExoplayerView extends FrameLayout implements
 
     public void setDrmLicenseUrl(String licenseUrl){
         this.drmLicenseUrl = licenseUrl;
+    }
+
+    public void setDisableTruexRateLimit(boolean isDisabled) {
+        this.disableTruexRateLimit = isDisabled;
     }
 
     public void setDrmLicenseHeader(String[] header){
