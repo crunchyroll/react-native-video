@@ -232,7 +232,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     }
 
     @ReactProp(name = PROP_DISABLE_TRUEX_RATE_LIMIT, defaultBoolean = false)
-    public void setDisableTruexRateLimit(final ReactExoplayerView, final boolean isDisabled) {
+    public void setDisableTruexRateLimit(final ReactExoplayerView videoView, final boolean isDisabled) {
         videoView.setDisableTruexRateLimit(isDisabled);
     }
 
