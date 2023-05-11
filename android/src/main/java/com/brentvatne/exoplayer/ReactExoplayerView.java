@@ -429,7 +429,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("ENDED_TRUEX", payload);
-
+        Log.w("RNV", "SKIP AD 1");
         adsLoader.skipAd();
         startPlayback();      
     }
@@ -475,6 +475,7 @@ public class ReactExoplayerView extends FrameLayout implements
         } else if (isTrueXAd && !isTruexEnabled) {
             Log.w("RNV", "Found trueX ad but skipping since TrueX is disabled!");
             // Don't display interactive ads if TrueX is disabled
+            Log.w("RNV", "SKIP AD 2");
             adsLoader.skipAd();
         }
         reLayout(exoPlayerView);
