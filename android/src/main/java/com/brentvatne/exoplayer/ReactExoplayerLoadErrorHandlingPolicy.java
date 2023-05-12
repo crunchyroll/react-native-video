@@ -3,8 +3,11 @@ package com.brentvatne.exoplayer;
 import java.io.IOException;
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy;
 import com.google.android.exoplayer2.upstream.HttpDataSource.HttpDataSourceException;
+import com.google.android.exoplayer2.upstream.HttpDataSource.InvalidResponseCodeException;
 import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorInfo;
 import com.google.android.exoplayer2.C;
+
+import android.util.Log;
 
 public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErrorHandlingPolicy {
   private int minLoadRetryCount = Integer.MAX_VALUE;
@@ -16,6 +19,18 @@ public final class ReactExoplayerLoadErrorHandlingPolicy extends DefaultLoadErro
 
   @Override
   public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
+
+    if (loadErrorInfo.exception instanceof InvalidResponseCodeException) {
+      if (((InvalidResponseCodeException)loadErrorInfo.exception).responseCode == 403) {
+        Log.w("RNV", "Request returned 403 - stopping retry!");
+        return C.TIME_UNSET;
+      }
+      if (((InvalidResponseCodeException)loadErrorInfo.exception).responseCode == 401) {
+        Log.w("RNV", "Request returned 401 - stopping retry!");
+        return C.TIME_UNSET;
+      }
+    }
+
     if (
       loadErrorInfo.exception instanceof HttpDataSourceException &&
       (loadErrorInfo.exception.getMessage() == "Unable to connect" || loadErrorInfo.exception.getMessage() == "Software caused connection abort")
