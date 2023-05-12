@@ -429,7 +429,6 @@ public class ReactExoplayerView extends FrameLayout implements
 
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("ENDED_TRUEX", payload);
-
         adsLoader.skipAd();
         startPlayback();      
     }
@@ -453,6 +452,7 @@ public class ReactExoplayerView extends FrameLayout implements
         // Pause the stream and display a true[X] engagement
         Long position = player.getCurrentPosition();
         if (position > 0) resumePosition = position;
+        pausePlayback();
 
         // Start the true[X] engagement
         ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout;
