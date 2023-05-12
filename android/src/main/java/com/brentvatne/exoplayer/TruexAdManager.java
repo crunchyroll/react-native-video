@@ -52,9 +52,11 @@ public class TruexAdManager {
      * @param viewGroup - the view group in which you would like to display the true[X] engagement
      * @param vastUrl - the vastUrl that comes from the ad service provider
      */
-    public void startAd(ViewGroup viewGroup, String vastUrl) {
+    public void startAd(ViewGroup viewGroup, String vastUrl, boolean disableRateLimit) {
         TruexAdOptions options = new TruexAdOptions();
-        options.userAdvertisingId = "CR" + String.valueOf(System.currentTimeMillis()) + "TX";
+        if (disableRateLimit) {
+            options.userAdvertisingId = "CR" + String.valueOf(System.currentTimeMillis()) + "TX";
+        }
         // After viewing a Truex Ad experience, there will could be a lockout period
         // That prevents the same user from getting another Truex ad for some period of time
         // To get around this for development, replace the TruexAdOptions.userAdvertisingId

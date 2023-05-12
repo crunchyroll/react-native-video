@@ -53,6 +53,7 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     private static final String PROP_SELECTED_TEXT_TRACK_TYPE = "type";
     private static final String PROP_SELECTED_TEXT_TRACK_VALUE = "value";
     private static final String PROP_TEXT_TRACKS = "textTracks";
+    private static final String PROP_DISABLE_TRUEX_RATE_LIMIT = "disableTruexRateLimit";
     private static final String PROP_PAUSED = "paused";
     private static final String PROP_MUTED = "muted";
     private static final String PROP_VOLUME = "volume";
@@ -228,6 +229,11 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     @ReactProp(name = PROP_REPEAT, defaultBoolean = false)
     public void setRepeat(final ReactExoplayerView videoView, final boolean repeat) {
         videoView.setRepeatModifier(repeat);
+    }
+
+    @ReactProp(name = PROP_DISABLE_TRUEX_RATE_LIMIT, defaultBoolean = false)
+    public void setDisableTruexRateLimit(final ReactExoplayerView videoView, final boolean isDisabled) {
+        videoView.setDisableTruexRateLimit(isDisabled);
     }
 
     @ReactProp(name = PROP_PREVENTS_DISPLAY_SLEEP_DURING_VIDEO_PLAYBACK, defaultBoolean = false)
