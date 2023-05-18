@@ -123,7 +123,6 @@ import com.mux.stats.sdk.core.model.CustomData;
 
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsSdkMedia3;
-import com.mux.stats.sdk.muxstats.monitorWithMuxData;
 // End Mux
 
 import java.io.IOException;
@@ -956,45 +955,46 @@ public class ReactExoplayerView extends FrameLayout implements
     private void initializeMuxData(ReactExoplayerView self) {
         if (!self.isMuxEnabled || self.muxOptions == null) { return; }
 
-        self.muxCustomerVideoData = new CustomerData();
-
         // Player data
         CustomerPlayerData customerPlayerData = new CustomerPlayerData();
-        customerPlayerData.playerName = self.muxOptions.getString("player_name");
-        customerPlayerData.playerVersion = self.muxOptions.getString("player_version");
-        customerPlayerData.playerInitTime = self.muxOptions.getString("player_init_time");
-        self.muxCustomerVideoData.customerPlayerData = customerPlayerData;
-
+        customerPlayerData.setPlayerName(self.muxOptions.getString("player_name"));
+        customerPlayerData.setPlayerVersion(self.muxOptions.getString("player_version"));
+        customerPlayerData.setPlayerInitTime(self.muxOptions.getInt("player_init_time"));
+        
         // Video data
-        CustomerVideoData customerVideoData = new CustomerVideoData();
-        customerVideoData.videoTitle = self.muxOptions.getString("video_title");
-        customerVideoData.videoId = self.muxOptions.getString("video_id");
-        customerVideoData.videoDrmType = self.muxOptions.getString("video_drm_type");
-        customerVideoData.videoSeries = self.muxOptions.getString("video_series");
-        customerVideoData.videoDuration = self.muxOptions.getString("video_duration");
-        customerVideoData.videoStreamType = self.muxOptions.getString("video_stream_type");
-        customerVideoData.videoCdn = self.muxOptions.getString("video_cdn");
+        CustomerVideoData customerVideoData(new CustomerVideoData());
+        customerVideoData.setVideoTitle(self.muxOptions.getString("video_title"));
+        customerVideoData.setVideoId(self.muxOptions.getString("video_id"));
+        customerVideoData.setVideoDrmType(self.muxOptions.getString("video_drm_type"));
+        customerVideoData.setVideoSeries(self.muxOptions.getString("video_series"));
+        customerVideoData.setVideoDuration(self.muxOptions.getString("video_duration"));
+        customerVideoData.setVideoStreamType(self.muxOptions.getString("video_stream_type"));
+        customerVideoData.setVideoCdn(self.muxOptions.getString("video_cdn"));
+        customerVideoData.setExperimentName(self.muxOptions.getString("experiment_name"));
+        customerVideoData.setSubPropertyId(self.muxOptions.getString("sub_property_id"));
 
         if (self.srcUri != null) {
-            customerVideoData.videoSourceUrl = self.srcUri.toString();
+            customerVideoData.setVideoSourceUrl(self.srcUri.toString());
         }
-        self.muxCustomerVideoData.customerVideoData = customerVideoData;
 
         // View data
         CustomerViewData customerViewData = new CustomerViewData();
-        customerViewData.viewSessionId = UUID.randomUUID().toString();
-        self.muxCustomerVideoData.customerViewData = customerViewData;
+        customerViewData.setViewSessionId(UUID.randomUUID().toString());
 
         // Viewer data
         CustomerViewerData customerViewerData = new CustomerViewerData();
-        customerViewerData.viewerUserId = self.muxOptions.getString("viewer_user_id");
-        self.muxCustomerVideoData.customerViewerData = customerViewerData;
+        customerViewerData.setViewerUserId(self.muxOptions.getString("viewer_user_id"));
 
         // Custom data
         CustomData customData = new CustomData();
-        customData.experimentName = self.muxOptions.getString("experiment_name");
-        customData.subPropertyId = self.muxOptions.getString("sub_property_id");
-        self.muxCustomerVideoData.customData = customData;
+
+        self.muxCustomerVideoData = new CustomerData(
+            customerPlayerData,
+            customerVideoData,
+            customerViewData,
+            customerViewerData,
+            customData
+        );
 
         // Initialize Mux stats
         self.muxStats = self.player.monitorWithMuxData(
@@ -2288,7 +2288,7 @@ public class ReactExoplayerView extends FrameLayout implements
         this.isMuxEnabled = isEnabled;
     }
 
-    public void setMuxOptions(@Nullable ReadableMap muxOptions) {
+    public void setMuxOptions(ReadableMap muxOptions) {
         this.muxOptions = muxOptions;
     }
 
