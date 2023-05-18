@@ -114,12 +114,12 @@ import com.google.android.exoplayer2.source.dash.manifest.Representation;
 import com.google.android.exoplayer2.source.dash.manifest.Descriptor;
 
 // Mux
-import com.mux.stats.sdk.core.model.CustomerData;
-import com.mux.stats.sdk.core.model.CustomerPlayerData;
-import com.mux.stats.sdk.core.model.CustomerVideoData;
-import com.mux.stats.sdk.core.model.CustomerViewData;
-import com.mux.stats.sdk.core.model.CustomerViewerData;
-import com.mux.stats.sdk.core.model.CustomData;
+import com.mux.stats.sdk.muxstats.CustomerData;
+import com.mux.stats.sdk.muxstats.CustomerPlayerData;
+import com.mux.stats.sdk.muxstats.CustomerVideoData;
+import com.mux.stats.sdk.muxstats.CustomerViewData;
+import com.mux.stats.sdk.muxstats.CustomerViewerData;
+import com.mux.stats.sdk.muxstats.CustomData;
 
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsSdkMedia3;
