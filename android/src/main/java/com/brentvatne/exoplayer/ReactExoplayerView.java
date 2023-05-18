@@ -1001,7 +1001,7 @@ public class ReactExoplayerView extends FrameLayout implements
             self.themedReactContext,
             self.muxOptions.getString("env_key"),
             self.exoPlayerView,
-            self.muxCustomerVideoData,
+            self.muxCustomerVideoData
         );
     }
 
