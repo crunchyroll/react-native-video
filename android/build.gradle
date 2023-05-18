@@ -50,7 +50,7 @@ dependencies {
     // Mux
     api 'com.mux.stats.sdk.muxstats:MuxExoPlayer_r2_18_1:3.4.0'
 
-    compileOnly 'org.checkerframework:checker-qual:3.13.0'
+    compileOnly 'org.checkerframework:checker-qual:3.12.0'
 
     // All support libs must use the same version
     implementation "androidx.annotation:annotation:1.1.0"

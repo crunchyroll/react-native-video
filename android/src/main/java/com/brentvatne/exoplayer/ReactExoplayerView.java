@@ -1009,6 +1009,8 @@ public class ReactExoplayerView extends FrameLayout implements
         ArrayList<MediaSource> mediaSourceList = buildTextSources();
         MediaSource videoSource = buildMediaSource(self.srcUri, self.extension, drmSessionManager);
 
+        self.initializeMuxData(self);
+
         videoSource.addEventListener(this.mainHandler, this.mediaSourceEventListener);
 
         MediaSource mediaSource;
