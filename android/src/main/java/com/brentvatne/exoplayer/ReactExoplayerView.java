@@ -123,7 +123,7 @@ import com.mux.stats.sdk.core.model.CustomData;
 
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsExoPlayer;
-import static com.mux.stats.sdk.muxstats.PlayerKt.monitorWithMuxData;
+import static com.mux.stats.sdk.muxstats.ExoPlayerExtensionsKt.monitorWithMuxData;
 // End Mux
 
 import java.io.IOException;
