@@ -123,7 +123,7 @@ import com.mux.stats.sdk.core.model.CustomData;
 
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsSdkMedia3;
-import com.mux.stats.sdk.muxstats.MuxStatsExoPlayer;
+import com.mux.stats.sdk.muxstats.monitorWithMuxData;
 // End Mux
 
 import java.io.IOException;
@@ -203,7 +203,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private Timeline playerTimeline;
 
     private DataSource.Factory mediaDataSourceFactory;
-    private MuxStatsExoPlayer player;
+    private ExoPlayer player;
     private DefaultTrackSelector trackSelector;
     private boolean playerNeedsSource;
 
