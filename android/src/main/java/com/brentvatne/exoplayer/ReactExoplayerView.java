@@ -1013,6 +1013,8 @@ public class ReactExoplayerView extends FrameLayout implements
             self.player,
             self.muxCustomerVideoData
         );
+        self.muxStats.setPlayerView(self.exoPlayerView);
+        self.muxStats.enableMuxCoreDebug(true, false);
     }
 
     private void initializePlayerSource(ReactExoplayerView self, DrmSessionManager drmSessionManager) {
