@@ -124,6 +124,8 @@ import com.mux.stats.sdk.core.model.CustomData;
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsExoPlayer;
 import static com.mux.stats.sdk.muxstats.ExoPlayerExtensionsKt.monitorWithMuxData;
+
+import com.mux.stats.sdk.core.CustomOptions;
 // End Mux
 
 import java.io.IOException;
@@ -1008,12 +1010,16 @@ public class ReactExoplayerView extends FrameLayout implements
             customData
         );
 
+        CustomOptions customOptions = new CustomOptions();
+
         // Initialize Mux stats
         self.muxStats = monitorWithMuxData(
+            self.player,
             self.themedReactContext,
             self.muxOptions.getString("env_key"),
             self.exoPlayerView,
             self.muxCustomerVideoData
+            customOptions,
         );
         /*self.muxStats = new MuxStatsExoPlayer(
             self.themedReactContext,
