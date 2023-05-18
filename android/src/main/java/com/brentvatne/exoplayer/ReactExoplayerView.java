@@ -496,6 +496,9 @@ public class ReactExoplayerView extends FrameLayout implements
 
     @Override
     public void onAdEvent(AdEvent event) {
+        if (muxStats != null) {
+            // muxStats.getAdsImaSdkListener().onAdEvent(event);
+        }
         if (event == null || !isCSAIEnabled) {
             return;
         }
@@ -800,6 +803,7 @@ public class ReactExoplayerView extends FrameLayout implements
                             imaSettings.setLanguage(uiLanguage);
                             adsLoader = new ImaAdsLoader.Builder(getContext())
                                 .setAdEventListener(self)
+                                // .setAdErrorListener(self.isMuxEnabled ? self.muxStats.getAdsImaSdkListener() : null)
                                 .setImaSdkSettings(imaSettings)
                                 .setPlayAdBeforeStartPosition(shouldPlayAdBeforeStartPosition)
                                 .build();
@@ -959,7 +963,6 @@ public class ReactExoplayerView extends FrameLayout implements
         CustomerPlayerData customerPlayerData = new CustomerPlayerData();
         customerPlayerData.setPlayerName(self.muxOptions.getString("player_name"));
         customerPlayerData.setPlayerVersion(self.muxOptions.getString("player_version"));
-        customerPlayerData.setEnvironmentKey(self.muxOptions.getString("env_key"));
         if (self.muxOptions.getString("player_init_time") != null) {
             Long initTime = Long.parseLong(self.muxOptions.getString("player_init_time"));
             customerPlayerData.setPlayerInitTime(initTime);
@@ -1006,8 +1009,8 @@ public class ReactExoplayerView extends FrameLayout implements
         // Initialize Mux stats
         self.muxStats = new MuxStatsExoPlayer(
             self.themedReactContext,
+            self.muxOptions.getString("env_key"),
             self.player,
-            self.muxOptions.getString("player_name"),
             self.muxCustomerVideoData
         );
     }
