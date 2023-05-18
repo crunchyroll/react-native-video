@@ -113,6 +113,19 @@ import com.google.android.exoplayer2.source.dash.manifest.AdaptationSet;
 import com.google.android.exoplayer2.source.dash.manifest.Representation;
 import com.google.android.exoplayer2.source.dash.manifest.Descriptor;
 
+// Mux
+import com.mux.stats.sdk.core.model.CustomerData;
+import com.mux.stats.sdk.core.model.CustomerPlayerData;
+import com.mux.stats.sdk.core.model.CustomerVideoData;
+import com.mux.stats.sdk.core.model.CustomerViewData;
+import com.mux.stats.sdk.core.model.CustomerViewerData;
+import com.mux.stats.sdk.core.model.CustomData;
+
+import com.mux.stats.sdk.muxstats.MuxErrorException;
+import com.mux.stats.sdk.muxstats.MuxStatsSdkMedia3;
+import com.mux.stats.sdk.muxstats.monitorWithMuxData;
+// End Mux
+
 import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -256,6 +269,13 @@ public class ReactExoplayerView extends FrameLayout implements
     private String[] drmLicenseHeader = null; 
     private boolean controls;
     private boolean disableTruexRateLimit = false;
+
+    // Mux
+    private boolean isMuxEnabled = false;
+    private ReadableMap muxOptions = null;
+    private CustomerData muxCustomerVideoData = null;
+    private MuxStatsSdkMedia3 muxStats = null;
+
     // \ End props
 
     // DASH Offline Source
@@ -933,6 +953,58 @@ public class ReactExoplayerView extends FrameLayout implements
         return drmSessionManager;
     }
 
+    private void initializeMuxData(ReactExoplayerView self) {
+        if (!self.isMuxEnabled || self.muxOptions == null) { return; }
+
+        self.muxCustomerVideoData = new CustomerData();
+
+        // Player data
+        CustomerPlayerData customerPlayerData = new CustomerPlayerData();
+        customerPlayerData.playerName = self.muxOptions.getString("player_name");
+        customerPlayerData.playerVersion = self.muxOptions.getString("player_version");
+        customerPlayerData.playerInitTime = self.muxOptions.getString("player_init_time");
+        self.muxCustomerVideoData.customerPlayerData = customerPlayerData;
+
+        // Video data
+        CustomerVideoData customerVideoData = new CustomerVideoData();
+        customerVideoData.videoTitle = self.muxOptions.getString("video_title");
+        customerVideoData.videoId = self.muxOptions.getString("video_id");
+        customerVideoData.videoDrmType = self.muxOptions.getString("video_drm_type");
+        customerVideoData.videoSeries = self.muxOptions.getString("video_series");
+        customerVideoData.videoDuration = self.muxOptions.getString("video_duration");
+        customerVideoData.videoStreamType = self.muxOptions.getString("video_stream_type");
+        customerVideoData.videoCdn = self.muxOptions.getString("video_cdn");
+
+        if (self.srcUri != null) {
+            customerVideoData.videoSourceUrl = self.srcUri.toString();
+        }
+        self.muxCustomerVideoData.customerVideoData = customerVideoData;
+
+        // View data
+        CustomerViewData customerViewData = new CustomerViewData();
+        customerViewData.viewSessionId = UUID.randomUUID().toString();
+        self.muxCustomerVideoData.customerViewData = customerViewData;
+
+        // Viewer data
+        CustomerViewerData customerViewerData = new CustomerViewerData();
+        customerViewerData.viewerUserId = self.muxOptions.getString("viewer_user_id");
+        self.muxCustomerVideoData.customerViewerData = customerViewerData;
+
+        // Custom data
+        CustomData customData = new CustomData();
+        customData.experimentName = self.muxOptions.getString("experiment_name");
+        customData.subPropertyId = self.muxOptions.getString("sub_property_id");
+        self.muxCustomerVideoData.customData = customData;
+
+        // Initialize Mux stats
+        self.muxStats = self.player.monitorWithMuxData(
+            self.themedReactContext,
+            self.muxOptions.getString("env_key"),
+            self.exoPlayerView,
+            self.muxCustomerVideoData,
+        );
+    }
+
     private void initializePlayerSource(ReactExoplayerView self, DrmSessionManager drmSessionManager) {
         ArrayList<MediaSource> mediaSourceList = buildTextSources();
         MediaSource videoSource = buildMediaSource(self.srcUri, self.extension, drmSessionManager);
@@ -1165,6 +1237,9 @@ public class ReactExoplayerView extends FrameLayout implements
             exoPlayerView.setPlayer(null);
             if (playerControlView != null) {
                 playerControlView.setPlayer(null);
+            }
+            if (muxStats != null) {
+                muxStats.release();
             }
         }
         segments.clear();
@@ -2205,6 +2280,14 @@ public class ReactExoplayerView extends FrameLayout implements
         textTrackType = type;
         textTrackValue = value;
         setSelectedTrack(C.TRACK_TYPE_TEXT, textTrackType, textTrackValue);
+    }
+
+    public void setMuxEnabled(boolean isEnabled) {
+        this.isMuxEnabled = isEnabled;
+    }
+
+    public void setMuxOptions(@Nullable ReadableMap muxOptions) {
+        this.muxOptions = muxOptions;
     }
 
     public void setPausedModifier(boolean paused) {

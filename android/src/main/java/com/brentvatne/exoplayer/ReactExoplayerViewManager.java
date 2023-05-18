@@ -88,6 +88,8 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
     private static final String PROP_SELECTED_VIDEO_TRACK_VALUE = "value";
     private static final String PROP_HIDE_SHUTTER_VIEW = "hideShutterView";
     private static final String PROP_CONTROLS = "controls";
+    private static final String PROP_MUX_ENABLED = "isMuxEnabled";
+    private static final String PROP_MUX_OPTIONS = "muxOptions";
 
     private ReactExoplayerConfig config;
 
@@ -281,6 +283,16 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
                     ? selectedTextTrack.getDynamic(PROP_SELECTED_TEXT_TRACK_VALUE) : null;
         }
         videoView.setSelectedTextTrack(typeString, value);
+    }
+
+    @ReactProp(name = PROP_MUX_ENABLED, defaultBoolean = false)
+    public void setMuxEnabled(final ReactExoplayerView videoView, final boolean isEnabled) {
+        videoView.setMuxEnabled(isEnabled);
+    }
+
+    @ReactProp(name = PROP_MUX_OPTIONS)
+    public void setMuxOptions(final ReactExoplayerView videoView, @Nullable ReadableMap muxOptions) {
+        videoView.setMuxOptions(muxOptions);
     }
 
     @ReactProp(name = PROP_TEXT_TRACKS)
