@@ -49,7 +49,7 @@ dependencies {
 
     // Mux
     api 'com.mux.stats.sdk.muxstats:MuxExoPlayer_r2_18_1:3.4.0'
-    api 'com.mux.stats.sdk.muxstats:android:0.7.2'
+    // api 'com.mux.stats.sdk.muxstats:android:0.7.2'
 
     compileOnly 'org.checkerframework:checker-qual:3.12.0'
 
