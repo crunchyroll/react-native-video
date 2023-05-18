@@ -990,7 +990,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Viewer data
         CustomerViewerData customerViewerData = new CustomerViewerData();
-        customerViewerData.setViewerUserId(self.muxOptions.getString("viewer_user_id"));
+        // customerViewerData.setViewerUserId(self.muxOptions.getString("viewer_user_id"));
 
         // Custom data
         CustomData customData = new CustomData();
@@ -1007,6 +1007,7 @@ public class ReactExoplayerView extends FrameLayout implements
         self.muxStats = new MuxStatsExoPlayer(
             self.themedReactContext,
             self.player,
+            self.muxOptions.getString("player_name"),
             self.muxCustomerVideoData
         );
     }
