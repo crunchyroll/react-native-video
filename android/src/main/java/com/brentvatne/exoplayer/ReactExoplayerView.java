@@ -1009,7 +1009,7 @@ public class ReactExoplayerView extends FrameLayout implements
         );
 
         // Initialize Mux stats
-        self.muxStats = self.player.monitorWithMuxData(
+        self.muxStats = monitorWithMuxData(
             self.themedReactContext,
             self.muxOptions.getString("env_key"),
             self.exoPlayerView,
