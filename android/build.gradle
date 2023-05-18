@@ -1,7 +1,5 @@
 apply plugin: 'com.android.library'
 
-api 'com.mux.stats.sdk.muxstats:MuxExoPlayer_r2_18_1:3.4.0'
-
 def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
@@ -48,6 +46,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.1'
     implementation 'com.google.android.exoplayer:extension-ima:2.18.1'
     implementation 'com.truex:TruexAdRenderer-Mobile:2.1.+'
+
+    // Mux
+    api 'com.mux.stats.sdk.muxstats:MuxExoPlayer_r2_18_1:3.4.0'
 
     compileOnly 'org.checkerframework:checker-qual:3.13.0'
 
