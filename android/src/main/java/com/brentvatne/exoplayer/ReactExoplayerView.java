@@ -797,6 +797,7 @@ public class ReactExoplayerView extends FrameLayout implements
                         initializePlayerCore(self);
                     }
                     if (playerNeedsSource && srcUri != null) {
+                        self.initializeMuxData(self);
                         // Init Ads Loader
                         if (self.isCSAIEnabled) {
                             imaSettings = ImaSdkFactory.getInstance().createImaSdkSettings();
@@ -1020,8 +1021,6 @@ public class ReactExoplayerView extends FrameLayout implements
     private void initializePlayerSource(ReactExoplayerView self, DrmSessionManager drmSessionManager) {
         ArrayList<MediaSource> mediaSourceList = buildTextSources();
         MediaSource videoSource = buildMediaSource(self.srcUri, self.extension, drmSessionManager);
-
-        self.initializeMuxData(self);
 
         videoSource.addEventListener(this.mainHandler, this.mediaSourceEventListener);
 
