@@ -123,7 +123,7 @@ import com.mux.stats.sdk.core.model.CustomData;
 
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsExoPlayer;
-import com.mux.stats.sdk.muxstats.monitorWithMuxData;
+import com.mux.stats.sdk.muxstats.*;
 // End Mux
 
 import java.io.IOException;
@@ -1009,7 +1009,7 @@ public class ReactExoplayerView extends FrameLayout implements
         );
 
         // Initialize Mux stats
-        self.muxStats = self.exoPlayer.monitorWithMuxData(
+        self.muxStats = self.player.monitorWithMuxData(
             self.themedReactContext,
             self.muxOptions.getString("env_key"),
             self.exoPlayerView,
