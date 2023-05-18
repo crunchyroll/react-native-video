@@ -123,6 +123,7 @@ import com.mux.stats.sdk.core.model.CustomData;
 
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsExoPlayer;
+import com.mux.stats.sdk.muxstats.monitorWithMuxData;
 // End Mux
 
 import java.io.IOException;
@@ -973,7 +974,6 @@ public class ReactExoplayerView extends FrameLayout implements
         CustomerVideoData customerVideoData = new CustomerVideoData();
         customerVideoData.setVideoTitle(self.muxOptions.getString("video_title"));
         customerVideoData.setVideoId(self.muxOptions.getString("video_id"));
-        // customerVideoData.setVideoDrmType(self.muxOptions.getString("video_drm_type"));
         customerVideoData.setVideoSeries(self.muxOptions.getString("video_series"));
         if (self.muxOptions.getString("video_duration") != null) {
             Long videoDuration = Long.parseLong(self.muxOptions.getString("video_duration"));
@@ -990,6 +990,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // View data
         CustomerViewData customerViewData = new CustomerViewData();
+        customerViewData.setViewDrmType(self.muxOptions.getString("video_drm_type"));
         customerViewData.setViewSessionId(UUID.randomUUID().toString());
 
         // Viewer data
@@ -1008,13 +1009,19 @@ public class ReactExoplayerView extends FrameLayout implements
         );
 
         // Initialize Mux stats
-        self.muxStats = new MuxStatsExoPlayer(
+        self.muxStats = self.exoPlayer.monitorWithMuxData(
+            self.themedReactContext,
+            self.muxOptions.getString("env_key"),
+            self.exoPlayerView
+            self.muxCustomerVideoData
+        );
+        /*self.muxStats = new MuxStatsExoPlayer(
             self.themedReactContext,
             self.muxOptions.getString("env_key"),
             self.player,
             self.muxCustomerVideoData
-        );
-        self.muxStats.setPlayerView(self.exoPlayerView);
+        );*/
+        // self.muxStats.setPlayerView(self.exoPlayerView);
         self.muxStats.enableMuxCoreDebug(true, false);
     }
 
