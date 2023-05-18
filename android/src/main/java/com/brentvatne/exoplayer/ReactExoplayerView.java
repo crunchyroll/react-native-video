@@ -123,6 +123,7 @@ import com.mux.stats.sdk.core.model.CustomData;
 
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsSdkMedia3;
+import com.mux.stats.sdk.muxstats.MuxStatsExoPlayer;
 // End Mux
 
 import java.io.IOException;
@@ -202,7 +203,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private Timeline playerTimeline;
 
     private DataSource.Factory mediaDataSourceFactory;
-    private ExoPlayer player;
+    private MuxStatsExoPlayer player;
     private DefaultTrackSelector trackSelector;
     private boolean playerNeedsSource;
 
@@ -959,19 +960,25 @@ public class ReactExoplayerView extends FrameLayout implements
         CustomerPlayerData customerPlayerData = new CustomerPlayerData();
         customerPlayerData.setPlayerName(self.muxOptions.getString("player_name"));
         customerPlayerData.setPlayerVersion(self.muxOptions.getString("player_version"));
-        customerPlayerData.setPlayerInitTime(self.muxOptions.getInt("player_init_time"));
+        if (self.muxOptions.getString("player_init_time") != null) {
+            Long initTime = Long.parseLong(self.muxOptions.getString("player_init_time"));
+            customerPlayerData.setPlayerInitTime(initTime);
+        }
         
         // Video data
         CustomerVideoData customerVideoData = new CustomerVideoData();
         customerVideoData.setVideoTitle(self.muxOptions.getString("video_title"));
         customerVideoData.setVideoId(self.muxOptions.getString("video_id"));
-        customerVideoData.setVideoDrmType(self.muxOptions.getString("video_drm_type"));
+        // customerVideoData.setVideoDrmType(self.muxOptions.getString("video_drm_type"));
         customerVideoData.setVideoSeries(self.muxOptions.getString("video_series"));
-        customerVideoData.setVideoDuration(self.muxOptions.getString("video_duration"));
+        if (self.muxOptions.getString("video_duration") != null) {
+            Long videoDuration = Long.parseLong(self.muxOptions.getString("video_duration"));
+            customerVideoData.setVideoDuration(videoDuration);
+        }
         customerVideoData.setVideoStreamType(self.muxOptions.getString("video_stream_type"));
         customerVideoData.setVideoCdn(self.muxOptions.getString("video_cdn"));
-        customerVideoData.setExperimentName(self.muxOptions.getString("experiment_name"));
-        customerVideoData.setSubPropertyId(self.muxOptions.getString("sub_property_id"));
+        // customerVideoData.setExperimentName(self.muxOptions.getString("experiment_name"));
+        // customerVideoData.setSubPropertyId(self.muxOptions.getString("sub_property_id"));
 
         if (self.srcUri != null) {
             customerVideoData.setVideoSourceUrl(self.srcUri.toString());
@@ -983,7 +990,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Viewer data
         CustomerViewerData customerViewerData = new CustomerViewerData();
-        customerViewerData.setViewerUserId(self.muxOptions.getString("viewer_user_id"));
+        customerViewerData.setUserId(self.muxOptions.getString("viewer_user_id"));
 
         // Custom data
         CustomData customData = new CustomData();
