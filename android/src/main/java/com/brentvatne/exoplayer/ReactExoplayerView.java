@@ -122,9 +122,7 @@ import com.mux.stats.sdk.core.model.CustomerViewerData;
 import com.mux.stats.sdk.core.model.CustomData;
 
 import com.mux.stats.sdk.muxstats.MuxErrorException;
-import com.mux.stats.sdk.muxstats.MuxStatsSdkMedia3;
-import com.mux.stats.sdk.muxstats.monitorWithMuxData;
-import com.mux.stats.sdk.muxstats.ExoPlayer.monitorWithMuxData;
+import com.mux.stats.sdk.muxstats.MuxStatsExoPlayer;
 // End Mux
 
 import java.io.IOException;
@@ -275,7 +273,7 @@ public class ReactExoplayerView extends FrameLayout implements
     private boolean isMuxEnabled = false;
     private ReadableMap muxOptions = null;
     private CustomerData muxCustomerVideoData = null;
-    private MuxStatsSdkMedia3 muxStats = null;
+    private MuxStatsExoPlayer muxStats = null;
 
     // \ End props
 
@@ -961,6 +959,7 @@ public class ReactExoplayerView extends FrameLayout implements
         CustomerPlayerData customerPlayerData = new CustomerPlayerData();
         customerPlayerData.setPlayerName(self.muxOptions.getString("player_name"));
         customerPlayerData.setPlayerVersion(self.muxOptions.getString("player_version"));
+        customerPlayerData.setEnvironmentKey(self.muxOptions.getString("env_key"));
         if (self.muxOptions.getString("player_init_time") != null) {
             Long initTime = Long.parseLong(self.muxOptions.getString("player_init_time"));
             customerPlayerData.setPlayerInitTime(initTime);
@@ -1005,10 +1004,9 @@ public class ReactExoplayerView extends FrameLayout implements
         );
 
         // Initialize Mux stats
-        self.muxStats = self.player.monitorWithMuxData(
+        self.muxStats = new MuxStatsExoPlayer(
             self.themedReactContext,
-            self.muxOptions.getString("env_key"),
-            self.exoPlayerView,
+            self.player,
             self.muxCustomerVideoData
         );
     }
