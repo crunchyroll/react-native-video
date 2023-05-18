@@ -124,6 +124,7 @@ import com.mux.stats.sdk.core.model.CustomData;
 import com.mux.stats.sdk.muxstats.MuxErrorException;
 import com.mux.stats.sdk.muxstats.MuxStatsSdkMedia3;
 import com.mux.stats.sdk.muxstats.monitorWithMuxData;
+import com.mux.stats.sdk.muxstats.ExoPlayer.monitorWithMuxData;
 // End Mux
 
 import java.io.IOException;
@@ -990,7 +991,7 @@ public class ReactExoplayerView extends FrameLayout implements
 
         // Viewer data
         CustomerViewerData customerViewerData = new CustomerViewerData();
-        customerViewerData.setUserId(self.muxOptions.getString("viewer_user_id"));
+        customerViewerData.setViewerUserId(self.muxOptions.getString("viewer_user_id"));
 
         // Custom data
         CustomData customData = new CustomData();
