@@ -962,7 +962,7 @@ public class ReactExoplayerView extends FrameLayout implements
         customerPlayerData.setPlayerInitTime(self.muxOptions.getInt("player_init_time"));
         
         // Video data
-        CustomerVideoData customerVideoData(new CustomerVideoData());
+        CustomerVideoData customerVideoData = new CustomerVideoData();
         customerVideoData.setVideoTitle(self.muxOptions.getString("video_title"));
         customerVideoData.setVideoId(self.muxOptions.getString("video_id"));
         customerVideoData.setVideoDrmType(self.muxOptions.getString("video_drm_type"));
