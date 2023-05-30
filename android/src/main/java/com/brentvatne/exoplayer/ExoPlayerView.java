@@ -131,7 +131,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     }
 
     private void clearVideoView() {
-        Log.w("RNV", "clearVideoView()");
         if (surfaceView instanceof TextureView) {
             player.clearVideoTextureView((TextureView) surfaceView);
         } else if (surfaceView instanceof SurfaceView) {
@@ -140,7 +139,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
     }
 
     private void setVideoView() {
-        Log.w("RNV", "setVideoView()");
         if (surfaceView instanceof TextureView) {
             player.setVideoTextureView((TextureView) surfaceView);
         } else if (surfaceView instanceof SurfaceView) {
@@ -150,27 +148,19 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
 
     private void updateSurfaceView() {
         View view;
-        Log.w("RNV", "DEBUG1");
         if (!useTextureView || useSecureView) {
-            Log.w("RNV", "DEBUG2");
             if (surfaceView != null && surfaceView instanceof SurfaceView) {
-                Log.w("RNV", "DEBUG3");
                 view = surfaceView;
             } else {
-                Log.w("RNV", "DEBUG4");
                 view = new SurfaceView(context);
             }
             if (useSecureView) {
-                Log.w("RNV", "DEBUG5");
                 ((SurfaceView)view).setSecure(true);
             }
         } else {
-            Log.w("RNV", "DEBUG6");
             if (surfaceView != null && surfaceView instanceof TextureView) {
-                Log.w("RNV", "DEBUG7");
                 view = surfaceView;
             } else {
-                Log.w("RNV", "DEBUG8");
                 view = new TextureView(context);
             }
         }
@@ -183,7 +173,6 @@ public final class ExoPlayerView extends FrameLayout implements AdViewProvider {
         layout.addView(surfaceView, 0, layoutParams);
 
         if (this.player != null) {
-            Log.w("RNV", "DEBUG9");
             setVideoView();
         }
     }
