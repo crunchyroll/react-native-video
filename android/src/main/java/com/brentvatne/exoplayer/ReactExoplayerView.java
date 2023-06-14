@@ -1914,14 +1914,16 @@ public class ReactExoplayerView extends FrameLayout implements
         if (srcUri != null) {
             player.stop();
             player.clearMediaItems();
-            this.srcUri = null;
-            this.extension = null;
-            this.requestHeaders = null;
-            this.mediaDataSourceFactory = null;
-            ReactExoplayerView.offlineMediaSource = null;
-            ReactExoplayerView.offlineCacheDataSourceFactory = null;
             clearResumePosition();
         }
+
+        this.srcUri = null;
+        this.extension = null;
+        this.requestHeaders = null;
+        this.mediaDataSourceFactory = null;
+        ReactExoplayerView.offlineMediaSource = null;
+        ReactExoplayerView.offlineCacheDataSourceFactory = null;
+
         releasePlayer();
     }
 
