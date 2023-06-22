@@ -467,14 +467,18 @@ public class ReactExoplayerView extends FrameLayout implements
         }
         Log.w("truex", "Checking if ad is TrueX");
         boolean isTrueXAd = activeAd.getAdSystem().contains("trueX");
+        Log.w("truex", "ad system: " + activeAd.getAdSystem());
+        Log.w("truex", "ad desc: " + activeAd.getDescription());
         if (isTrueXAd && isTruexEnabled) {
             Log.w("truex", "Ad is TrueX");
             String vastUrl = activeAd.getDescription();
             displayInteractiveAd(vastUrl);
         } else if (isTrueXAd && !isTruexEnabled) {
-            Log.w("truex", "Ad is not TrueX");
+            Log.w("truex", "Ad is TrueX but TrueX is disabled");
             // Don't display interactive ads if TrueX is disabled
             adsLoader.skipAd();
+        } else {
+            Log.w("truex", "Ad is not TrueX");
         }
         reLayout(exoPlayerView);
     }
