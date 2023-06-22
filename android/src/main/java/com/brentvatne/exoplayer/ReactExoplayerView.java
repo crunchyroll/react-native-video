@@ -446,6 +446,7 @@ public class ReactExoplayerView extends FrameLayout implements
         if (player == null) {
             return;
         }
+        Log.w("truex", "Displaying interactive ad!");
         WritableMap payload = Arguments.createMap();
         eventEmitter.adEvent("STARTED_TRUEX", payload);
 
@@ -457,18 +458,21 @@ public class ReactExoplayerView extends FrameLayout implements
         // Start the true[X] engagement
         ViewGroup viewGroup = (ViewGroup) truexOverlayFrameLayout;
         truexAdManager = new TruexAdManager(getContext(), this);
-        truexAdManager.startAd(viewGroup, vastUrl, disableTruexRateLimit);
+        truexAdManager.startAd(viewGroup, vastUrl, true);
     }
 
     public void handleCheckTruex(AdEvent event) {
         if (activeAd == null) {
             return;
         }
+        Log.w("truex", "Checking if ad is TrueX");
         boolean isTrueXAd = activeAd.getAdSystem().contains("trueX");
         if (isTrueXAd && isTruexEnabled) {
+            Log.w("truex", "Ad is TrueX");
             String vastUrl = activeAd.getDescription();
             displayInteractiveAd(vastUrl);
         } else if (isTrueXAd && !isTruexEnabled) {
+            Log.w("truex", "Ad is not TrueX");
             // Don't display interactive ads if TrueX is disabled
             adsLoader.skipAd();
         }
