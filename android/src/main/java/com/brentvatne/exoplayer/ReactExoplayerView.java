@@ -507,7 +507,7 @@ public class ReactExoplayerView extends FrameLayout implements
                 break;
             case TAPPED:
                 eventEmitter.videoClickEvent();
-                adsLoader.discardAdBreak()
+                adsLoader.discardAdBreak();
                 break;
         }
     }
